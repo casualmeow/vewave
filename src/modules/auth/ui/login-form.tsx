@@ -1,6 +1,4 @@
-import { EyeOff, Eye } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, type LoginFields } from '../model/login-schema'
 import {
@@ -16,8 +14,6 @@ import {
 import { SecureInput } from '@/shared/ui/secure-input'
 
 export const LoginForm = () => {
-  const [showPassword, setShowPassword] = useState(false)
-
   const form = useForm<LoginFields>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
