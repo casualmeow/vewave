@@ -1,15 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { ThumbnailCropDialog } from './thumbnail-crop-dialog'
 import { ThumbnailCard } from './thumbnail-card'
 import { ThumbnailUpload } from './thumbnail-upload'
 import type { Area } from '../utils/types'
 import { useFileUpload } from '@/shared/lib/hooks/useFileUplaod'
-
-interface ThumbnailManagerProps {
-  videoSrc?: string
-  thumbnailSrc?: string
-  onThumbnailChange?: (file: File) => void
-}
 
 const initialFiles = [
   {
@@ -48,6 +42,10 @@ export const ThumbnailManager = () => {
   const maxFiles = 6
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [finalImageUrl, setFinalImageUrl] = useState<string | null>(null)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
+  const [zoom, setZoom] = useState(1)
+
   const [
     { files, isDragging, errors },
     {
@@ -65,80 +63,66 @@ export const ThumbnailManager = () => {
     multiple: true,
     maxFiles,
     initialFiles,
+    onFilesAdded: (addedFiles) => {
+      const latestFile = addedFiles[addedFiles.length - 1]
+      if (!latestFile) return
+
+      setCroppedAreaPixels(null)
+      setZoom(1)
+      setFinalImageUrl(latestFile.preview ?? null)
+      setIsDialogOpen(true)
+    },
   })
 
-  const previewUrl = files[0]?.preview || null
-  const fileId = files[0]?.id
-
-  const [finalImageUrl, setFinalImageUrl] = useState<string | null>(null)
-
-  const previousFileIdRef = useRef<string | undefined | null>(null)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
-
-  // State for zoom level
-  const [zoom, setZoom] = useState(1)
-
-  // Callback for Cropper to provide crop data - Wrap with useCallback
   const handleCropChange = useCallback((pixels: Area | null) => {
     setCroppedAreaPixels(pixels)
   }, [])
 
+  const handleOpenDialog = () => {
+    openFileDialog()
+  }
+
   useEffect(() => {
-    const currentFinalUrl = finalImageUrl
-    // Cleanup function
     return () => {
-      if (currentFinalUrl && currentFinalUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(currentFinalUrl)
+      if (finalImageUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(finalImageUrl)
       }
     }
   }, [finalImageUrl])
 
-  useEffect(() => {
-    // Check if fileId exists and is different from the previous one
-    if (fileId && fileId !== previousFileIdRef.current) {
-      setIsDialogOpen(true) // Open dialog for the new file
-      setCroppedAreaPixels(null) // Reset crop area for the new file
-      setZoom(1) // Reset zoom for the new file
-    }
-    previousFileIdRef.current = fileId
-  }, [fileId])
-
-  const dummy = () => {
-    console.log('123')
-  }
-
   return (
-    <>
-      <div className="flex flex-row gap-2">
-        {files.map((file) => (
-          <div key={file.id} className="relative">
-            <ThumbnailCard
-              src={file.preview}
-              alt={file.file.name}
-              onClose={() => removeFile(file.id)}
-            />
-          </div>
-        ))}
-        <ThumbnailUpload
-          onClick={openFileDialog}
-          handleDragOver={() => handleDragOver}
-          handleDrop={() => handleDrop}
-          handleDragEnter={() => handleDragEnter}
-          handleDragLeave={() => handleDragLeave}
-          isDragging={isDragging}
-        />
-        <input
-          {...getInputProps()}
-          className="sr-only"
-          aria-label="Upload image file"
-          tabIndex={-1}
-        />
-        <ThumbnailCropDialog
-          open={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-          imageSrc={finalImageUrl ?? ''}
-        />
-      </div>
-    </>
+    <div className="flex flex-row gap-2">
+      {files.map((file) => (
+        <div key={file.id} className="relative">
+          <ThumbnailCard
+            src={file.preview}
+            alt={file.file.name}
+            onClose={() => removeFile(file.id)}
+          />
+        </div>
+      ))}
+
+      <ThumbnailUpload
+        onClick={handleOpenDialog}
+        handleDragOver={handleDragOver}
+        handleDrop={handleDrop}
+        handleDragEnter={handleDragEnter}
+        handleDragLeave={handleDragLeave}
+        isDragging={isDragging}
+      />
+
+      <input
+        {...getInputProps()}
+        className="sr-only"
+        aria-label="Upload image file"
+        tabIndex={-1}
+      />
+
+      <ThumbnailCropDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        imageSrc={finalImageUrl ?? ''}
+      />
+    </div>
   )
 }
