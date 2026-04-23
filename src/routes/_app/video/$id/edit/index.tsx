@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { EllipsisVertical } from 'lucide-react'
@@ -28,7 +28,7 @@ import { type VideoEntity } from '@/api/video'
 import { AccessSelector } from '@/shared/ui/edit-acess-selector'
 import { ThumbnailManager } from '@/modules/thumbnail'
 
-export const Route = createFileRoute('/video/$id/edit/')({
+export const Route = createFileRoute('/_app/video/$id/edit/')({
   component: VideoEditForm,
 })
 
@@ -73,7 +73,7 @@ function VideoEditForm() {
     reset,
   } = form
 
-  const onSubmit = async (data: FormFields) => {
+  const onSubmit = (data: FormFields) => {
     console.log('Form data:', data)
   }
 
@@ -86,11 +86,11 @@ function VideoEditForm() {
     document.body.removeChild(a)
   }
 
-  const handleUpload = (file: File, field: 'thumbnail' | 'video') => {
-    const fileList = new DataTransfer()
-    fileList.items.add(file)
-    setValue(field, fileList.files, { shouldValidate: true })
-  }
+  // const handleUpload = (file: File, field: 'thumbnail' | 'video') => {
+  //   const fileList = new DataTransfer()
+  //   fileList.items.add(file)
+  //   setValue(field, fileList.files, { shouldValidate: true })
+  // }
 
   const handleAccessChange = (newAccess: 'Public' | 'Unlisted' | 'Private') => {
     setValue('access', newAccess, { shouldValidate: true })

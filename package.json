@@ -8,10 +8,11 @@
     "build": "vite build && tsc",
     "serve": "vite preview",
     "test": "vitest run",
-    "lint": "eslint",
+    "lint": "eslint --fix",
     "format": "npx prettier --write .",
     "check": "prettier --write . && eslint --fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -70,15 +71,5 @@
     "vite": "^6.1.0",
     "vitest": "^3.2.4",
     "web-vitals": "^4.2.4"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "npm run test",
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,css}": [
-      "prettier --write"
-    ]
   }
 }
