@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { EllipsisVertical } from 'lucide-react'
+import { toast } from 'sonner'
+
 import {
   Button,
   Input,
@@ -33,11 +35,11 @@ export const Route = createFileRoute('/_app/video/$id/edit/')({
 })
 
 const formSchema = z.object({
-  name: z.string().max(100),
+  name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
   playlists: z.string().optional(),
   thumbnail: z.instanceof(FileList).optional(),
-  video: z.instanceof(FileList).optional(),
+  video: z.instanceof(FileList),
   access: z.enum(['Public', 'Unlisted', 'Private']),
 })
 
@@ -54,6 +56,8 @@ const VideoData: VideoEntity = {
   createdAt: new Date(),
   updatedAt: new Date(),
 }
+
+const settings = [{ name: 'Share', onClick: () => handleShareVideo }]
 
 function VideoEditForm() {
   const form = useForm<FormFields>({
@@ -91,6 +95,11 @@ function VideoEditForm() {
   //   fileList.items.add(file)
   //   setValue(field, fileList.files, { shouldValidate: true })
   // }
+  //
+  const handleShareVideo = () => {
+    navigator.clipboard.writeText(window.location.href)
+    toast.success('Link copied to clipboard')
+  }
 
   const handleAccessChange = (newAccess: 'Public' | 'Unlisted' | 'Private') => {
     setValue('access', newAccess, { shouldValidate: true })

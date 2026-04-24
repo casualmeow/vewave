@@ -1,5 +1,5 @@
 import { type FileMetadata, type FileUploadOptions } from '../types'
-import { formatBytes } from './formatBytes'
+import { formatBytes } from '../helpers'
 
 type FileValidateOptions = Required<Pick<FileUploadOptions, 'maxSize' | 'accept'>>
 

@@ -1,53 +1,20 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
+import { useFileUpload } from '../hooks/useFileUplaod'
+import { FileConstraints } from '../constants/file-constraints'
+import { initialFiles } from '../api/getPreviews.mock'
 import { ThumbnailCropDialog } from './thumbnail-crop-dialog'
 import { ThumbnailCard } from './thumbnail-card'
 import { ThumbnailUpload } from './thumbnail-upload'
 import type { Area } from '../utils/types'
-import { useFileUpload } from '@/shared/lib/hooks/useFileUplaod'
-
-const initialFiles = [
-  {
-    name: 'image-01.jpg',
-    size: 1528737,
-    type: 'image/jpeg',
-    url: 'https://picsum.photos/1000/800?grayscale&random=1',
-    id: 'image-01-123456789',
-  },
-  {
-    name: 'image-02.jpg',
-    size: 1528737,
-    type: 'image/jpeg',
-    url: 'https://picsum.photos/1000/800?grayscale&random=2',
-    id: 'image-02-123456789',
-  },
-  {
-    name: 'image-03.jpg',
-    size: 1528737,
-    type: 'image/jpeg',
-    url: 'https://picsum.photos/1000/800?grayscale&random=3',
-    id: 'image-03-123456789',
-  },
-  {
-    name: 'image-04.jpg',
-    size: 1528737,
-    type: 'image/jpeg',
-    url: 'https://picsum.photos/1000/800?grayscale&random=4',
-    id: 'image-04-123456789',
-  },
-]
 
 export const ThumbnailManager = () => {
-  const maxSizeMB = 5
-  const maxSize = maxSizeMB * 1024 * 1024
-  const maxFiles = 6
-
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [finalImageUrl, setFinalImageUrl] = useState<string | null>(null)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
-  const [zoom, setZoom] = useState(1)
+  const [_croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
+  const [_zoom, setZoom] = useState(1)
 
   const [
-    { files, isDragging, errors },
+    { files, isDragging },
     {
       handleDragEnter,
       handleDragLeave,
@@ -59,9 +26,9 @@ export const ThumbnailManager = () => {
     },
   ] = useFileUpload({
     accept: 'image/svg+xml,image/png,image/jpeg,image/jpg,image/gif',
-    maxSize,
+    maxSize: FileConstraints.MAX_SIZE,
     multiple: true,
-    maxFiles,
+    maxFiles: FileConstraints.MAX_FILES,
     initialFiles,
     onFilesAdded: (addedFiles) => {
       const latestFile = addedFiles[addedFiles.length - 1]
@@ -73,10 +40,6 @@ export const ThumbnailManager = () => {
       setIsDialogOpen(true)
     },
   })
-
-  const handleCropChange = useCallback((pixels: Area | null) => {
-    setCroppedAreaPixels(pixels)
-  }, [])
 
   const handleOpenDialog = () => {
     openFileDialog()

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatBytes } from '@/shared/lib/hooks/useFileUplaod/utils/formatBytes'
+import { formatBytes } from '@/modules/thumbnail/hooks/useFileUplaod/helpers'
 
 describe('formatBytes', () => {
   it('returns "0 Bytes" when input is 0', () => {

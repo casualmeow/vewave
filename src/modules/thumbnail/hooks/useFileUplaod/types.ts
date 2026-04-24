@@ -14,6 +14,21 @@ export type FileWithPreview = {
   preview?: string
 }
 
+export interface ProcessIncomingFilesParams {
+  incomingFiles: Array<File>
+  currentFiles: Array<FileWithPreview>
+  maxFiles: number
+  maxSize: number
+  accept: string
+  multiple: boolean
+}
+
+export interface ProcessIncomingFilesResult {
+  nextFiles: Array<FileWithPreview>
+  addedFiles: Array<FileWithPreview>
+  errors: Array<string>
+}
+
 export type FileUploadOptions = {
   maxFiles?: number // Only used when multiple is true, defaults to Infinity
   maxSize?: number // in bytes
