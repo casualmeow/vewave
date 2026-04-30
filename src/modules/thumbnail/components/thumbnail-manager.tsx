@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { useFileUpload } from '../hooks/useFileUplaod'
 import { FileConstraints } from '../constants/file-constraints'
 import { initialFiles } from '../api/getPreviews.mock'
-import { ThumbnailCropDialog } from './thumbnail-crop-dialog'
-import { ThumbnailCard } from './thumbnail-card'
-import { ThumbnailUpload } from './thumbnail-upload'
+import { ThumbnailCropDialog } from '../ui/thumbnail-crop-dialog'
+import { ThumbnailCard } from '../ui/thumbnail-card'
+import { ThumbnailUpload } from '../ui/thumbnail-upload'
 import type { Area } from '../utils/types'
 
 export const ThumbnailManager = () => {

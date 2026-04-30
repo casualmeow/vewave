@@ -1,1 +1,1 @@
-export * from './ui/minified'
+export * from './components/minified-video-player'

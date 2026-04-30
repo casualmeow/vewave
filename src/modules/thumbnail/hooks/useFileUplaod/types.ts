@@ -29,14 +29,24 @@ export interface ProcessIncomingFilesResult {
   errors: Array<string>
 }
 
+/**
+ * File upload options
+ * @param maxFiles - Only used when multiple is true, defaults to Infinity
+ * @param maxSize - in bytes
+ * @param accept - file type filter
+ * @param multiple - Defaults to false
+ * @param initialFiles - initial files to upload
+ * @param onFilesChange - Callback when files change
+ * @param onFilesAdded - Callback when new files are added
+ */
 export type FileUploadOptions = {
-  maxFiles?: number // Only used when multiple is true, defaults to Infinity
-  maxSize?: number // in bytes
+  maxFiles?: number
+  maxSize?: number
   accept?: string
-  multiple?: boolean // Defaults to false
+  multiple?: boolean
   initialFiles?: Array<FileMetadata>
-  onFilesChange?: (files: Array<FileWithPreview>) => void // Callback when files change
-  onFilesAdded?: (addedFiles: Array<FileWithPreview>) => void // Callback when new files are added
+  onFilesChange?: (files: Array<FileWithPreview>) => void
+  onFilesAdded?: (addedFiles: Array<FileWithPreview>) => void
 }
 
 export type FileUploadState = {

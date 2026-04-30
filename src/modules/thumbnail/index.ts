@@ -1,1 +1,1 @@
-export * from './ui/thumbnail-manager'
+export * from './components/thumbnail-manager'
