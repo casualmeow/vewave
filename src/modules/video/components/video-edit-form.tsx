@@ -1,6 +1,5 @@
 import { useVideoEditForm } from '../hooks/useVideoEditForm'
-import { VideoEditDetailsSection } from './video-edit-details'
-import { VideoEditSidebar } from './video-edit-sidebar'
+import { VideoEditDetailsSection, VideoEditSidebar } from '../ui'
 import { Form } from '@/shared/ui'
 
 export function VideoEditForm() {
