@@ -20,7 +20,7 @@ export function SidebarFooter({ ...props }) {
             Settings
           </Button>
         </DialogTrigger>
-        <DialogContent className="min-w-[60vw] min-h-[80vh]">
+        <DialogContent className="min-w-[60vw] min-h-[80vh] flex flex-col">
           <DialogTitle>Settings</DialogTitle>
           <SidebarSettingsDialog />
         </DialogContent>

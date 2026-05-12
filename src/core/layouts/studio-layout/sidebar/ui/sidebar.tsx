@@ -6,11 +6,11 @@ import type { ComponentProps } from 'react'
 import { cn } from '@/shared/lib/utils'
 
 const mainLinks: Array<SidebarLink> = [
-  { label: 'Home', to: '/', icon: '#' },
-  { label: 'Channel Settings', to: '/channel-settings', icon: '#' },
-  { label: 'Analytics', to: '/analytics', icon: '#' },
-  { label: 'Content manager', to: '/content-manager', icon: '#' },
-  { label: 'Community', to: '/community', icon: '#' },
+  { label: 'Home', to: '/studio/home', icon: '#' },
+  { label: 'Channel Settings', to: '/studio/channel-settings', icon: '#' },
+  { label: 'Analytics', to: '/studio/analytics', icon: '#' },
+  { label: 'Content manager', to: '/studio/content-manager', icon: '#' },
+  { label: 'Community', to: '/studio/community', icon: '#' },
 ]
 
 export const Sidebar = ({ className, ...props }: ComponentProps<'nav'>) => {
