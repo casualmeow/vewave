@@ -1,12 +1,8 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router'
-import { Header } from '@/pages/_layout/header/ui/header'
-import { Sidebar } from '@/pages/_layout/sidebar'
+import { Outlet } from '@tanstack/react-router'
+import { Header } from './header'
+import { Sidebar } from './sidebar'
 
-export const Route = createFileRoute('/_app')({
-  component: AppLayout,
-})
-
-function AppLayout() {
+export function StudioLayout() {
   return (
     <div className="bg-sidebar min-h-screen">
       <div className="p-4 flex items-start">

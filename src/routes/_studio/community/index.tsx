@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_app/content-manager/')({
+export const Route = createFileRoute('/_studio/community/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  return <div>Hello "/_layout/content-manager/"!</div>
+  return <div>Hello "/_layout/community/"!</div>
 }
