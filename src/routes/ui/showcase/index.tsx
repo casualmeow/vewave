@@ -20,7 +20,7 @@ import {
   HeaderNav,
   HeaderNavItem,
   HeaderSpacer,
-} from '@/shared/ui/header'
+} from '@/components/header'
 
 export const Route = createFileRoute('/ui/showcase/')({
   component: UiShowcasePage,

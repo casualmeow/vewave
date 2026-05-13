@@ -1,6 +1,6 @@
 import { type Ref, type HTMLAttributes } from 'react'
-import { type HeaderSize } from './types'
-import { HEADER_HEIGHT } from './config'
+import { HEADER_HEIGHT } from '../constants'
+import { type HeaderSize } from '../types'
 
 export interface HeaderSpacerProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>

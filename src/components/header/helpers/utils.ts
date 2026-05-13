@@ -1,4 +1,4 @@
-import { type CSSLength } from './types'
+import { type CSSLength } from '../types'
 
 export function toWidth(value: CSSLength) {
   return typeof value === 'number' ? `${Math.max(0, value)}%` : value

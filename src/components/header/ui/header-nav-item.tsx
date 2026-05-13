@@ -1,6 +1,6 @@
 import { type Ref, type AnchorHTMLAttributes, type MouseEvent } from 'react'
 import { type VariantProps } from 'class-variance-authority'
-import { headerNavItemVariants } from './header.variants'
+import { headerNavItemVariants } from '../constants'
 import { cn } from '@/shared/lib/utils'
 
 export interface HeaderNavItemProps

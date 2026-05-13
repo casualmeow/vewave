@@ -1,1 +1,3 @@
-export * from './resizable-card'
+export { ExpandableCards } from './resizable-card'
+
+export * from './types'

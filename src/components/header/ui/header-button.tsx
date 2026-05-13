@@ -1,6 +1,6 @@
 import { type Ref, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { type VariantProps } from 'class-variance-authority'
-import { headerButtonVariants } from './header.variants'
+import { headerButtonVariants } from '../constants'
 import { cn } from '@/shared/lib/utils'
 
 export interface HeaderButtonProps
