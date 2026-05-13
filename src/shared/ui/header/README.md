@@ -1,8 +1,8 @@
-# PremiumHeader usage
+# Header usage
 
-`PremiumHeader` is a scroll-reactive header component built for React 19. It supports glass/solid visual variants, animated width collapse, optional hide-on-scroll behavior, navigation slots, action slots, manual collapse mode, reduced-motion handling, and a small set of composition helpers:
+`Header` is a scroll-reactive header component built for React 19. It supports glass/solid visual variants, animated width collapse, optional hide-on-scroll behavior, navigation slots, action slots, manual collapse mode, reduced-motion handling, and a small set of composition helpers:
 
-- `PremiumHeader`
+- `Header`
 - `HeaderLogo`
 - `HeaderNav`
 - `HeaderNavItem`
@@ -40,8 +40,8 @@ import {
   HeaderNav,
   HeaderNavItem,
   HeaderSpacer,
-  PremiumHeader,
-} from '@/shared/ui/premium-header'
+  Header,
+} from '@/shared/ui/header'
 ```
 
 Adjust the import path to match your project.
@@ -61,13 +61,13 @@ import {
   HeaderNav,
   HeaderNavItem,
   HeaderSpacer,
-  PremiumHeader,
-} from '@/shared/ui/premium-header'
+  Header,
+} from '@/shared/ui/header'
 
 export function MarketingLayoutHeader() {
   return (
     <>
-      <PremiumHeader
+      <Header
         logo={<HeaderLogo text="Vewave" href="/" />}
         navigation={
           <HeaderNav>
