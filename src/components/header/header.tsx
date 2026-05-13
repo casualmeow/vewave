@@ -384,8 +384,4 @@ export function Header({
   )
 }
 
-/* -----------------------------------------------------------------------------
- * Exports for external composition
- * -------------------------------------------------------------------------- */
-
 export { headerVariants, headerButtonVariants, headerNavItemVariants }

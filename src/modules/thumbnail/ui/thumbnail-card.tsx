@@ -8,7 +8,7 @@ interface ThumbnailCardProps {
   onClose: () => void
 }
 
-export const ThumbnailCard = ({ src, alt, onActive, onClose }: ThumbnailCardProps) => {
+export const ThumbnailCard = ({ src, alt, onClose }: ThumbnailCardProps) => {
   return (
     <div className="w-fit">
       <img src={src} alt={alt} className="object-cover rounded-md aspect-video w-48" />

@@ -7,8 +7,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  DialogClose,
 } from '@/shared/ui'
 
 interface ThumbnailCropDialogProps {
