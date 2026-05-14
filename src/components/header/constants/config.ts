@@ -1,4 +1,4 @@
-import { type HeaderSize, type HeaderBlurIntensity } from './types'
+import { type HeaderBlurIntensity, type HeaderSize } from '../types'
 
 export const HEADER_HEIGHT: Record<HeaderSize, number> = {
   sm: 48,

@@ -41,7 +41,7 @@ import {
   HeaderNavItem,
   HeaderSpacer,
   Header,
-} from '@/shared/ui/header'
+} from '@/components/header'
 ```
 
 Adjust the import path to match your project.
@@ -62,7 +62,7 @@ import {
   HeaderNavItem,
   HeaderSpacer,
   Header,
-} from '@/shared/ui/header'
+} from '@/components/header'
 
 export function MarketingLayoutHeader() {
   return (
@@ -110,8 +110,8 @@ import {
   HeaderNav,
   HeaderNavItem,
   HeaderSpacer,
-  PremiumHeader,
-} from '@/shared/ui/header'
+  Header,
+} from '@/components/header'
 
 interface PublicLayoutProps {
   children: ReactNode
@@ -120,7 +120,7 @@ interface PublicLayoutProps {
 export function PublicLayout({ children }: PublicLayoutProps) {
   return (
     <>
-      <PremiumHeader
+      <Header
         variant="glass"
         size="md"
         position="fixed"
@@ -157,7 +157,7 @@ collapseBehavior = 'scroll'
 Its width and radius animate according to page scroll progress. The collapse state becomes `collapsed` when the progress crosses `collapseThreshold`.
 
 ```tsx
-<PremiumHeader
+<Header
   initialWidth={92}
   collapsedWidth={48}
   scrollDistance={220}
@@ -181,7 +181,7 @@ Its width and radius animate according to page scroll progress. The collapse sta
 - a CSS length string, for example `"min(92vw, 72rem)"`.
 
 ```tsx
-<PremiumHeader initialWidth="min(92vw, 72rem)" collapsedWidth="min(60vw, 44rem)" maxWidth="72rem" />
+<Header initialWidth="min(92vw, 72rem)" collapsedWidth="min(60vw, 44rem)" maxWidth="72rem" />
 ```
 
 When string widths are used, it is best to keep both widths in compatible CSS units or expressions.
@@ -193,7 +193,7 @@ When string widths are used, it is best to keep both widths in compatible CSS un
 Set `hideOnScrollDown` to move the header out of view when scrolling down and reveal it when scrolling up.
 
 ```tsx
-<PremiumHeader
+<Header
   hideOnScrollDown
   revealAtTop={24}
   logo={<HeaderLogo text="Vewave" href="/" />}
@@ -219,13 +219,13 @@ Use manual mode when collapse should be controlled by application state rather t
 'use client'
 
 import { useState } from 'react'
-import { HeaderButton, HeaderLogo, PremiumHeader } from '@/shared/ui/header'
+import { HeaderButton, HeaderLogo, Header } from '@/components/header'
 
 export function ManualCollapseHeader() {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
-    <PremiumHeader
+    <Header
       collapseBehavior="manual"
       collapsed={collapsed}
       logo={<HeaderLogo text="Dashboard" href="/dashboard" />}
@@ -242,7 +242,7 @@ export function ManualCollapseHeader() {
 `defaultCollapsed` is a fallback value used when `collapsed` is omitted. It does not create an internally toggled uncontrolled header state.
 
 ```tsx
-<PremiumHeader
+<Header
   collapseBehavior="manual"
   defaultCollapsed
   logo={<HeaderLogo text="Dashboard" href="/dashboard" />}
@@ -256,7 +256,7 @@ export function ManualCollapseHeader() {
 Use `collapseBehavior="none"` when the component should stay fully expanded.
 
 ```tsx
-<PremiumHeader
+<Header
   collapseBehavior="none"
   logo={<HeaderLogo text="Admin" href="/admin" />}
   actions={<HeaderButton variant="ghost">Settings</HeaderButton>}
@@ -270,7 +270,7 @@ Use `collapseBehavior="none"` when the component should stay fully expanded.
 The component emits collapse-state changes through `onCollapsedChange`.
 
 ```tsx
-<PremiumHeader
+<Header
   onCollapsedChange={(collapsed) => {
     console.log('Header collapsed:', collapsed)
   }}
@@ -286,7 +286,7 @@ The callback fires only when the boolean state actually changes.
 `hideNavOnCollapse` is enabled by default. When the header becomes collapsed, the internal navigation region fades and becomes non-interactive.
 
 ```tsx
-<PremiumHeader
+<Header
   hideNavOnCollapse
   navigation={
     <HeaderNav>
@@ -300,7 +300,7 @@ The callback fires only when the boolean state actually changes.
 Set it to `false` to keep navigation visible even in the collapsed header.
 
 ```tsx
-<PremiumHeader hideNavOnCollapse={false} />
+<Header hideNavOnCollapse={false} />
 ```
 
 The internal navigation wrapper is hidden below the `md` breakpoint by the component styles. For mobile navigation, render a menu trigger inside `actions`, or provide your own mobile-specific UI through `children`.
@@ -406,16 +406,16 @@ An accessible label is recommended for icon-only buttons.
 
 ## Slot composition
 
-`PremiumHeader` exposes four content areas:
+`Header` exposes four content areas:
 
 ```tsx
-<PremiumHeader
+<Header
   logo={...}
   navigation={...}
   actions={...}
 >
   Optional custom trailing content
-</PremiumHeader>
+</Header>
 ```
 
 The `children` slot is rendered after the built-in `actions` slot inside the header inner layout.
@@ -427,7 +427,7 @@ The `children` slot is rendered after the built-in `actions` slot inside the hea
 Use `slotClassNames` to customize internal regions without rewriting the component.
 
 ```tsx
-<PremiumHeader
+<Header
   slotClassNames={{
     inner: 'gap-4',
     logo: 'mr-2',
@@ -450,31 +450,26 @@ slotClassNames?: {
 }
 ```
 
-The exact exported type comes from `PremiumHeaderSlotClassNames`.
+The exact exported type comes from `HeaderSlotClassNames`.
 
 ---
 
 ## Motion and animation controls
 
 ```tsx
-<PremiumHeader
-  motionPreset="spring"
-  smoothScrollMotion
-  showGlow
-  glowColor="rgba(99, 102, 241, 0.38)"
-/>
+<Header motionPreset="spring" smoothScrollMotion showGlow glowColor="rgba(99, 102, 241, 0.38)" />
 ```
 
 The exact available `motionPreset` values are defined by `HeaderMotionPreset` in `./types` and the matching presets in `./config`.
 
-`PremiumHeader` automatically respects the user's reduced-motion preference via Motion's `useReducedMotion`.
+`Header` automatically respects the user's reduced-motion preference via Motion's `useReducedMotion`.
 
 ---
 
 ## Visual customization
 
 ```tsx
-<PremiumHeader
+<Header
   variant="glass"
   size="lg"
   blurIntensity="lg"
@@ -497,12 +492,12 @@ The component follows React 19 ref-as-prop style.
 'use client'
 
 import { useRef } from 'react'
-import { PremiumHeader } from '@/shared/ui/premium-header'
+import { Header } from '@/components/header'
 
 export function HeaderWithRef() {
   const headerRef = useRef<HTMLElement>(null)
 
-  return <PremiumHeader ref={headerRef} />
+  return <Header ref={headerRef} />
 }
 ```
 
@@ -565,13 +560,13 @@ import {
   HeaderNav,
   HeaderNavItem,
   HeaderSpacer,
-  PremiumHeader,
-} from '@/shared/ui/header'
+  Header,
+} from '@/components/header'
 
 export function LandingHeader() {
   return (
     <>
-      <PremiumHeader
+      <Header
         variant="glass"
         size="lg"
         initialWidth="min(94vw, 76rem)"
@@ -612,13 +607,13 @@ export function LandingHeader() {
 'use client'
 
 import { useState } from 'react'
-import { HeaderButton, HeaderLogo, PremiumHeader } from '@/shared/ui/premium-header'
+import { HeaderButton, HeaderLogo, Header } from '@/components/header'
 
 export function DashboardHeader() {
   const [compact, setCompact] = useState(false)
 
   return (
-    <PremiumHeader
+    <Header
       variant="glass"
       collapseBehavior="manual"
       collapsed={compact}
@@ -643,7 +638,7 @@ export function DashboardHeader() {
 The module also exports variant builders for external composition:
 
 ```ts
-export { premiumHeaderVariants, headerButtonVariants, headerNavItemVariants }
+export { HeaderVariants, headerButtonVariants, headerNavItemVariants }
 ```
 
 Use them when you need a separate element to visually match the header system.
@@ -652,12 +647,12 @@ Use them when you need a separate element to visually match the header system.
 
 ## Summary
 
-Use `PremiumHeader` when you need a polished, reusable top-level header with animated collapse behavior and slot-based composition.
+Use `Header` when you need a polished, reusable top-level header with animated collapse behavior and slot-based composition.
 
 A good default setup is:
 
 ```tsx
-<PremiumHeader
+<Header
   logo={<HeaderLogo text="Brand" href="/" />}
   navigation={<HeaderNav>{/* items */}</HeaderNav>}
   actions={<HeaderButton>Action</HeaderButton>}

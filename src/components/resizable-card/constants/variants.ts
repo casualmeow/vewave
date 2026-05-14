@@ -3,8 +3,8 @@ import { cva } from 'class-variance-authority'
 export const expandableCardVariants = cva(
   [
     'group flex w-full items-center justify-between gap-4',
-    'border text-left shadow-sm transition',
-    'hover:-translate-y-0.5 hover:shadow-md',
+    'border text-left shadow-sm transition-[background-color,border-color,box-shadow,color]',
+    'hover:shadow-md',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-background',
   ],
@@ -25,6 +25,40 @@ export const expandableCardVariants = cva(
         sm: 'min-h-20 rounded-2xl p-3',
         default: 'min-h-28 rounded-3xl p-4',
         lg: 'min-h-32 rounded-[2rem] p-5',
+      },
+      active: {
+        true: 'ring-2 ring-ring ring-offset-2 ring-offset-background',
+        false: '',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+      active: false,
+    },
+  },
+)
+
+export const expandableMediaCardVariants = cva(
+  [
+    'group flex h-full w-full flex-col text-left transition-[background-color,border-color,box-shadow,color]',
+    'hover:bg-neutral-50 dark:hover:bg-neutral-800',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+    'focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+  ],
+  {
+    variants: {
+      variant: {
+        default: 'bg-transparent text-card-foreground',
+        secondary: 'bg-secondary/40 text-secondary-foreground hover:bg-secondary/70',
+        outline: 'border border-border/70 bg-background text-foreground hover:bg-accent/50',
+        ghost: 'bg-transparent text-foreground hover:bg-accent/70',
+        destructive: 'bg-destructive/5 text-foreground hover:bg-destructive/10',
+      },
+      size: {
+        sm: 'min-h-72 rounded-xl p-3',
+        default: 'min-h-80 rounded-xl p-4',
+        lg: 'min-h-96 rounded-2xl p-5',
       },
       active: {
         true: 'ring-2 ring-ring ring-offset-2 ring-offset-background',
@@ -165,18 +199,21 @@ export const expandableContentVariants = cva('min-h-0 flex-1 overflow-auto p-5 t
 export const expandableResizeHandleVariants = cva(
   [
     'absolute bottom-2 right-2 z-20 grid cursor-nwse-resize place-items-center',
-    'rounded-lg transition',
+    'touch-none rounded-lg bg-background/85 shadow-sm ring-1 ring-border/80 transition',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
   ],
   {
     variants: {
       variant: {
-        default: 'text-muted-foreground hover:bg-muted hover:text-foreground',
+        default: 'text-muted-foreground hover:bg-muted hover:text-foreground hover:ring-ring/70',
         secondary:
-          'text-secondary-foreground/70 hover:bg-secondary-foreground/10 hover:text-secondary-foreground',
-        outline: 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-        ghost: 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-        destructive: 'text-destructive/80 hover:bg-destructive/10 hover:text-destructive',
+          'text-secondary-foreground/70 hover:bg-secondary-foreground/10 hover:text-secondary-foreground hover:ring-secondary-foreground/30',
+        outline:
+          'text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:ring-ring/70',
+        ghost:
+          'text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:ring-ring/70',
+        destructive:
+          'text-destructive/80 hover:bg-destructive/10 hover:text-destructive hover:ring-destructive/35',
       },
       size: {
         sm: 'h-7 w-7',

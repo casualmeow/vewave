@@ -5,7 +5,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react'
 import { type VariantProps } from 'class-variance-authority'
-import { type expandableCardVariants } from './constants/variants'
+import { type expandableCardVariants } from '../constants/variants'
 
 export type CardRenderState = {
   expanded: boolean
@@ -14,6 +14,8 @@ export type CardRenderState = {
 }
 
 export type ExpandableCardVariant = 'default' | 'secondary' | 'outline' | 'ghost' | 'destructive'
+
+export type ExpandableCardPresentation = 'inline' | 'media'
 
 export type ExpandableCardSizeVariant = 'sm' | 'default' | 'lg'
 

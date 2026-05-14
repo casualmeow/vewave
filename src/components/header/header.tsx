@@ -1,6 +1,12 @@
 'use client'
 
-import { type ComponentPropsWithoutRef, type FocusEvent, type ReactNode, type Ref } from 'react'
+import {
+  type ComponentPropsWithoutRef,
+  type FocusEvent,
+  type ReactNode,
+  type Ref,
+  type RefObject,
+} from 'react'
 import { motion } from 'motion/react'
 
 import {
@@ -20,7 +26,7 @@ import {
   type HeaderPosition,
   type HeaderSize,
   type HeaderVariant,
-  type PremiumHeaderSlotClassNames,
+  type HeaderSlotClassNames,
 } from './types'
 import { toLength } from './helpers'
 import { useHeaderCollapsedState, useHeaderMotion, useHeaderVisibility } from './hooks'
@@ -45,7 +51,7 @@ export interface HeaderProps extends MotionHeaderNativeProps {
   actions?: ReactNode
   children?: ReactNode
 
-  slotClassNames?: PremiumHeaderSlotClassNames
+  slotClassNames?: HeaderSlotClassNames
 
   initialWidth?: CSSLength
   collapsedWidth?: CSSLength
@@ -73,6 +79,12 @@ export interface HeaderProps extends MotionHeaderNativeProps {
   smoothScrollMotion?: boolean
   hideOnScrollDown?: boolean
   revealAtTop?: number
+
+  /**
+   * Optional scroll container used for scroll-linked collapse and hide-on-scroll.
+   * Defaults to document scroll when omitted.
+   */
+  scrollContainerRef?: RefObject<HTMLElement | null>
 }
 
 export function Header({
@@ -115,6 +127,7 @@ export function Header({
   smoothScrollMotion = true,
   hideOnScrollDown = false,
   revealAtTop = 20,
+  scrollContainerRef,
 
   onFocusCapture,
   ...props
@@ -141,6 +154,7 @@ export function Header({
     borderRadiusCollapsed,
     motionPreset,
     smoothScrollMotion,
+    scrollContainerRef,
   })
 
   const isCollapsed = useHeaderCollapsedState({

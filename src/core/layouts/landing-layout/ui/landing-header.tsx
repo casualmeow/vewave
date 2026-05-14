@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowRight, Play } from 'lucide-react'
 
-import { Header, HeaderButton, HeaderLogo, HeaderNav, HeaderNavItem } from '@/shared/ui/header'
+import { Header, HeaderButton, HeaderLogo, HeaderNav, HeaderNavItem } from '@/components/header'
 
 export function LandingHeader() {
   const navigate = useNavigate()

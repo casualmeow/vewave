@@ -1,6 +1,7 @@
 'use client'
 
-import { LayoutGroup } from 'motion/react'
+import { LayoutGroup, useReducedMotion } from 'motion/react'
+import { resolveResizableCardAnimation } from './animations'
 import { DEFAULT_COMPACT_SIZE } from './constants'
 import { useDialogResize, useExpandableCards, useExpandableCardModalEffects } from './hooks'
 import { ExpandableCardDialog, ExpandableCardList } from './ui'
@@ -14,9 +15,13 @@ export function ExpandableCards<T extends ExpandableCardItem>({
   lockBodyScroll = true,
   compactSize,
   expandedSize,
+  presentation = 'inline',
+  animationPreset,
+  transitionPreset,
   onActiveItemChange,
   ...props
 }: ExpandableCardsProps<T>) {
+  const shouldReduceMotion = useReducedMotion()
   const controller = useExpandableCards({
     items,
     onActiveItemChange,
@@ -37,10 +42,19 @@ export function ExpandableCards<T extends ExpandableCardItem>({
     ...compactSize,
   }
 
+  const animation = resolveResizableCardAnimation({
+    presentation,
+    animationPreset,
+    transitionPreset,
+    reducedMotion: Boolean(shouldReduceMotion),
+  })
+
   return (
     <LayoutGroup id={controller.scopeId}>
       <ExpandableCardList
         {...props}
+        presentation={presentation}
+        animation={animation}
         items={items}
         scopeId={controller.scopeId}
         activeId={controller.activeId}
@@ -51,6 +65,8 @@ export function ExpandableCards<T extends ExpandableCardItem>({
 
       <ExpandableCardDialog
         {...props}
+        presentation={presentation}
+        animation={animation}
         activeItem={controller.activeItem}
         scopeId={controller.scopeId}
         dialogSize={resize.dialogSize}
@@ -63,4 +79,8 @@ export function ExpandableCards<T extends ExpandableCardItem>({
       />
     </LayoutGroup>
   )
+}
+
+export function ResizableCard<T extends ExpandableCardItem>(props: ExpandableCardsProps<T>) {
+  return <ExpandableCards {...props} />
 }

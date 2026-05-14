@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { type RefObject, useEffect } from 'react'
 import { useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
 
 import { SPRING_PRESETS } from '../constants'
@@ -23,6 +23,7 @@ type UseHeaderMotionParams = {
   borderRadiusCollapsed: number
   motionPreset: HeaderMotionPreset
   smoothScrollMotion: boolean
+  scrollContainerRef?: RefObject<HTMLElement | null>
 }
 
 export function useHeaderMotion({
@@ -37,9 +38,10 @@ export function useHeaderMotion({
   borderRadiusCollapsed,
   motionPreset,
   smoothScrollMotion,
+  scrollContainerRef,
 }: UseHeaderMotionParams) {
   const prefersReducedMotion = useReducedMotion()
-  const { scrollY } = useScroll()
+  const { scrollY } = useScroll({ container: scrollContainerRef })
 
   const safeScrollDistance = Math.max(scrollDistance, 1)
   const safeCollapseThreshold = clamp(collapseThreshold, 0, 1)

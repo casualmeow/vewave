@@ -1,7 +1,7 @@
 import { Outlet } from '@tanstack/react-router'
 
 import { LandingHeader } from './landing-header'
-import { HeaderSpacer } from '@/shared/ui/header'
+import { HeaderSpacer } from '@/components/header'
 
 export function LandingLayout() {
   return (

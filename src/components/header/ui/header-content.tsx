@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react'
 import { type MotionValue, motion } from 'motion/react'
 
-import { type PremiumHeaderSlotClassNames } from '../types'
+import { type HeaderSlotClassNames } from '../types'
 
 import { cn } from '@/shared/lib/utils'
 
@@ -10,7 +10,7 @@ type HeaderContentProps = {
   navigation?: ReactNode
   actions?: ReactNode
   children?: ReactNode
-  slotClassNames?: PremiumHeaderSlotClassNames
+  slotClassNames?: HeaderSlotClassNames
   navigationLabel: string
   hideNavOnCollapse: boolean
   isCollapsed: boolean

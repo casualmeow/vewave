@@ -21,10 +21,12 @@ export type CSSVariableStyle = MotionHeaderStyle & {
   '--header-glow'?: string
 }
 
-export interface PremiumHeaderSlotClassNames {
+export interface HeaderSlotClassNames {
   inner?: string
   logo?: string
   navigation?: string
   actions?: string
   children?: string
 }
+
+export type PremiumHeaderSlotClassNames = HeaderSlotClassNames

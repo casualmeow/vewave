@@ -1,4 +1,4 @@
-import { type ExpandableCardItem, type ExpandableCardsProps } from './types'
+import { type ExpandableCardItem, type ExpandableCardsProps } from '../types'
 
 export const DEFAULT_COMPACT_SIZE = {
   width: '100%',

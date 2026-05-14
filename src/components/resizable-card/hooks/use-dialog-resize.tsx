@@ -94,6 +94,15 @@ export function useDialogResize(
 
       const previousUserSelect = document.body.style.userSelect
       document.body.style.userSelect = 'none'
+      const target = event.currentTarget
+
+      if (target.setPointerCapture) {
+        try {
+          target.setPointerCapture(event.pointerId)
+        } catch {
+          // Pointer capture can fail if the pointer is already released.
+        }
+      }
 
       const handlePointerMove = (moveEvent: PointerEvent) => {
         setDialogSize(
@@ -104,14 +113,32 @@ export function useDialogResize(
         )
       }
 
-      const handlePointerUp = () => {
+      const cleanupResize = () => {
         document.body.style.userSelect = previousUserSelect
         window.removeEventListener('pointermove', handlePointerMove)
         window.removeEventListener('pointerup', handlePointerUp)
+        window.removeEventListener('pointercancel', handlePointerCancel)
+
+        if (target.hasPointerCapture?.(event.pointerId)) {
+          try {
+            target.releasePointerCapture(event.pointerId)
+          } catch {
+            // Ignore stale pointer capture release attempts.
+          }
+        }
+      }
+
+      const handlePointerUp = () => {
+        cleanupResize()
+      }
+
+      const handlePointerCancel = () => {
+        cleanupResize()
       }
 
       window.addEventListener('pointermove', handlePointerMove)
       window.addEventListener('pointerup', handlePointerUp)
+      window.addEventListener('pointercancel', handlePointerCancel)
     },
     [dialogSize, getClampedDialogSize, resizable],
   )

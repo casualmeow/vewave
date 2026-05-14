@@ -8,12 +8,16 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
+  {
+    ignores: ['dist/**', 'eslint.config.js', 'prettier.config.js', 'vite.config.js'],
+  },
   ...tanstackConfig,
   {
     languageOptions: {
       parserOptions: {
-        project: './tsconfig.json',
         tsconfigRootDir: __dirname,
+        project: null,
+        projectService: true,
       },
     },
     rules: {
@@ -21,6 +25,5 @@ export default [
       'import/consistent-type-specifier-style': 'off',
       '@typescript-eslint/no-unnecessary-condition': 'off',
     },
-    ignores: ['vite.config.js'],
   },
 ]
