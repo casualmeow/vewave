@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 
-export const expandableCardVariants = cva(
+export const resizableCardVariants = cva(
   [
     'group flex w-full items-center justify-between gap-4',
     'border text-left shadow-sm transition-[background-color,border-color,box-shadow,color]',
@@ -39,26 +39,29 @@ export const expandableCardVariants = cva(
   },
 )
 
-export const expandableMediaCardVariants = cva(
+export const resizableMediaCardVariants = cva(
   [
-    'group flex h-full w-full flex-col text-left transition-[background-color,border-color,box-shadow,color]',
-    'hover:bg-neutral-50 dark:hover:bg-neutral-800',
+    'group flex h-full w-full flex-col overflow-hidden border text-left shadow-sm',
+    'transition-[background-color,border-color,box-shadow,color] hover:shadow-xl',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-background',
   ],
   {
     variants: {
       variant: {
-        default: 'bg-transparent text-card-foreground',
-        secondary: 'bg-secondary/40 text-secondary-foreground hover:bg-secondary/70',
-        outline: 'border border-border/70 bg-background text-foreground hover:bg-accent/50',
-        ghost: 'bg-transparent text-foreground hover:bg-accent/70',
-        destructive: 'bg-destructive/5 text-foreground hover:bg-destructive/10',
+        default: 'border-border/70 bg-card text-card-foreground hover:border-border',
+        secondary:
+          'border-secondary/30 bg-secondary/55 text-secondary-foreground hover:bg-secondary/70',
+        outline: 'border-input bg-background text-foreground hover:bg-accent/30',
+        ghost:
+          'border-border/50 bg-background/80 text-foreground shadow-none hover:bg-accent/45 hover:shadow-md',
+        destructive:
+          'border-destructive/25 bg-destructive/5 text-foreground hover:bg-destructive/10',
       },
       size: {
-        sm: 'min-h-72 rounded-xl p-3',
-        default: 'min-h-80 rounded-xl p-4',
-        lg: 'min-h-96 rounded-2xl p-5',
+        sm: 'min-h-72 rounded-2xl p-2',
+        default: 'min-h-80 rounded-3xl p-2.5',
+        lg: 'min-h-96 rounded-[2rem] p-3',
       },
       active: {
         true: 'ring-2 ring-ring ring-offset-2 ring-offset-background',
@@ -73,7 +76,7 @@ export const expandableMediaCardVariants = cva(
   },
 )
 
-export const expandableDialogVariants = cva(
+export const resizableDialogVariants = cva(
   ['relative flex max-h-full max-w-full flex-col overflow-hidden', 'border shadow-2xl'],
   {
     variants: {
@@ -97,7 +100,7 @@ export const expandableDialogVariants = cva(
   },
 )
 
-export const expandableActionVariants = cva(
+export const resizableActionVariants = cva(
   [
     'inline-flex items-center justify-center rounded-full',
     'font-semibold transition',
@@ -151,7 +154,7 @@ export const expandableActionVariants = cva(
   },
 )
 
-export const expandableIconButtonVariants = cva(
+export const resizableIconButtonVariants = cva(
   [
     'grid place-items-center rounded-full border shadow-sm backdrop-blur transition',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
@@ -181,7 +184,7 @@ export const expandableIconButtonVariants = cva(
   },
 )
 
-export const expandableContentVariants = cva('min-h-0 flex-1 overflow-auto p-5 text-sm leading-7', {
+export const resizableContentVariants = cva('min-h-0 flex-1 overflow-auto p-5 text-sm leading-7', {
   variants: {
     variant: {
       default: 'text-muted-foreground',
@@ -196,7 +199,7 @@ export const expandableContentVariants = cva('min-h-0 flex-1 overflow-auto p-5 t
   },
 })
 
-export const expandableResizeHandleVariants = cva(
+export const resizableResizeHandleVariants = cva(
   [
     'absolute bottom-2 right-2 z-20 grid cursor-nwse-resize place-items-center',
     'touch-none rounded-lg bg-background/85 shadow-sm ring-1 ring-border/80 transition',

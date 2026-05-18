@@ -1,13 +1,13 @@
 import { CardListItem } from './card-list-item'
 import type {
   CompactCardSize,
-  ExpandableCardItem,
-  ExpandableCardsProps,
+  ResizableCardItem,
+  ResizableCardsProps,
   ResizableCardResolvedTransition,
 } from '../types'
 import { cx } from '@/shared/lib/utils'
 
-type ExpandableCardListProps<T extends ExpandableCardItem> = ExpandableCardsProps<T> & {
+type ResizableCardListProps<T extends ResizableCardItem> = ResizableCardsProps<T> & {
   scopeId: string
   activeId: string | null
   compactSize: CompactCardSize
@@ -16,7 +16,7 @@ type ExpandableCardListProps<T extends ExpandableCardItem> = ExpandableCardsProp
   closeItem: () => void
 }
 
-export function ExpandableCardList<T extends ExpandableCardItem>({
+export function ResizableCardList<T extends ResizableCardItem>({
   items,
   scopeId,
   activeId,
@@ -28,13 +28,11 @@ export function ExpandableCardList<T extends ExpandableCardItem>({
   listClassName,
   presentation = 'inline',
   ...props
-}: ExpandableCardListProps<T>) {
+}: ResizableCardListProps<T>) {
   const defaultListClassName =
     presentation === 'media'
-      ? 'mx-auto grid w-full max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3'
-      : presentation === 'standard'
-        ? 'mx-auto grid w-full max-w-2xl gap-4'
-        : 'mx-auto grid w-full max-w-3xl gap-3'
+      ? 'mx-auto grid w-full max-w-5xl gap-5 sm:grid-cols-2 lg:grid-cols-3'
+      : 'mx-auto grid w-full max-w-3xl gap-3'
 
   return (
     <div className={className}>

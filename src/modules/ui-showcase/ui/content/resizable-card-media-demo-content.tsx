@@ -1,8 +1,8 @@
-import type { ExpandableCardItem } from '@/components/resizable-card'
+import type { ResizableCardItem } from '@/components/resizable-card'
 import type { ContentDensity } from '../../types/types'
 
 interface MediaDemoContentProps {
-  item: ExpandableCardItem
+  item: ResizableCardItem
   density: ContentDensity
 }
 

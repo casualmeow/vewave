@@ -1,15 +1,15 @@
 import { type ReactNode } from 'react'
 import {
-  type ExpandableCardItem,
+  type ResizableCardItem,
   type ResizableCardResolvedTransition,
   type ResizableCardSharedLayoutPart,
-} from '../types'
+} from '../types/types'
 
-export function defaultTitleRenderer<T extends ExpandableCardItem>(item: T) {
+export function defaultTitleRenderer<T extends ResizableCardItem>(item: T) {
   return item.title
 }
 
-export function defaultDescriptionRenderer<T extends ExpandableCardItem>(item: T) {
+export function defaultDescriptionRenderer<T extends ResizableCardItem>(item: T) {
   return item.description
 }
 
@@ -26,7 +26,7 @@ export function animatedLayoutId(
   return animation.sharedLayout[part] ? layoutId(scopeId, part, itemId) : undefined
 }
 
-export function resolveCardContent<T extends ExpandableCardItem>(
+export function resolveCardContent<T extends ResizableCardItem>(
   item: T,
   renderContent?: (item: T) => ReactNode,
 ) {

@@ -1,10 +1,10 @@
 import { Grip } from 'lucide-react'
 
-import type { ExpandableCardItem } from '@/components/resizable-card'
+import type { ResizableCardItem } from '@/components/resizable-card'
 import type { ContentDensity } from '../../types'
 
 interface InlineDemoContentProps {
-  item: ExpandableCardItem
+  item: ResizableCardItem
   density: ContentDensity
 }
 

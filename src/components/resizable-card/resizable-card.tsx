@@ -3,11 +3,11 @@
 import { LayoutGroup, useReducedMotion } from 'motion/react'
 import { resolveResizableCardAnimation } from './animations'
 import { DEFAULT_COMPACT_SIZE } from './constants'
-import { useDialogResize, useExpandableCards, useExpandableCardModalEffects } from './hooks'
-import { ExpandableCardDialog, ExpandableCardList } from './ui'
-import type { ExpandableCardItem, ExpandableCardsProps } from './types'
+import { useDialogResize, useResizableCards, useResizableCardModalEffects } from './hooks'
+import { ResizableCardDialog, ResizableCardList } from './ui'
+import type { ResizableCardItem, ResizableCardsProps } from './types'
 
-export function ExpandableCards<T extends ExpandableCardItem>({
+export function ResizableCards<T extends ResizableCardItem>({
   items,
   resizable = true,
   closeOnBackdropClick = true,
@@ -17,19 +17,18 @@ export function ExpandableCards<T extends ExpandableCardItem>({
   expandedSize,
   presentation = 'inline',
   animationPreset,
-  transitionPreset,
   onActiveItemChange,
   ...props
-}: ExpandableCardsProps<T>) {
+}: ResizableCardsProps<T>) {
   const shouldReduceMotion = useReducedMotion()
-  const controller = useExpandableCards({
+  const controller = useResizableCards({
     items,
     onActiveItemChange,
   })
 
   const resize = useDialogResize(expandedSize, controller.activeItem, resizable)
 
-  useExpandableCardModalEffects({
+  useResizableCardModalEffects({
     activeItem: controller.activeItem,
     closeItem: controller.closeItem,
     closeButtonRef: controller.closeButtonRef,
@@ -45,13 +44,12 @@ export function ExpandableCards<T extends ExpandableCardItem>({
   const animation = resolveResizableCardAnimation({
     presentation,
     animationPreset,
-    transitionPreset,
     reducedMotion: Boolean(shouldReduceMotion),
   })
 
   return (
     <LayoutGroup id={controller.scopeId}>
-      <ExpandableCardList
+      <ResizableCardList
         {...props}
         presentation={presentation}
         animation={animation}
@@ -63,7 +61,7 @@ export function ExpandableCards<T extends ExpandableCardItem>({
         closeItem={controller.closeItem}
       />
 
-      <ExpandableCardDialog
+      <ResizableCardDialog
         {...props}
         presentation={presentation}
         animation={animation}
@@ -79,8 +77,4 @@ export function ExpandableCards<T extends ExpandableCardItem>({
       />
     </LayoutGroup>
   )
-}
-
-export function ResizableCard<T extends ExpandableCardItem>(props: ExpandableCardsProps<T>) {
-  return <ExpandableCards {...props} />
 }

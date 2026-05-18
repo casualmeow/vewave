@@ -51,8 +51,8 @@ export function ResizableCardShowcaseControls({
           onChange={onPresentationChange}
         />
         <p className="text-sm leading-6 text-zinc-600">
-          Inline keeps the utility layout. Media uses the grid-card morph. Standard uses the
-          Aceternity-style row-to-modal morph with a shared CTA.
+          Inline keeps the utility layout. Media uses the polished resizable-card structure with a
+          media surface, stable text motion, and independently revealed details.
         </p>
       </ControlCard>
 

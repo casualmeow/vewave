@@ -8,7 +8,7 @@ type Params = {
   closeOnEscape?: boolean
 }
 
-export function useExpandableCardModalEffects({
+export function useResizableCardModalEffects({
   activeItem,
   closeItem,
   closeButtonRef,

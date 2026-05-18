@@ -2,16 +2,27 @@
 
 `ResizableCard` is a reusable React 19 component for content-driven expandable cards. It renders a compact card list, animates the active item into a portal dialog with Motion shared layout, and can expose a resize handle for larger preview or reading surfaces.
 
-The public component is exported as both `ResizableCard` and `ExpandableCards`.
+The item-list component is exported as `ResizableCards`, `ResizableCardList`, and `ResizableCards`.
+The package also exports Shadix-style `ResizableCard*` compound pieces for single-card composition.
 
 ```tsx
-import { ResizableCard, type ExpandableCardItem } from '@/components/resizable-card'
+import {
+  ResizableCard,
+  ResizableCardBody,
+  ResizableCardContent,
+  ResizableCardDescription,
+  ResizableCardExpandContainer,
+  ResizableCardImage,
+  ResizableCardTitle,
+  ResizableCards,
+  type ResizableCardItem,
+} from '@/components/resizable-card'
 ```
 
 ## Basic Usage
 
 ```tsx
-const cards: ExpandableCardItem[] = [
+const cards: ResizableCardItem[] = [
   {
     id: 'preview',
     title: 'Responsive preview',
@@ -23,7 +34,7 @@ const cards: ExpandableCardItem[] = [
 
 export function Example() {
   return (
-    <ResizableCard
+    <ResizableCards
       items={cards}
       variant="outline"
       size="default"
@@ -40,95 +51,97 @@ export function Example() {
 }
 ```
 
+## Compound API
+
+Use the compound API when you want the original Shadix-style single-card composition instead of the
+data-driven list controller.
+
+```tsx
+<ResizableCard transition={{ type: 'spring', stiffness: 260, damping: 30 }}>
+  <ResizableCardBody className="w-[250px]">
+    <div className="h-56 overflow-hidden rounded-t-xl">
+      <ResizableCardImage src="/images/card-1.jpg" alt="Preview" />
+    </div>
+    <ResizableCardTitle>Hello Shadix UI</ResizableCardTitle>
+    <ResizableCardDescription>This is a description of the card.</ResizableCardDescription>
+  </ResizableCardBody>
+
+  <ResizableCardExpandContainer className="w-[min(92vw,34rem)]">
+    <div className="h-72 overflow-hidden">
+      <ResizableCardImage src="/images/card-1.jpg" alt="Preview" />
+    </div>
+    <ResizableCardTitle>Hello Shadix UI</ResizableCardTitle>
+    <ResizableCardDescription>This is a description of the card.</ResizableCardDescription>
+    <ResizableCardContent>Expanded details fade in after the surface opens.</ResizableCardContent>
+  </ResizableCardExpandContainer>
+</ResizableCard>
+```
+
+Compound exports:
+
+- `ResizableCard`
+- `ResizableCardBody`
+- `ResizableCardExpandContainer`
+- `ResizableCardImage`
+- `ResizableCardTitle`
+- `ResizableCardDescription`
+- `ResizableCardContent`
+- `ResizableCardCloseButton`
+
+`ResizableCard` supports `open`, `defaultOpen`, `onOpenChange`, `transition`,
+`closeOnEscape`, `closeOnOutsideClick`, and `lockBodyScroll`. The expanded container renders through
+a portal, the backdrop closes on outside click by default, and Escape closes the card by default.
+
 ## Presentations
 
-`presentation` controls the structural layout. `variant` controls only visual tone.
+`presentation` controls structure. `variant` controls visual tone.
 
 ```ts
-presentation: 'inline' | 'media' | 'standard'
+presentation: 'inline' | 'media'
 variant: 'default' | 'secondary' | 'outline' | 'ghost' | 'destructive'
 animationPreset: ResizableCardAnimationPreset
 ```
 
 ### Inline
 
-`presentation="inline"` is the default and preserves the existing list-like card structure:
+`presentation="inline"` is the default utility layout:
 
 ```txt
 [ small media ] [ title / description ] [ action ]
 ```
 
-Expanded state keeps the same utility-card feel and is best for previews, settings, docs, and dense UI entries.
+Use it for previews, settings, docs, and dense UI entries.
 
 ```tsx
-<ResizableCard items={cards} presentation="inline" variant="outline" />
+<ResizableCards items={cards} presentation="inline" variant="outline" />
 ```
 
 ### Media
 
-`presentation="media"` uses the Aceternity-style grid card structure designed for a stronger shared-element morph:
+`presentation="media"` is the polished resizable-card layout. It is inspired by a compact media card growing into a larger elevated surface:
 
 ```txt
 compact:
-[ large media ]
+[ media ]
 [ title ]
 [ description ]
 
 expanded:
-[ large media hero ]
+[ media hero ]
 [ title / description ] [ CTA ]
 [ content ]
 ```
 
-The card, media, title, and description all keep shared layout ids between compact and expanded states. The CTA and expanded content fade/reveal separately so the transition stays close to the original grid media-card demo style.
+The card, media, title, and description can participate in shared layout. Title and description use position-oriented motion so text does not visibly stretch, while expanded-only action/content layers reveal separately.
 
 ```tsx
-const mediaCards: ExpandableCardItem[] = [
-  {
-    id: 'summertime-sadness',
-    title: 'Summertime Sadness',
-    description: 'Lana Del Rey',
-    src: 'https://assets.aceternity.com/demos/lana-del-rey.jpeg',
-    imageAlt: 'Lana Del Rey portrait',
-    ctaText: 'Visit',
-    ctaLink: 'https://ui.aceternity.com/templates',
-    content: () => <p>Expanded long-form content.</p>,
-  },
-]
-
-<ResizableCard
-  items={mediaCards}
-  presentation="media"
-  variant="default"
-  size="lg"
-/>
-```
-
-### Standard
-
-`presentation="standard"` uses the Aceternity-style row/list structure with a shared CTA:
-
-```txt
-compact:
-[ media ] [ title / description ] [ CTA ]
-
-expanded:
-[ large media hero ]
-[ title / description ] [ CTA ]
-[ content ]
-```
-
-Use this presentation when the compact state should feel like a playable/selectable list item, but
-the expanded state should still morph into a media-focused modal.
-
-```tsx
-<ResizableCard items={mediaCards} presentation="standard" variant="ghost" />
+<ResizableCards items={mediaCards} presentation="media" animationPreset="surface-grow" />
 ```
 
 ## Data Model
 
 ```ts
-type ExpandableCardItem = {
+type ResizableCardItem = {
   id: string
   title: ReactNode
   description?: ReactNode
@@ -140,14 +153,14 @@ type ExpandableCardItem = {
 }
 ```
 
-`src` and `imageAlt` feed the default media renderer. `ctaText` and `ctaLink` feed the default action renderer. `content` is shown inside the expanded dialog unless `renderContent` is supplied. The `media` and `standard` presentations are intentionally optimized for this complete item shape.
+`src` and `imageAlt` feed the default media renderer. `ctaText` and `ctaLink` feed the default action renderer. `content` is shown inside the expanded dialog unless `renderContent` is supplied.
 
 ## Rendering Slots
 
-Use render callbacks to customize slots without replacing the controller, modal, or resize behavior.
+Use render callbacks to customize slots without replacing the controller, modal, resize behavior, or accessibility wiring.
 
 ```tsx
-<ResizableCard
+<ResizableCards
   items={cards}
   presentation="media"
   renderMedia={(item, state) => (
@@ -182,30 +195,18 @@ type CardRenderState = {
 }
 ```
 
-In `inline`, the action is shared between compact and expanded states for utility-style cards. In
-`media`, the compact card focuses on media/title/description and the expanded action fades in near
-the title area. In `standard`, the compact and expanded actions share a layout id, matching the
-row-to-modal reference animation.
-
 ## Animation Presets
 
-`animationPreset` controls the opening and closing animation strategy. It changes both Motion
-transition timing and which visual parts participate in shared-layout morphing. `transitionPreset`
-is still accepted as a backward-compatible alias.
-
-```tsx
-<ResizableCard items={mediaCards} presentation="media" animationPreset="soft-container-morph" />
-```
+`animationPreset` controls the opening and closing animation strategy. It changes both Motion transition timing and which visual parts participate in shared-layout morphing.
 
 When omitted, the component chooses a presentation-aware default:
 
 - `inline`: `fade-scale`, because compact rows and expanded dialogs often have different geometry.
-- `media`: `media-led-morph`, because the card is designed around shared media continuity.
-- `standard`: `soft-container-morph`, because the row, media, title, description, and CTA are structurally related.
+- `media`: `surface-grow`, because the media presentation is designed to read as an intentional card-surface growth transition.
 
 Preset families:
 
-- Morph: `container-morph`, `soft-container-morph`, `media-led-morph`, `content-led-morph`, `shape-shift`, `elevation-lift`.
+- Morph: `container-morph`, `soft-container-morph`, `media-led-morph`, `content-led-morph`, `shape-shift`, `elevation-lift`, `surface-grow`.
 - Axis: `slide-up-expand`, `slide-down-expand`, `slide-left-expand`, `slide-right-expand`, `shared-axis-x`, `shared-axis-y`.
 - Fade: `fade-scale`, `container-fade`, `crossfade-details`, `fade-through`, `instant`.
 - Expressive: `spring-pop`, `elastic-settle`, `squash-lift`, `overshoot-settle`, `tilt-unfold`, `flip-lite`.
@@ -213,28 +214,23 @@ Preset families:
 
 Recommended starting points:
 
-| Presentation | Presets                                                                      |
-| ------------ | ---------------------------------------------------------------------------- |
-| `inline`     | `fade-scale`, `content-led-morph`, `slide-up-expand`, `fade-through`         |
-| `media`      | `media-led-morph`, `container-morph`, `media-spotlight`, `staggered-details` |
-| `standard`   | `soft-container-morph`, `container-morph`, `flip-lite`, `staggered-details`  |
+| Presentation | Presets                                                                   |
+| ------------ | ------------------------------------------------------------------------- |
+| `inline`     | `fade-scale`, `surface-grow`, `content-led-morph`, `slide-up-expand`      |
+| `media`      | `surface-grow`, `media-led-morph`, `media-spotlight`, `staggered-details` |
 
-If compact and expanded geometry differ significantly, prefer `fade-scale`, `container-fade`, or
-`fade-through` to avoid intermediate stretching. Use `container-morph`, `soft-container-morph`, or
-`media-led-morph` when compact and expanded structures are deliberately similar.
+Use `surface-grow` when the desired effect is deliberate enlargement: the compact surface acts as the spatial origin, the container grows into the dialog, and expanded-only details reveal separately so the transition reads as designed growth rather than accidental stretching.
 
-The close animation is modeled as a shared-layout return from expanded card to compact card. The
-shared card/media elements perform the morph, title and description prioritize position motion to
-avoid text stretching, and expanded-only action/content layers fade or translate independently.
-Compact cards intentionally avoid CSS hover translate transforms on the same node that owns a
-Motion `layoutId`, because competing transform animations can cause close jitter.
+If compact and expanded geometry differ significantly, prefer `fade-scale`, `container-fade`, or `fade-through` to avoid intermediate stretching. Use `container-morph`, `soft-container-morph`, or `media-led-morph` when compact and expanded structures are deliberately similar.
+
+The close animation is modeled as a shared-layout return from expanded card to compact card. The shared card/media elements perform the morph, title and description prioritize position motion, and expanded-only action/content layers fade or translate independently. Compact cards intentionally avoid CSS hover translate transforms on nodes that own Motion `layoutId` values.
 
 ## Sizing And Resizing
 
 Expansion is internally managed. Clicking a compact card opens it; closing clears the active card. `onActiveItemChange` fires whenever the active item changes.
 
 ```tsx
-<ResizableCard
+<ResizableCards
   items={cards}
   onActiveItemChange={(item) => {
     console.log(item?.id ?? 'closed')
@@ -245,7 +241,7 @@ Expansion is internally managed. Clicking a compact card opens it; closing clear
 Resize behavior is controlled by `resizable` and `expandedSize`.
 
 ```tsx
-<ResizableCard
+<ResizableCards
   items={cards}
   resizable
   expandedSize={{
@@ -260,11 +256,7 @@ Resize behavior is controlled by `resizable` and `expandedSize`.
 />
 ```
 
-`expandedSize` values are clamped to the viewport after subtracting `viewportPadding`. `compactSize`
-can set compact card width and minimum height, but avoid forcing a very small
-`compactSize.minHeight` with `presentation="media"` because the media presentation relies on a
-taller compact geometry for the shared-layout morph. `presentation="standard"` can use a shorter
-compact height because the media thumbnail is row-sized on desktop.
+`expandedSize` values are clamped to the viewport after subtracting `viewportPadding`. `compactSize` can set compact card width and minimum height, but avoid forcing a very small `compactSize.minHeight` with `presentation="media"` because the media presentation relies on a taller compact geometry for the shared-layout morph.
 
 ## Accessibility And Interaction
 
@@ -282,5 +274,7 @@ compact height because the media thumbnail is row-sized on desktop.
 `/ui/showcase` uses `ResizableCard` as:
 
 - the host for the same-document Header preview surface;
-- its own component playground, including `inline`, `media`, and `standard` presentations;
-- a media-card demo that uses the snippet-style `title`, `description`, `src`, `ctaText`, `ctaLink`, and `content` props.
+- its own component playground, including `inline` and `media` presentations;
+- a media-card demo that uses `title`, `description`, `src`, `ctaText`, `ctaLink`, and `content`;
+- Shadix-style compound cards built from `ResizableCardBody`, `ResizableCardImage`,
+  `ResizableCardTitle`, `ResizableCardDescription`, and `ResizableCardExpandContainer`.

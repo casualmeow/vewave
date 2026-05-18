@@ -1,30 +1,18 @@
 import { motion } from 'motion/react'
 import { animatedLayoutId } from '../../../helpers'
-import { expandableCardVariants } from '../../../constants'
+import { resizableCardVariants } from '../../../constants'
 import { DefaultAction, DefaultMedia } from '../../default-renders'
 import type {
   CardRenderState,
-  CompactCardSize,
-  ExpandableCardItem,
-  ExpandableCardsProps,
-  ResizableCardResolvedTransition,
+  ResizableCardItem,
+  ResizableCardListItemPresentationProps,
 } from '../../../types'
 import { cx } from '@/shared/lib/utils'
 
-export type InlineCardListItemProps<T extends ExpandableCardItem> = Omit<
-  ExpandableCardsProps<T>,
-  'items'
-> & {
-  item: T
-  scopeId: string
-  isActive: boolean
-  compactSize: CompactCardSize
-  animation: ResizableCardResolvedTransition
-  openItem: (item: T) => void
-  closeItem: () => void
-}
+export type InlineCardListItemProps<T extends ResizableCardItem> =
+  ResizableCardListItemPresentationProps<T>
 
-export function InlineCardListItem<T extends ExpandableCardItem>({
+export function InlineCardListItem<T extends ResizableCardItem>({
   item,
   scopeId,
   isActive,
@@ -61,7 +49,7 @@ export function InlineCardListItem<T extends ExpandableCardItem>({
         minHeight: compactSize.minHeight,
       }}
       className={cx(
-        expandableCardVariants({
+        resizableCardVariants({
           variant,
           size,
           active: isActive,

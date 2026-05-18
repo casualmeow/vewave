@@ -1,17 +1,17 @@
-import { expandableActionVariants } from '../constants'
+import { resizableActionVariants } from '../constants'
 import type {
   CardRenderState,
-  ExpandableCardItem,
-  ExpandableCardSizeVariant,
-  ExpandableCardVariant,
+  ResizableCardItem,
+  ResizableCardSizeVariant,
+  ResizableCardVariant,
 } from '../types'
 
-type DefaultMediaProps<T extends ExpandableCardItem> = {
+type DefaultMediaProps<T extends ResizableCardItem> = {
   item: T
   state: CardRenderState
 }
 
-export function DefaultMedia<T extends ExpandableCardItem>({ item, state }: DefaultMediaProps<T>) {
+export function DefaultMedia<T extends ResizableCardItem>({ item, state }: DefaultMediaProps<T>) {
   if (!item.src) return null
 
   return (
@@ -27,14 +27,14 @@ export function DefaultMedia<T extends ExpandableCardItem>({ item, state }: Defa
   )
 }
 
-type DefaultActionProps<T extends ExpandableCardItem> = {
+type DefaultActionProps<T extends ResizableCardItem> = {
   item: T
   state: CardRenderState
-  variant: ExpandableCardVariant
-  size: ExpandableCardSizeVariant
+  variant: ResizableCardVariant
+  size: ResizableCardSizeVariant
 }
 
-export function DefaultAction<T extends ExpandableCardItem>({
+export function DefaultAction<T extends ResizableCardItem>({
   item,
   state,
   variant,
@@ -42,7 +42,7 @@ export function DefaultAction<T extends ExpandableCardItem>({
 }: DefaultActionProps<T>) {
   if (!item.ctaText) return null
 
-  const className = expandableActionVariants({
+  const className = resizableActionVariants({
     variant,
     size,
     mode: state.expanded ? 'expanded' : 'compact',

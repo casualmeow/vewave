@@ -17,7 +17,7 @@ import {
   type HeaderSize,
   type HeaderVariant,
 } from '@/components/header'
-import { ResizableCard, type ExpandableCardItem } from '@/components/resizable-card'
+import { ResizableCards, type ResizableCardItem } from '@/components/resizable-card'
 import { Button } from '@/shared/ui'
 
 type HeaderButtonVariant = 'default' | 'ghost' | 'outline' | 'soft'
@@ -66,7 +66,7 @@ const motionPresets: Array<HeaderMotionPreset> = ['gentle', 'spring', 'smooth', 
 const actionVariants: Array<HeaderButtonVariant> = ['default', 'ghost', 'outline', 'soft']
 const activeNavItems: Array<ActiveNavItem> = ['overview', 'rooms', 'studio', 'billing']
 
-const previewItems: Array<ExpandableCardItem> = [
+const previewItems: Array<ResizableCardItem> = [
   {
     id: 'header-frame',
     title: 'Live Header preview surface',
@@ -358,7 +358,7 @@ export function HeaderShowcaseSection() {
             </div>
 
             <div className="mt-5">
-              <ResizableCard
+              <ResizableCards
                 items={previewItems}
                 variant="outline"
                 size="lg"

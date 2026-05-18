@@ -1,45 +1,32 @@
-import { type PointerEventHandler, type RefObject } from 'react'
 import { motion } from 'motion/react'
-import { animatedLayoutId, resolveCardContent } from '../../../helpers'
+import { animatedLayoutId, resolveCardContent } from '../../../helpers/utils'
 import {
-  expandableContentVariants,
-  expandableDialogVariants,
-  expandableIconButtonVariants,
-  expandableResizeHandleVariants,
+  resizableContentVariants,
+  resizableDialogVariants,
+  resizableIconButtonVariants,
+  resizableResizeHandleVariants,
 } from '../../../constants'
 import { CloseIcon } from '../../close-icon'
 import { ResizeHandleIcon } from '../../resize-handle-icon'
 import { DefaultAction } from '../../default-renders'
+import { MediaDefaultImage } from './media-default-image'
 import type {
   CardRenderState,
-  DialogSize,
-  ExpandableCardItem,
-  ExpandableCardsProps,
-  ResizableCardResolvedTransition,
+  ResizableCardDialogPresentationProps,
+  ResizableCardItem,
 } from '../../../types'
 import { cx } from '@/shared/lib/utils'
 
-export type MediaCardDialogSurfaceProps<T extends ExpandableCardItem> = Omit<
-  ExpandableCardsProps<T>,
-  'items'
-> & {
-  activeItem: T
-  scopeId: string
-  dialogSize: DialogSize
-  animation: ResizableCardResolvedTransition
-  closeItem: () => void
-  openItem: (item: T) => void
-  closeButtonRef: RefObject<HTMLButtonElement | null>
-  handleResizeStart: PointerEventHandler<HTMLButtonElement>
-}
+export type MediaCardDialogSurfaceProps<T extends ResizableCardItem> =
+  ResizableCardDialogPresentationProps<T>
 
 const mediaHeightBySize = {
-  sm: 'h-52',
-  default: 'h-64',
+  sm: 'h-56',
+  default: 'h-72',
   lg: 'h-80',
 }
 
-export function MediaCardDialogSurface<T extends ExpandableCardItem>({
+export function MediaCardDialogSurface<T extends ResizableCardItem>({
   activeItem,
   scopeId,
   dialogSize,
@@ -88,10 +75,11 @@ export function MediaCardDialogSurface<T extends ExpandableCardItem>({
         height: dialogSize.height,
       }}
       className={cx(
-        expandableDialogVariants({
+        resizableDialogVariants({
           variant: dialogVariant ?? variant,
           size,
         }),
+        'shadow-[0_24px_80px_rgba(15,23,42,0.22)] ring-1 ring-border/60',
         animation.dialogClassName,
         dialogClassName,
       )}
@@ -103,7 +91,7 @@ export function MediaCardDialogSurface<T extends ExpandableCardItem>({
         onClick={closeItem}
         className={cx(
           'absolute right-4 top-4 z-20',
-          expandableIconButtonVariants({
+          resizableIconButtonVariants({
             variant: iconButtonVariant ?? variant,
             size: iconButtonSize,
           }),
@@ -121,7 +109,7 @@ export function MediaCardDialogSurface<T extends ExpandableCardItem>({
       </motion.div>
 
       <div className="flex min-h-0 flex-1 flex-col">
-        <div className="grid shrink-0 gap-4 border-b border-border p-5 pr-16 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+        <div className="grid shrink-0 gap-4 p-5 pr-16 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:p-6 sm:pr-16">
           <div className="min-w-0">
             <motion.h3
               id={`${scopeId}-${activeItem.id}-title`}
@@ -174,7 +162,7 @@ export function MediaCardDialogSurface<T extends ExpandableCardItem>({
           exit={animation.presence.content.exit}
           transition={animation.content}
           className={cx(
-            expandableContentVariants({
+            resizableContentVariants({
               variant: dialogVariant ?? variant,
             }),
             '[mask:linear-gradient(to_bottom,white_85%,transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
@@ -191,7 +179,7 @@ export function MediaCardDialogSurface<T extends ExpandableCardItem>({
           type="button"
           aria-label="Resize expanded card"
           onPointerDown={handleResizeStart}
-          className={expandableResizeHandleVariants({
+          className={resizableResizeHandleVariants({
             variant: iconButtonVariant ?? variant,
             size: iconButtonSize,
           })}
@@ -200,17 +188,5 @@ export function MediaCardDialogSurface<T extends ExpandableCardItem>({
         </button>
       ) : null}
     </motion.section>
-  )
-}
-
-function MediaDefaultImage<T extends ExpandableCardItem>({ item }: { item: T }) {
-  if (!item.src) return null
-
-  return (
-    <img
-      src={item.src}
-      alt={item.imageAlt ?? ''}
-      className="h-full w-full object-cover object-top"
-    />
   )
 }

@@ -234,6 +234,44 @@ export const RESIZABLE_CARD_ANIMATION_PRESET_DEFINITIONS = [
     dialogClassName: 'shadow-[0_32px_100px_rgba(15,23,42,0.32)]',
   }),
   definePreset({
+    id: 'surface-grow',
+    label: 'Surface Grow',
+    family: 'morph',
+    description:
+      'A deliberate enlargement transition where the compact surface grows into the expanded dialog without stretching inner details.',
+    recommendedPresentation: 'both',
+    sharedLayout: {
+      card: true,
+      media: true,
+      title: true,
+      description: true,
+      action: false,
+    },
+    container: { type: 'spring', stiffness: 210, damping: 29, mass: 0.82 },
+    media: { type: 'spring', stiffness: 190, damping: 31, mass: 0.9 },
+    text: { type: 'spring', stiffness: 240, damping: 32, mass: 0.72 },
+    action: { duration: 0.18, delay: 0.05, ease: 'easeOut' },
+    content: { duration: 0.22, delay: 0.08, ease: 'easeOut' },
+    presence: {
+      dialog: {
+        initial: { opacity: 0.98, scale: 0.985 },
+        animate: { opacity: 1, scale: 1 },
+        exit: { opacity: 0.98, scale: 0.985 },
+      },
+      action: {
+        initial: { opacity: 0, y: 10 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: 6 },
+      },
+      content: {
+        initial: { opacity: 0, y: 14 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: 8 },
+      },
+    },
+    layout: { action: false, content: true },
+  }),
+  definePreset({
     id: 'slide-up-expand',
     label: 'Slide Up Expand',
     family: 'axis',

@@ -1,39 +1,25 @@
-import { type PointerEventHandler, type RefObject } from 'react'
 import { motion } from 'motion/react'
 import { animatedLayoutId, resolveCardContent } from '../../../helpers'
 import {
-  expandableContentVariants,
-  expandableDialogVariants,
-  expandableIconButtonVariants,
-  expandableResizeHandleVariants,
+  resizableContentVariants,
+  resizableDialogVariants,
+  resizableIconButtonVariants,
+  resizableResizeHandleVariants,
 } from '../../../constants'
 import { CloseIcon } from '../../close-icon'
 import { ResizeHandleIcon } from '../../resize-handle-icon'
 import { DefaultAction, DefaultMedia } from '../../default-renders'
 import type {
   CardRenderState,
-  DialogSize,
-  ExpandableCardItem,
-  ExpandableCardsProps,
-  ResizableCardResolvedTransition,
+  ResizableCardDialogPresentationProps,
+  ResizableCardItem,
 } from '../../../types'
 import { cx } from '@/shared/lib/utils'
 
-export type InlineCardDialogSurfaceProps<T extends ExpandableCardItem> = Omit<
-  ExpandableCardsProps<T>,
-  'items'
-> & {
-  activeItem: T
-  scopeId: string
-  dialogSize: DialogSize
-  animation: ResizableCardResolvedTransition
-  closeItem: () => void
-  openItem: (item: T) => void
-  closeButtonRef: RefObject<HTMLButtonElement | null>
-  handleResizeStart: PointerEventHandler<HTMLButtonElement>
-}
+export type InlineCardDialogSurfaceProps<T extends ResizableCardItem> =
+  ResizableCardDialogPresentationProps<T>
 
-export function InlineCardDialogSurface<T extends ExpandableCardItem>({
+export function InlineCardDialogSurface<T extends ResizableCardItem>({
   activeItem,
   scopeId,
   dialogSize,
@@ -82,7 +68,7 @@ export function InlineCardDialogSurface<T extends ExpandableCardItem>({
         height: dialogSize.height,
       }}
       className={cx(
-        expandableDialogVariants({
+        resizableDialogVariants({
           variant: dialogVariant ?? variant,
           size,
         }),
@@ -97,7 +83,7 @@ export function InlineCardDialogSurface<T extends ExpandableCardItem>({
         onClick={closeItem}
         className={cx(
           'absolute right-4 top-4 z-20',
-          expandableIconButtonVariants({
+          resizableIconButtonVariants({
             variant: iconButtonVariant ?? variant,
             size: iconButtonSize,
           }),
@@ -169,7 +155,7 @@ export function InlineCardDialogSurface<T extends ExpandableCardItem>({
           exit={animation.presence.content.exit}
           transition={animation.content}
           className={cx(
-            expandableContentVariants({
+            resizableContentVariants({
               variant: dialogVariant ?? variant,
             }),
             animation.contentClassName,
@@ -185,7 +171,7 @@ export function InlineCardDialogSurface<T extends ExpandableCardItem>({
           type="button"
           aria-label="Resize expanded card"
           onPointerDown={handleResizeStart}
-          className={expandableResizeHandleVariants({
+          className={resizableResizeHandleVariants({
             variant: iconButtonVariant ?? variant,
             size: iconButtonSize,
           })}

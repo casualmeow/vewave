@@ -1,4 +1,8 @@
 export default {
-  '*.{js,jsx,ts,tsx}': [() => 'vitest run', 'tsc --noemit', 'eslint --fix', 'prettier --write'],
-  '*.{json,md,css}': ['prettier --write'],
+  '*.{js,jsx,ts,tsx}': [
+    () => 'vitest run',
+    () => 'tsc -p tsconfig.json --noEmit',
+    'eslint --fix',
+    'prettier --write',
+  ],
 }

@@ -1,20 +1,19 @@
-import type { ExpandableCardItem } from '@/components/resizable-card'
+import type { ResizableCardItem } from '@/components/resizable-card'
 
-export const mediaCardItems: Array<ExpandableCardItem> = [
+export const mediaCardItems: Array<ResizableCardItem> = [
   {
     id: 'lana-del-rey',
     description: 'Lana Del Rey',
     title: 'Summertime Sadness',
     src: 'https://assets.aceternity.com/demos/lana-del-rey.jpeg',
     imageAlt: 'Lana Del Rey portrait',
-    ctaText: 'Visit',
+    ctaText: 'Play',
     ctaLink: 'https://ui.aceternity.com/templates',
     content: () => (
-      <>
-        Lana Del Rey is known for cinematic pop, melancholic atmosphere, and visual storytelling.
-        This card uses the same reusable item fields as the reference demo: media source, title,
-        description, CTA link, and long-form content.
-      </>
+      <p>
+        A cinematic pop reference with moody color, soft-focus photography, and enough expanded copy
+        to test a card surface that grows from compact artwork into a readable detail view.
+      </p>
     ),
   },
   {
@@ -23,14 +22,13 @@ export const mediaCardItems: Array<ExpandableCardItem> = [
     title: 'Mitran Di Chhatri',
     src: 'https://assets.aceternity.com/demos/babbu-maan.jpeg',
     imageAlt: 'Babbu Maan portrait',
-    ctaText: 'Visit',
+    ctaText: 'Play',
     ctaLink: 'https://ui.aceternity.com/templates',
     content: () => (
-      <>
-        Babbu Maan is a Punjabi singer and songwriter with a large catalog of narrative songs. The
-        media presentation keeps the image, title, and description structurally aligned between
-        compact and expanded states.
-      </>
+      <p>
+        A warmer portrait-led example for checking how title, artist, and media continuity behave
+        when the compact card and expanded surface share the same visual identity.
+      </p>
     ),
   },
   {
@@ -39,29 +37,58 @@ export const mediaCardItems: Array<ExpandableCardItem> = [
     title: 'For Whom The Bell Tolls',
     src: 'https://assets.aceternity.com/demos/metallica.jpeg',
     imageAlt: 'Metallica performance',
-    ctaText: 'Visit',
+    ctaText: 'Play',
     ctaLink: 'https://ui.aceternity.com/templates',
     content: () => (
-      <>
-        Metallica brings a heavier visual example to the gallery. The expanded content fades in
-        independently while the card, image, title, and description morph through shared layout ids.
-      </>
+      <p>
+        A high-contrast performance card that makes image cropping, shadow depth, and backdrop
+        treatment easy to inspect during repeated open and close transitions.
+      </p>
     ),
   },
   {
-    id: 'himesh-reshammiya',
+    id: 'led-zeppelin',
+    description: 'Led Zeppelin',
+    title: 'Stairway To Heaven',
+    src: 'https://assets.aceternity.com/demos/led-zeppelin.jpeg',
+    imageAlt: 'Led Zeppelin artwork',
+    ctaText: 'Play',
+    ctaLink: 'https://ui.aceternity.com/templates',
+    content: () => (
+      <p>
+        A classic-rock entry that mirrors the reference card list shape: compact artwork, concise
+        metadata, a CTA, and expanded copy that should reveal without disturbing the shared morph.
+      </p>
+    ),
+  },
+  {
+    id: 'toh-phir-aao',
+    description: 'Mustafa Zahid',
+    title: 'Toh Phir Aao',
+    src: 'https://assets.aceternity.com/demos/toh-phir-aao.jpeg',
+    imageAlt: 'Toh Phir Aao artwork',
+    ctaText: 'Play',
+    ctaLink: 'https://ui.aceternity.com/templates',
+    content: () => (
+      <p>
+        A darker artwork sample for testing how the expanded media surface handles content density,
+        readable spacing, and a clean close animation back to the selected compact card.
+      </p>
+    ),
+  },
+  {
+    id: 'aap-ka-suroor',
     description: 'Lord Himesh',
     title: 'Aap Ka Suroor',
     src: 'https://assets.aceternity.com/demos/aap-ka-suroor.jpeg',
-    imageAlt: 'Himesh Reshammiya album art',
-    ctaText: 'Visit',
+    imageAlt: 'Aap Ka Suroor artwork',
+    ctaText: 'Play',
     ctaLink: 'https://ui.aceternity.com/templates',
     content: () => (
-      <>
-        Himesh Reshammiya rounds out the demo set with another image-heavy card. This data shape can
-        be replaced with product, profile, article, or media library content without changing the
-        component controller.
-      </>
+      <p>
+        A saturated album-art card that helps compare the data-driven media presentation with the
+        Shadix-style compound API shown below.
+      </p>
     ),
   },
 ]

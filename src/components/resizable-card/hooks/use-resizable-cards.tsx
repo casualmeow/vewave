@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import type { ExpandableCardItem } from '../types'
+import type { ResizableCardItem } from '../types'
 
-type UseExpandableCardsParams<T extends ExpandableCardItem> = {
+type UseResizableCardsParams<T extends ResizableCardItem> = {
   items: ReadonlyArray<T>
   onActiveItemChange?: (item: T | null) => void
 }
 
-export function useExpandableCards<T extends ExpandableCardItem>({
+export function useResizableCards<T extends ResizableCardItem>({
   items,
   onActiveItemChange,
-}: UseExpandableCardsParams<T>) {
+}: UseResizableCardsParams<T>) {
   const scopeId = useId()
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null)

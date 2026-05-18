@@ -1,5 +1,5 @@
 import { PanelTop, Box, Sparkles } from 'lucide-react'
-import type { ExpandableCardItem } from '@/components/resizable-card'
+import type { ResizableCardItem } from '@/components/resizable-card'
 
 export const catalogItems = [
   {
@@ -12,7 +12,7 @@ export const catalogItems = [
   {
     href: '#resizable-card',
     label: 'ResizableCard',
-    description: 'Inline, standard, and media presentations with shared-layout morphs.',
+    description: 'Item-list cards plus Shadix-style compound expandable cards.',
     icon: Box,
     tone: 'from-violet-300 to-fuchsia-400',
   },
@@ -25,7 +25,7 @@ export const catalogItems = [
   },
 ]
 
-export const inlineCardItems: Array<ExpandableCardItem> = [
+export const inlineCardItems: Array<ResizableCardItem> = [
   {
     id: 'preview-shell',
     title: 'Responsive preview shell',

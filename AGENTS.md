@@ -155,6 +155,7 @@ When editing animated components:
 Before finishing substantial UI work:
 
 - run the project build command;
-- run typecheck or lint if the repository provides them;
+- make sure that you are using barrel imports
+- run `npm run test` then `npm run check ` and find out if there some errors;
 - remove stale imports and dead files;
 - report any command failures honestly.

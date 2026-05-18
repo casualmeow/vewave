@@ -1,9 +1,9 @@
 import type {
-  ExpandableCardPresentation,
+  ResizableCardPresentation as ComponentResizableCardPresentation,
   ResizableCardAnimationFamily,
   ResizableCardAnimationPreset,
-  ExpandableCardVariant,
-  ExpandableCardSizeVariant,
+  ResizableCardVariant,
+  ResizableCardSizeVariant,
 } from '@/components/resizable-card'
 import type {
   HeaderSize,
@@ -15,15 +15,15 @@ import type {
 
 export type ContentDensity = 'compact' | 'comfortable' | 'dense'
 
-export type ResizableCardPresentation = ExpandableCardPresentation
+export type ResizableCardPresentation = ComponentResizableCardPresentation
 export type ResizableCardAnimationFamilyFilter = ResizableCardAnimationFamily | 'all'
 
 export type ResizableCardShowcaseState = {
   presentation: ResizableCardPresentation
   animationPreset: ResizableCardAnimationPreset
   animationFamily: ResizableCardAnimationFamilyFilter
-  variant: ExpandableCardVariant
-  size: ExpandableCardSizeVariant
+  variant: ResizableCardVariant
+  size: ResizableCardSizeVariant
   resizable: boolean
   closeOnBackdropClick: boolean
   closeOnEscape: boolean

@@ -1,9 +1,9 @@
-import { type ExpandableCardItem, type ExpandableCardsProps } from '../types'
+import { type ResizableCardItem, type ResizableCardsProps } from '../types'
 
 export const DEFAULT_COMPACT_SIZE = {
   width: '100%',
   minHeight: '7rem',
-} satisfies NonNullable<ExpandableCardsProps<ExpandableCardItem>['compactSize']>
+} satisfies NonNullable<ResizableCardsProps<ResizableCardItem>['compactSize']>
 
 export const DEFAULT_EXPANDED_SIZE = {
   initialWidth: 720,
@@ -13,4 +13,4 @@ export const DEFAULT_EXPANDED_SIZE = {
   maxWidth: 1100,
   maxHeight: 900,
   viewportPadding: 16,
-} satisfies NonNullable<ExpandableCardsProps<ExpandableCardItem>['expandedSize']>
+} satisfies NonNullable<ResizableCardsProps<ResizableCardItem>['expandedSize']>

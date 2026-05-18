@@ -1,4 +1,4 @@
-import { type motion } from 'framer-motion'
+import { type motion } from 'motion/react'
 
 export type HeaderVariant = 'glass' | 'glassDark' | 'glassLight' | 'solid' | 'gradient' | 'glow'
 

@@ -8,8 +8,8 @@ import {
   RESIZABLE_CARD_ANIMATION_PRESET_DEFINITIONS as COMPONENT_ANIMATION_PRESET_DEFINITIONS,
   RESIZABLE_CARD_ANIMATION_PRESETS as COMPONENT_ANIMATION_PRESETS,
   type ResizableCardAnimationPreset,
-  type ExpandableCardSizeVariant,
-  type ExpandableCardVariant,
+  type ResizableCardSizeVariant,
+  type ResizableCardVariant,
 } from '@/components/resizable-card'
 
 export const RESIZABLE_CARD_DEFAULT_STATE: ResizableCardShowcaseState = {
@@ -34,11 +34,7 @@ export const RESIZABLE_CARD_DEFAULT_STATE: ResizableCardShowcaseState = {
   maxHeight: 860,
 }
 
-export const RESIZABLE_CARD_PRESENTATIONS: Array<ResizableCardPresentation> = [
-  'inline',
-  'media',
-  'standard',
-]
+export const RESIZABLE_CARD_PRESENTATIONS: Array<ResizableCardPresentation> = ['inline', 'media']
 
 export const RESIZABLE_CARD_ANIMATION_PRESETS: Array<ResizableCardAnimationPreset> =
   COMPONENT_ANIMATION_PRESETS
@@ -54,7 +50,7 @@ export const RESIZABLE_CARD_ANIMATION_FAMILIES: Array<ResizableCardAnimationFami
   'content',
 ]
 
-export const RESIZABLE_CARD_VARIANTS: Array<ExpandableCardVariant> = [
+export const RESIZABLE_CARD_VARIANTS: Array<ResizableCardVariant> = [
   'default',
   'secondary',
   'outline',
@@ -62,6 +58,6 @@ export const RESIZABLE_CARD_VARIANTS: Array<ExpandableCardVariant> = [
   'destructive',
 ]
 
-export const RESIZABLE_CARD_SIZES: Array<ExpandableCardSizeVariant> = ['sm', 'default', 'lg']
+export const RESIZABLE_CARD_SIZES: Array<ResizableCardSizeVariant> = ['sm', 'default', 'lg']
 
 export const RESIZABLE_CARD_DENSITIES: Array<ContentDensity> = ['compact', 'comfortable', 'dense']

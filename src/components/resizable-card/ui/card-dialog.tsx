@@ -3,17 +3,16 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { InlineCardDialogSurface } from './presentations/inline/inline-card-dialog-surface'
 import { MediaCardDialogSurface } from './presentations/media/media-card-dialog-surface'
-import { StandardCardDialogSurface } from './presentations/standard/standard-card-dialog-surface'
 import type {
   DialogSize,
-  ExpandableCardItem,
-  ExpandableCardsProps,
+  ResizableCardItem,
+  ResizableCardsProps,
   ResizableCardResolvedTransition,
 } from '../types'
 import { cx } from '@/shared/lib/utils'
 
-type ExpandableCardDialogProps<T extends ExpandableCardItem> = Omit<
-  ExpandableCardsProps<T>,
+type ResizableCardDialogProps<T extends ResizableCardItem> = Omit<
+  ResizableCardsProps<T>,
   'items'
 > & {
   activeItem: T | null
@@ -26,7 +25,7 @@ type ExpandableCardDialogProps<T extends ExpandableCardItem> = Omit<
   handleResizeStart: PointerEventHandler<HTMLButtonElement>
 }
 
-export function ExpandableCardDialog<T extends ExpandableCardItem>({
+export function ResizableCardDialog<T extends ResizableCardItem>({
   activeItem,
   scopeId,
   dialogSize,
@@ -39,7 +38,7 @@ export function ExpandableCardDialog<T extends ExpandableCardItem>({
   backdropClassName,
   presentation = 'inline',
   ...props
-}: ExpandableCardDialogProps<T>) {
+}: ResizableCardDialogProps<T>) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -53,7 +52,7 @@ export function ExpandableCardDialog<T extends ExpandableCardItem>({
       {activeItem ? (
         <>
           <motion.div
-            key="expandable-card-backdrop"
+            key="resizable-card-backdrop"
             initial={animation.presence.backdrop.initial}
             animate={animation.presence.backdrop.animate}
             exit={animation.presence.backdrop.exit}
@@ -76,19 +75,6 @@ export function ExpandableCardDialog<T extends ExpandableCardItem>({
           >
             {presentation === 'media' ? (
               <MediaCardDialogSurface
-                {...props}
-                presentation={presentation}
-                activeItem={activeItem}
-                scopeId={scopeId}
-                dialogSize={dialogSize}
-                animation={animation}
-                closeItem={closeItem}
-                openItem={openItem}
-                closeButtonRef={closeButtonRef}
-                handleResizeStart={handleResizeStart}
-              />
-            ) : presentation === 'standard' ? (
-              <StandardCardDialogSurface
                 {...props}
                 presentation={presentation}
                 activeItem={activeItem}

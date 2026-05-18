@@ -28,7 +28,7 @@ const presentationSizing: Record<
     compactMinHeight: 320,
     initialWidth: 540,
     initialHeight: 720,
-    animationPreset: 'media-led-morph',
+    animationPreset: 'surface-grow',
   },
 }
 
