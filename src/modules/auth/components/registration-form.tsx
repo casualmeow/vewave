@@ -1,6 +1,11 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import { registrationSchema, type RegistrationFields } from '../schema'
+import { useAuthStore } from '../model'
+import { usePostApiAuthRegister } from '@/core/api/generated/auth/auth'
+import { getApiErrorMessage } from '@/core/api/http/errors'
 import {
   Button,
   Form,
@@ -14,6 +19,9 @@ import {
 } from '@/shared/ui'
 
 export const RegistrationForm = () => {
+  const navigate = useNavigate()
+  const setAuthenticated = useAuthStore((state) => state.setAuthenticated)
+  const registerMutation = usePostApiAuthRegister()
   const form = useForm<RegistrationFields>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
@@ -23,8 +31,17 @@ export const RegistrationForm = () => {
     },
   })
 
-  function onSubmit(values: RegistrationFields) {
-    console.log(values)
+  async function onSubmit(values: RegistrationFields) {
+    try {
+      const response = await registerMutation.mutateAsync({ data: values })
+      setAuthenticated(response.user, response.accessToken)
+      toast.success('Account created')
+      await navigate({ to: '/create' })
+    } catch (error) {
+      form.setError('root', {
+        message: getApiErrorMessage(error, 'Unable to create your account.'),
+      })
+    }
   }
 
   return (
@@ -70,8 +87,11 @@ export const RegistrationForm = () => {
             </FormItem>
           )}
         />
+        {form.formState.errors.root ? (
+          <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>
+        ) : null}
         <Button type="submit" disabled={form.formState.isSubmitting}>
-          Login
+          {form.formState.isSubmitting ? 'Creating account...' : 'Create account'}
         </Button>
       </form>
     </Form>

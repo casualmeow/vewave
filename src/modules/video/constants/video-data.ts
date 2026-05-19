@@ -1,4 +1,4 @@
-import type { VideoEntity } from '@/api/video'
+import type { VideoEntity } from '@/core/api/video'
 
 enum VideoPlaylists {
   playlist1 = 'Playlist 1',

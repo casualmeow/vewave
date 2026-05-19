@@ -17,6 +17,29 @@ To build this application for production:
 npm run build
 ```
 
+## Backend Integration
+
+Local frontend/backend defaults:
+
+```bash
+VITE_API_URL=http://localhost:3001
+VITE_WS_URL=ws://localhost:3001
+```
+
+Copy `.env.example` when you need local overrides. Runtime access goes through
+`src/shared/config/env.ts`; feature modules should not hardcode backend URLs.
+
+REST clients are generated from the backend OpenAPI document with Orval:
+
+```bash
+npm run api:gen
+```
+
+The generated files live under `src/core/api/generated/**` and should not be edited by hand. The
+generated client uses `src/core/api/http/orval-mutator.ts`, which routes requests through the shared
+Axios client. Auth uses an in-memory access token and an HTTP-only refresh cookie; do not store
+access tokens in `localStorage` or inspect refresh cookies from frontend JavaScript.
+
 ## Testing
 
 This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:

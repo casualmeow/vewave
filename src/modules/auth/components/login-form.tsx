@@ -1,6 +1,11 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import { loginSchema, type LoginFields } from '../schema'
+import { useAuthStore } from '../model'
+import { usePostApiAuthLogin } from '@/core/api/generated/auth/auth'
+import { getApiErrorMessage } from '@/core/api/http/errors'
 import {
   Button,
   Form,
@@ -14,16 +19,28 @@ import {
 import { SecureInput } from '@/shared/ui/secure-input'
 
 export const LoginForm = () => {
+  const navigate = useNavigate()
+  const setAuthenticated = useAuthStore((state) => state.setAuthenticated)
+  const loginMutation = usePostApiAuthLogin()
   const form = useForm<LoginFields>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: '',
+      email: '',
       password: '',
     },
   })
 
-  function onSubmit(values: LoginFields) {
-    console.log(values)
+  async function onSubmit(values: LoginFields) {
+    try {
+      const response = await loginMutation.mutateAsync({ data: values })
+      setAuthenticated(response.user, response.accessToken)
+      toast.success('Signed in')
+      await navigate({ to: '/create' })
+    } catch (error) {
+      form.setError('root', {
+        message: getApiErrorMessage(error, 'Unable to sign in.'),
+      })
+    }
   }
 
   return (
@@ -31,12 +48,12 @@ export const LoginForm = () => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="username"
+          name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter your username" />
+                <Input {...field} placeholder="you@example.com" type="email" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -60,8 +77,11 @@ export const LoginForm = () => {
             </FormItem>
           )}
         />
+        {form.formState.errors.root ? (
+          <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>
+        ) : null}
         <Button type="submit" disabled={form.formState.isSubmitting}>
-          Login
+          {form.formState.isSubmitting ? 'Signing in...' : 'Sign in'}
         </Button>
       </form>
     </Form>
