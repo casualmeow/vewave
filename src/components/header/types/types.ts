@@ -1,4 +1,6 @@
 import { type motion } from 'motion/react'
+import type { ReactNode } from 'react'
+import type { HeaderNavItemProps } from '@/components/header'
 
 export type HeaderVariant = 'glass' | 'glassDark' | 'glassLight' | 'solid' | 'gradient' | 'glow'
 
@@ -30,3 +32,8 @@ export interface HeaderSlotClassNames {
 }
 
 export type PremiumHeaderSlotClassNames = HeaderSlotClassNames
+
+export type HeaderItem = Omit<HeaderNavItemProps, 'children' | 'ref' | 'href'> & {
+  label: ReactNode
+  href: string
+}

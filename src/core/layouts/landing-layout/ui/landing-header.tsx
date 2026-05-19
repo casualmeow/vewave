@@ -1,6 +1,6 @@
 import { useNavigate } from '@tanstack/react-router'
-import { ArrowRight, Play } from 'lucide-react'
-
+import { ArrowRight } from 'lucide-react'
+import { headerItems } from '../config'
 import { Header, HeaderButton, HeaderLogo, HeaderNav, HeaderNavItem } from '@/components/header'
 
 export function LandingHeader() {
@@ -20,7 +20,6 @@ export function LandingHeader() {
       blurIntensity="xl"
       showGlow
       glowColor="rgba(45, 212, 191, 0.28)"
-      hideOnScrollDown
       revealAtTop={32}
       navigationLabel="Landing"
       logo={
@@ -36,29 +35,29 @@ export function LandingHeader() {
       }
       navigation={
         <HeaderNav>
-          <HeaderNavItem href="/" active>
-            Overview
-          </HeaderNavItem>
-          <HeaderNavItem href="#features">Features</HeaderNavItem>
-          <HeaderNavItem href="#workflow">Workflow</HeaderNavItem>
-          <HeaderNavItem href="#launch">Launch</HeaderNavItem>
+          {headerItems.map((item) => (
+            <HeaderNavItem key={item.label} onClick={() => void navigate({ to: item.href })}>
+              {item.label}
+            </HeaderNavItem>
+          ))}
         </HeaderNav>
       }
       actions={
         <>
-          <HeaderButton
+          {/*
+            <HeaderButton
             variant="ghost"
             className="hidden sm:inline-flex"
             startIcon={<Play className="size-4" />}
             onClick={() => void navigate({ to: '/studio' })}
           >
             Studio
-          </HeaderButton>
+          </HeaderButton>*/}
           <HeaderButton
             endIcon={<ArrowRight className="size-4" />}
-            onClick={() => void navigate({ to: '/register' })}
+            onClick={() => navigate({ to: '/create' })}
           >
-            Start free
+            Get started
           </HeaderButton>
         </>
       }
