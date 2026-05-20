@@ -71,14 +71,6 @@ Rules:
 
 Use this area for application shell and layout composition.
 
-Current layout families include:
-
-- app layout
-- landing layout
-- main layout
-- studio layout
-- watch-together layout
-
 Rules:
 
 - Layouts compose page shells, persistent navigation, and `<Outlet />`.
