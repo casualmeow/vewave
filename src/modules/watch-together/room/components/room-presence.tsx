@@ -16,10 +16,10 @@ export function RoomPresence({ members }: RoomPresenceProps) {
         <ul className="mt-4 space-y-2 text-sm">
           {members.map((member) => (
             <li
-              key={member.id}
+              key={member.connectionId}
               className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2"
             >
-              <span>{member.name ?? member.id}</span>
+              <span>{member.name}</span>
               {member.role ? <span className="text-muted-foreground">{member.role}</span> : null}
             </li>
           ))}

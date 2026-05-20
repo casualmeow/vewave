@@ -1,5 +1,3 @@
-This file provides durable repository instructions for coding agents working on this project.
-
 ## Project Stack
 
 - React 19
@@ -20,6 +18,10 @@ This file provides durable repository instructions for coding agents working on 
 - Do not duplicate existing reusable components or recreate abstractions that already exist.
 - Keep changes scoped to the task, but update adjacent documentation when component APIs change.
 - Remove dead code, unused imports, and obsolete helper files when replacing an implementation.
+- Use module architecture.
+- Prefer CVA for component variants.
+- Shared UI primitives live in src/shared/ui.
+- Do not put business logic inside route components.
 
 ## Architecture Boundaries
 
@@ -144,8 +146,6 @@ structural variant:
 When editing animated components:
 
 - preserve the intended interaction quality, not only the TypeScript shape;
-- do not assume `layoutId` alone preserves animation quality if compact and expanded geometry
-  changes significantly;
 - verify that portals, scroll containers, and preview hosts do not break the intended motion
   behavior;
 - keep reduced-motion support intact when it already exists.

@@ -40,6 +40,14 @@ generated client uses `src/core/api/http/orval-mutator.ts`, which routes request
 Axios client. Auth uses an in-memory access token and an HTTP-only refresh cookie; do not store
 access tokens in `localStorage` or inspect refresh cookies from frontend JavaScript.
 
+Room URLs use the backend public room code:
+
+```txt
+/room/:code
+```
+
+Do not use the internal room UUID for navigation.
+
 ## Testing
 
 This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:

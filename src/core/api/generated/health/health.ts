@@ -19,7 +19,7 @@ import type {
   UseQueryResult,
 } from '@tanstack/react-query'
 
-import type { GetApiHealth200 } from '.././model'
+import type { GetApiHealth200, GetApiHealthDb200, GetApiHealthDb503 } from '.././model'
 
 import type { ErrorType } from '../../http/orval-mutator'
 
@@ -124,6 +124,116 @@ export function useGetApiHealth<
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
   const queryOptions = getGetApiHealthQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  query.queryKey = queryOptions.queryKey
+
+  return query
+}
+
+/**
+ * Reports PostgreSQL connectivity and missing required tables without leaking credentials.
+ * @summary Database health check
+ */
+export const getApiHealthDb = (
+  options?: SecondParameter<typeof orvalMutator>,
+  signal?: AbortSignal,
+) => {
+  return orvalMutator<GetApiHealthDb200>({ url: `/api/health/db`, method: 'GET', signal }, options)
+}
+
+export const getGetApiHealthDbQueryKey = () => {
+  return [`/api/health/db`] as const
+}
+
+export const getGetApiHealthDbQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiHealthDb>>,
+  TError = ErrorType<GetApiHealthDb503>,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiHealthDb>>, TError, TData>>
+  request?: SecondParameter<typeof orvalMutator>
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = queryOptions?.queryKey ?? getGetApiHealthDbQueryKey()
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiHealthDb>>> = ({ signal }) =>
+    getApiHealthDb(requestOptions, signal)
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiHealthDb>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiHealthDbQueryResult = NonNullable<Awaited<ReturnType<typeof getApiHealthDb>>>
+export type GetApiHealthDbQueryError = ErrorType<GetApiHealthDb503>
+
+export function useGetApiHealthDb<
+  TData = Awaited<ReturnType<typeof getApiHealthDb>>,
+  TError = ErrorType<GetApiHealthDb503>,
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiHealthDb>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiHealthDb>>,
+          TError,
+          Awaited<ReturnType<typeof getApiHealthDb>>
+        >,
+        'initialData'
+      >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiHealthDb<
+  TData = Awaited<ReturnType<typeof getApiHealthDb>>,
+  TError = ErrorType<GetApiHealthDb503>,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiHealthDb>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiHealthDb>>,
+          TError,
+          Awaited<ReturnType<typeof getApiHealthDb>>
+        >,
+        'initialData'
+      >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiHealthDb<
+  TData = Awaited<ReturnType<typeof getApiHealthDb>>,
+  TError = ErrorType<GetApiHealthDb503>,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiHealthDb>>, TError, TData>>
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Database health check
+ */
+
+export function useGetApiHealthDb<
+  TData = Awaited<ReturnType<typeof getApiHealthDb>>,
+  TError = ErrorType<GetApiHealthDb503>,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiHealthDb>>, TError, TData>>
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetApiHealthDbQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>

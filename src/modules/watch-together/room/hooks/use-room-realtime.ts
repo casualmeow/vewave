@@ -77,7 +77,7 @@ export function useRoomRealtime(code: string) {
           applyServerEvent(event)
 
           if (event.type === 'command.rejected') {
-            toast.error(event.payload.message ?? event.payload.reason)
+            toast.error(event.payload.message)
           }
 
           if (event.type === 'error') {

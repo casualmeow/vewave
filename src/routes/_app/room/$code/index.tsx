@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { RoomPage } from '@/modules/watch-together'
 
-export const Route = createFileRoute('/_app/room/$id/')({
+export const Route = createFileRoute('/_app/room/$code/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { id } = Route.useParams()
+  const { code } = Route.useParams()
 
-  return <RoomPage code={id} />
+  return <RoomPage code={code} />
 }

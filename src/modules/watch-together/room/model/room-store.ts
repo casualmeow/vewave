@@ -41,7 +41,7 @@ export const useRoomStore = create<RoomState>((set) => ({
           return {
             snapshot: event.payload,
             playback: event.payload.playback,
-            presence: event.payload.presence ?? state.presence,
+            presence: event.payload.presence?.members ?? state.presence,
             lastError: null,
           }
         case 'playback.state':
@@ -53,21 +53,15 @@ export const useRoomStore = create<RoomState>((set) => ({
           }
         case 'presence.member.joined':
           return {
-            presence: [
-              ...state.presence.filter((member) => member.id !== event.payload.id),
-              event.payload,
-            ],
+            presence: event.payload.members,
           }
-        case 'presence.member.left': {
-          const id = event.payload.id ?? event.payload.memberId ?? event.payload.userId
-
+        case 'presence.member.left':
           return {
-            presence: id ? state.presence.filter((member) => member.id !== id) : state.presence,
+            presence: event.payload.members,
           }
-        }
         case 'command.rejected':
           return {
-            lastError: event.payload.message ?? event.payload.reason,
+            lastError: event.payload.message,
           }
         case 'error':
           return {

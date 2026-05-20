@@ -64,4 +64,76 @@ describe('room store', () => {
       version: 2,
     })
   })
+
+  it('hydrates presence from realtime snapshots', () => {
+    useRoomStore.getState().applyServerEvent({
+      type: 'room.snapshot',
+      payload: {
+        ...snapshot,
+        presence: {
+          members: [
+            {
+              connectionId: 'conn-1',
+              memberId: 'member-1',
+              userId: 'user-1',
+              name: 'Jane',
+              role: 'owner',
+            },
+          ],
+        },
+      },
+    })
+
+    expect(useRoomStore.getState().presence).toEqual([
+      expect.objectContaining({ connectionId: 'conn-1', name: 'Jane' }),
+    ])
+  })
+
+  it('applies joined and left presence member lists', () => {
+    const jane = {
+      connectionId: 'conn-1',
+      memberId: 'member-1',
+      userId: 'user-1',
+      name: 'Jane',
+      role: 'owner',
+    }
+    const sam = {
+      connectionId: 'conn-2',
+      memberId: 'member-2',
+      userId: 'user-2',
+      name: 'Sam',
+      role: 'viewer',
+    }
+
+    useRoomStore.getState().applyServerEvent({
+      type: 'presence.member.joined',
+      payload: { member: sam, members: [jane, sam] },
+    })
+
+    expect(useRoomStore.getState().presence).toHaveLength(2)
+
+    useRoomStore.getState().applyServerEvent({
+      type: 'presence.member.left',
+      payload: {
+        connectionId: 'conn-2',
+        memberId: 'member-2',
+        userId: 'user-2',
+        members: [jane],
+      },
+    })
+
+    expect(useRoomStore.getState().presence).toEqual([jane])
+  })
+
+  it('stores command rejection messages', () => {
+    useRoomStore.getState().applyServerEvent({
+      type: 'command.rejected',
+      payload: {
+        code: 'PLAYBACK_COMMAND_FORBIDDEN',
+        message: 'Only the room host can control playback.',
+      },
+    })
+
+    expect(useRoomStore.getState().lastError).toBe('Only the room host can control playback.')
+  })
 })

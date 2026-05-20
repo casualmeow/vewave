@@ -68,9 +68,9 @@ export function CreateRoomForm() {
       })
       toast.success('Room created')
       await navigate({
-        to: '/room/$id',
+        to: '/room/$code',
         params: {
-          id: response.room.code,
+          code: response.room.code,
         },
       })
     } catch (error) {
