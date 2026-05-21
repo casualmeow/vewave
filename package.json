@@ -42,6 +42,8 @@
     "axios": "^1.10.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "fumadocs-core": "^16.9.0",
+    "fumadocs-ui": "^16.9.0",
     "gsap": "^3.15.0",
     "lucide-react": "^0.513.0",
     "motion": "^12.38.0",

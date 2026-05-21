@@ -40,7 +40,8 @@ Rules:
 - Reusable complex UI components belong here.
 - Component packages may include local `hooks`, `helpers`, `constants`, `types`, and `ui`
   folders when that pattern already exists.
-- If a public component API changes, update its local README or usage documentation.
+- If a public component API changes, update the matching docs page under
+  `src/modules/docs/**` and `/docs/ui/components/**`.
 - Do not put route-specific showcase orchestration here unless it is truly part of the reusable
   component itself.
 
@@ -127,7 +128,7 @@ Rules:
 When a reusable component under `src/components/**` gains a new public prop, behavior mode, or
 structural variant:
 
-- update its README or local usage documentation;
+- update its UI-kit docs page under `/docs/ui/components/**`;
 - document the real API only;
 - distinguish visual variants from structural or presentation variants;
 - include basic usage and advanced usage when relevant;
