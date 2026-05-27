@@ -9,6 +9,7 @@ import {
   Layers3,
   MonitorPlay,
   Paintbrush,
+  PanelLeft,
   Route,
   ShieldCheck,
   Sparkles,
@@ -60,6 +61,14 @@ export const docsNavItems = [
     description: 'Expandable card, resize, and motion API.',
     to: '/docs/ui/components/resizable-card',
     icon: Paintbrush,
+    exact: true,
+  },
+  {
+    title: 'Sidebar',
+    description:
+      'Composable shell navigation with liquid glass, glass, fluent, and solid variants.',
+    to: '/docs/ui/components/sidebar',
+    icon: PanelLeft,
     exact: true,
   },
   {
@@ -177,6 +186,20 @@ export const uiComponentDocs = [
     ],
     to: '/docs/ui/components/resizable-card',
     icon: Paintbrush,
+  },
+  {
+    title: 'Sidebar',
+    status: 'Composable navigation shell package',
+    description:
+      'Builds studio/app sidebars from Sidebar, SidebarBrand, SidebarSection, SidebarItem, and SidebarFooter.',
+    notes: [
+      'moving liquid selector',
+      'solid/glass/fluent designs',
+      'compound items',
+      'collapsed labels',
+    ],
+    to: '/docs/ui/components/sidebar',
+    icon: PanelLeft,
   },
   {
     title: 'Shared UI',

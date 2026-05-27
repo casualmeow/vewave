@@ -1,4 +1,4 @@
-import { PanelTop, Box, Sparkles } from 'lucide-react'
+import { Box, PanelLeft, PanelTop, Sparkles } from 'lucide-react'
 import type { ResizableCardItem } from '@/components/resizable-card'
 
 export const catalogItems = [
@@ -8,6 +8,13 @@ export const catalogItems = [
     description: 'Live header playground with scroll-linked behavior.',
     icon: PanelTop,
     tone: 'from-teal-300 to-sky-400',
+  },
+  {
+    href: '#sidebar',
+    label: 'Sidebar',
+    description: 'Solid, glass, and fluent app-shell navigation variants.',
+    icon: PanelLeft,
+    tone: 'from-cyan-300 to-teal-400',
   },
   {
     href: '#resizable-card',

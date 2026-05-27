@@ -35,7 +35,7 @@ export const LoginForm = () => {
       const response = await loginMutation.mutateAsync({ data: values })
       setAuthenticated(response.user, response.accessToken)
       toast.success('Signed in')
-      await navigate({ to: '/create' })
+      await navigate({ to: '/projects' })
     } catch (error) {
       form.setError('root', {
         message: getApiErrorMessage(error, 'Unable to sign in.'),

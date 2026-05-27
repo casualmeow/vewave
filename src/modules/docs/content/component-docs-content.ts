@@ -2,18 +2,20 @@ import {
   Component,
   GalleryHorizontalEnd,
   MousePointerClick,
+  PanelLeft,
   PanelTop,
   Sparkles,
   StretchHorizontal,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
-export type ComponentDocSlug = 'header' | 'resizable-card'
+export type ComponentDocSlug = 'header' | 'resizable-card' | 'sidebar'
 
 export type ComponentDocRoute =
   | '/docs/ui/components'
   | '/docs/ui/components/header'
   | '/docs/ui/components/resizable-card'
+  | '/docs/ui/components/sidebar'
 
 export type ComponentDocLink = {
   slug: ComponentDocSlug
@@ -115,6 +117,60 @@ export function Example() {
     />
   )
 }`
+
+const sidebarImportSnippet = `import {
+  Sidebar,
+  SidebarBrand,
+  SidebarFooter,
+  SidebarItem,
+  SidebarItemBadge,
+  SidebarItemIcon,
+  SidebarItemLabel,
+  SidebarSection,
+} from '@/components/sidebar'`
+
+const sidebarUsageSnippet = `<Sidebar
+  design="liquidGlass"
+  size="md"
+  density="comfortable"
+  motion="fluid"
+  fluidPreset="expressive"
+  hoverSize={10}
+  hoverScale={1.07}
+  activeHoverScale={1.045}
+  dragScale={1.12}
+  magneticStrength={13}
+  magneticVerticalStrength={8}
+  tiltStrength={4.2}
+  focusBlur
+  focusBlurAmount={4.5}
+  focusDimOpacity={0.46}
+  liquidIntensity={1.25}
+  dragMode="both"
+  aria-label="Studio navigation"
+>
+  <SidebarBrand
+    visual={<Avatar className="size-12" />}
+    title="Your channel"
+    subtitle="Creator studio"
+  />
+
+  <SidebarSection title="Workspace">
+    <SidebarItem asChild active>
+      <Link to="/studio/home">
+        <SidebarItemIcon><Home /></SidebarItemIcon>
+        <SidebarItemLabel>Home</SidebarItemLabel>
+        <SidebarItemBadge>Live</SidebarItemBadge>
+      </Link>
+    </SidebarItem>
+  </SidebarSection>
+
+  <SidebarFooter>
+    <SidebarItem type="button" icon={<Settings />}>
+      Settings
+    </SidebarItem>
+  </SidebarFooter>
+</Sidebar>`
 
 export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
   header: {
@@ -284,6 +340,196 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
       'The resize handle is keyboard focusable and labeled.',
     ],
   },
+  sidebar: {
+    slug: 'sidebar',
+    title: 'Sidebar',
+    eyebrow: 'Navigation / shell component',
+    description:
+      'A decomposable sidebar system for app shells with compound items, CVA design variants, one moving active selector, and solid/glass/liquid-glass/fluent visual treatments.',
+    to: '/docs/ui/components/sidebar',
+    icon: PanelLeft,
+    importSnippet: sidebarImportSnippet,
+    usageSnippet: sidebarUsageSnippet,
+    apiRows: [
+      {
+        name: 'design',
+        type: "'solid' | 'glass' | 'liquidGlass' | 'fluent'",
+        description:
+          'Visual treatment for the sidebar surface and items. liquidGlass uses one floating glass shell, subtle nav platters, and a moving liquid active selector; fluent uses acrylic-like depth.',
+      },
+      {
+        name: 'size',
+        type: "'sm' | 'md' | 'lg'",
+        description: 'Controls sidebar width, spacing, and item scale.',
+      },
+      {
+        name: 'density',
+        type: "'compact' | 'comfortable'",
+        description: 'Controls vertical rhythm inside sections and items.',
+      },
+      {
+        name: 'collapsed',
+        type: 'boolean',
+        description:
+          'Switches text labels and badges into icon-only layout while preserving accessible text.',
+      },
+      {
+        name: 'motion',
+        type: "'none' | 'soft' | 'fluid'",
+        description:
+          'Controls entrance, hover, and active-indicator motion. fluid uses a tighter spring for the liquid-glass active highlight.',
+      },
+      {
+        name: 'fluidPreset',
+        type: "'subtle' | 'balanced' | 'expressive' | 'extreme'",
+        description:
+          'Preconfigured interaction strength for liquidGlass hover scale, magnetic movement, tilt, focus blur, and liquid intensity.',
+      },
+      {
+        name: 'hoverSize',
+        type: 'number',
+        description:
+          'Pixel expansion of the liquid hover/active selector layer around the item shell.',
+      },
+      {
+        name: 'hoverScale',
+        type: 'number',
+        description: 'Scale applied to inactive liquid item shells on hover.',
+      },
+      {
+        name: 'activeHoverScale',
+        type: 'number',
+        description: 'Scale applied to the active liquid item shell on hover.',
+      },
+      {
+        name: 'dragScale',
+        type: 'number',
+        description: 'Scale used while dragging a liquid item shell.',
+      },
+      {
+        name: 'magneticStrength',
+        type: 'number',
+        description: 'Horizontal magnetic pointer offset strength for liquidGlass items.',
+      },
+      {
+        name: 'magneticVerticalStrength',
+        type: 'number',
+        description: 'Vertical magnetic pointer offset strength for liquidGlass items.',
+      },
+      {
+        name: 'tiltStrength',
+        type: 'number',
+        description: 'Maximum tilt angle used by pointer-driven liquid item motion.',
+      },
+      {
+        name: 'focusBlur',
+        type: 'boolean',
+        description: 'Dims and blurs sibling items while one liquid item is focused or hovered.',
+      },
+      {
+        name: 'focusBlurAmount',
+        type: 'number',
+        description: 'Blur radius in pixels for focus/hover sibling attenuation.',
+      },
+      {
+        name: 'focusDimOpacity',
+        type: 'number',
+        description: 'Opacity applied to sibling items during focus/hover attenuation.',
+      },
+      {
+        name: 'liquidIntensity',
+        type: 'number',
+        description: 'Multiplier used by the liquid selector and hover material effects.',
+      },
+      {
+        name: 'dragMode',
+        type: "'none' | 'x' | 'y' | 'both'",
+        description:
+          'Controls drag direction for liquid item shells when motion is fluid. Use none for conservative navigation.',
+      },
+      {
+        name: 'SidebarItem asChild',
+        type: 'boolean',
+        description:
+          'Lets route links or dialog triggers receive sidebar item classes while keeping router primitives outside the reusable package.',
+      },
+      {
+        name: 'SidebarItem icon / badge',
+        type: 'ReactNode',
+        description:
+          'Optional shorthand slots for button-style items. Use SidebarItemIcon, SidebarItemLabel, and SidebarItemBadge when composing asChild links.',
+      },
+    ],
+    sections: [
+      {
+        title: 'Composition model',
+        body: 'Sidebar owns reusable shell behavior. Layouts provide route-specific links, active state, dialog content, and product copy. SidebarSection creates the grouped navigation region and keeps section labels accessible in collapsed mode.',
+        code: `<Sidebar design="glass">
+  <SidebarBrand title="Studio" subtitle="Creator tools" />
+  <SidebarSection title="Navigation">
+    <SidebarItem asChild>
+      <Link to="/studio/home">
+        <SidebarItemIcon><Home /></SidebarItemIcon>
+        <SidebarItemLabel>Home</SidebarItemLabel>
+      </Link>
+    </SidebarItem>
+  </SidebarSection>
+</Sidebar>`,
+      },
+      {
+        title: 'Liquid glass and fluent variants',
+        body: 'Use liquidGlass when the shell sits over a rich background and should show a fluid active highlight. Use fluent when the app needs a calmer acrylic-style panel. All variants share the same component API.',
+        code: `<Sidebar design="liquidGlass" motion="fluid" />
+<Sidebar design="glass" />
+<Sidebar design="fluent" />`,
+      },
+      {
+        title: 'Fluid active highlight',
+        body: 'The liquidGlass variant renders a scoped shared-layout selector behind the active item. Item content stays sharp above it, and fine-pointer devices only add a small shell shine rather than per-item glass cards.',
+        code: `<Sidebar design="liquidGlass" motion="fluid" fluidPreset="balanced">
+  <SidebarSection title="Workspace">
+    <SidebarItem active icon={<Home />}>Home</SidebarItem>
+    <SidebarItem icon={<Video />} badge="12">Content</SidebarItem>
+  </SidebarSection>
+</Sidebar>`,
+      },
+      {
+        title: 'Interaction tuning',
+        body: 'Use fluidPreset first. Reach for hoverScale, magneticStrength, tiltStrength, liquidIntensity, focusBlur, or dragMode only when a layout needs a specific interaction profile.',
+        code: `<Sidebar
+  design="liquidGlass"
+  motion="fluid"
+  fluidPreset="subtle"
+  hoverSize={3}
+  hoverScale={1.025}
+  activeHoverScale={1.015}
+  dragScale={1.045}
+  magneticStrength={4}
+  magneticVerticalStrength={2.5}
+  tiltStrength={1.8}
+  liquidIntensity={0.72}
+  dragMode="none"
+  focusBlur={false}
+/>`,
+      },
+      {
+        title: 'Collapsed sidebars',
+        body: 'Collapsed mode hides visible labels with sr-only text instead of removing names from assistive technology.',
+        code: `<Sidebar collapsed aria-label="Primary navigation">
+  <SidebarSection title="Workspace">
+    <SidebarItem icon={<Home />}>Home</SidebarItem>
+  </SidebarSection>
+</Sidebar>`,
+      },
+    ],
+    accessibility: [
+      'Consumers provide aria-label on the Sidebar root when it acts as navigation.',
+      'Active items set aria-current="page".',
+      'Collapsed labels remain accessible through sr-only text.',
+      'Disabled items expose aria-disabled and block pointer interaction.',
+      'Reduced-motion users do not receive transform-heavy sidebar entrance animation.',
+    ],
+  },
 }
 
 export const componentDocLinks: Array<ComponentDocLink> = [
@@ -300,6 +546,13 @@ export const componentDocLinks: Array<ComponentDocLink> = [
     description: componentDocs['resizable-card'].description,
     to: componentDocs['resizable-card'].to,
     icon: componentDocs['resizable-card'].icon,
+  },
+  {
+    slug: 'sidebar',
+    title: componentDocs.sidebar.title,
+    description: componentDocs.sidebar.description,
+    to: componentDocs.sidebar.to,
+    icon: componentDocs.sidebar.icon,
   },
 ]
 

@@ -3,7 +3,7 @@ import {
   type ResizableCardItem,
   type ResizableCardResolvedTransition,
   type ResizableCardSharedLayoutPart,
-} from '../types/types'
+} from '../../types/types'
 
 export function defaultTitleRenderer<T extends ResizableCardItem>(item: T) {
   return item.title

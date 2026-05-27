@@ -2,7 +2,7 @@ import { CreateRoomForm } from './create-room-form'
 
 export function CreateRoomPage() {
   return (
-    <main className="min-h-screen bg-background px-6 py-10">
+    <div className="min-h-[calc(100vh-2rem)] overflow-auto px-6 py-10">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
         <section className="max-w-2xl">
           <p className="text-sm font-medium text-muted-foreground">Watch together</p>
@@ -16,6 +16,6 @@ export function CreateRoomPage() {
         </section>
         <CreateRoomForm />
       </div>
-    </main>
+    </div>
   )
 }

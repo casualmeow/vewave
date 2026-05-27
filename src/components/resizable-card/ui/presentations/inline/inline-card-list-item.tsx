@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { animatedLayoutId } from '../../../helpers'
+import { animatedLayoutId } from '../../../hooks/helpers'
 import { resizableCardVariants } from '../../../constants'
 import { DefaultAction, DefaultMedia } from '../../default-renders'
 import type {

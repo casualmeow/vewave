@@ -21,29 +21,29 @@ export function RoomPage({ code }: RoomPageProps) {
 
   if (query.isPending) {
     return (
-      <main className="grid min-h-screen place-items-center bg-background px-6 text-sm text-muted-foreground">
+      <div className="grid min-h-[calc(100vh-2rem)] place-items-center px-6 text-sm text-muted-foreground">
         Loading room...
-      </main>
+      </div>
     )
   }
 
   if (query.isError || !snapshot) {
     return (
-      <main className="grid min-h-screen place-items-center bg-background px-6">
+      <div className="grid min-h-[calc(100vh-2rem)] place-items-center px-6">
         <div className="max-w-md text-center">
           <h1 className="text-2xl font-semibold">Room unavailable</h1>
           <p className="mt-3 text-sm text-muted-foreground">
             {getApiErrorMessage(query.error, 'The room could not be loaded.')}
           </p>
         </div>
-      </main>
+      </div>
     )
   }
 
   const canControl = snapshot.permissions.canControlPlayback
 
   return (
-    <main className="min-h-screen bg-background px-6 py-8">
+    <div className="min-h-[calc(100vh-2rem)] overflow-auto px-6 py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
         <RoomHeader snapshot={snapshot} connectionStatus={connectionStatus} />
         {lastError ? (
@@ -63,6 +63,6 @@ export function RoomPage({ code }: RoomPageProps) {
           <RoomPresence members={presence} />
         </section>
       </div>
-    </main>
+    </div>
   )
 }

@@ -1,0 +1,5 @@
+export { SidebarBrand } from './ui/sidebar-brand'
+export { SidebarFooter } from './ui/sidebar-footer'
+export { SidebarItem, SidebarItemBadge, SidebarItemIcon, SidebarItemLabel } from './ui/sidebar-item'
+export { SidebarRoot, SidebarRoot as Sidebar } from './ui/sidebar-root'
+export { SidebarSection } from './ui/sidebar-section'

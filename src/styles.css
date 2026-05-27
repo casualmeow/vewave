@@ -138,3 +138,35 @@ code {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    [data-sidebar-root='liquidGlass'] {
+      --sidebar-glass-border: rgba(203, 213, 225, 0.82);
+      background: rgba(248, 250, 252, 0.94);
+    }
+
+    .dark [data-sidebar-root='liquidGlass'] {
+      --sidebar-glass-border: rgba(255, 255, 255, 0.14);
+      background: rgba(24, 24, 27, 0.94);
+    }
+
+    [data-sidebar-root='liquidGlass'] [data-sidebar-glass='specular'],
+    [data-sidebar-root='liquidGlass'] [data-sidebar-glass='noise'] {
+      display: none;
+    }
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    [data-sidebar-root='liquidGlass'] [data-sidebar-glass='specular'] {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-sidebar-root='liquidGlass'] *,
+    [data-sidebar-root='glass'] * {
+      scroll-behavior: auto !important;
+    }
+  }
+}

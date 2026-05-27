@@ -1,17 +1,35 @@
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock.core'
+import { docsShiki } from '../lib/shiki'
 import type { ReactNode } from 'react'
 
 import type { ComponentApiRow } from '../content/component-docs-content'
 
-export function DocsCodeBlock({ children }: { children: string }) {
+export function DocsCodeBlock({
+  children,
+  lang = 'tsx',
+  title = 'Example',
+}: {
+  children: string
+  lang?: string
+  title?: string
+}) {
   return (
-    <div className="not-prose overflow-hidden rounded-lg border border-zinc-900 bg-zinc-950 shadow-sm">
-      <div className="border-b border-white/10 px-4 py-2 text-xs font-medium text-zinc-400">
-        Example
-      </div>
-      <pre className="overflow-x-auto p-4 text-sm leading-6 text-zinc-100">
-        <code>{children}</code>
-      </pre>
-    </div>
+    <DynamicCodeBlock
+      highlighter={() => docsShiki.getOrInit()}
+      lang={lang}
+      code={children}
+      options={{
+        theme: 'github-dark',
+      }}
+      codeblock={{
+        title,
+        className:
+          'not-prose overflow-hidden rounded-lg border border-zinc-900 bg-zinc-950 shadow-[0_16px_50px_rgba(15,23,42,0.18)] [&_pre]:px-4 [&_pre]:py-4 [&_pre]:text-sm [&_pre]:leading-6',
+        viewportProps: {
+          className: 'max-h-[34rem] overflow-auto bg-zinc-950 text-zinc-100 [scrollbar-width:thin]',
+        },
+      }}
+    />
   )
 }
 

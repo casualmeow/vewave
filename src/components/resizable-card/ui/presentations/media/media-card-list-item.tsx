@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { animatedLayoutId } from '../../../helpers/utils'
+import { animatedLayoutId } from '../../../hooks/helpers'
 import { resizableMediaCardVariants } from '../../../constants'
 import { MediaDefaultImage } from './media-default-image'
 import type {

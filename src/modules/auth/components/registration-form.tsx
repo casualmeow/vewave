@@ -36,7 +36,7 @@ export const RegistrationForm = () => {
       const response = await registerMutation.mutateAsync({ data: values })
       setAuthenticated(response.user, response.accessToken)
       toast.success('Account created')
-      await navigate({ to: '/create' })
+      await navigate({ to: '/projects' })
     } catch (error) {
       form.setError('root', {
         message: getApiErrorMessage(error, 'Unable to create your account.'),

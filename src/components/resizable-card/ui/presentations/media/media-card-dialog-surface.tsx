@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { animatedLayoutId, resolveCardContent } from '../../../helpers/utils'
+import { animatedLayoutId, resolveCardContent } from '../../../hooks/helpers'
 import {
   resizableContentVariants,
   resizableDialogVariants,
