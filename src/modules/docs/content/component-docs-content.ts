@@ -129,9 +129,21 @@ const sidebarImportSnippet = `import {
   SidebarItemIcon,
   SidebarItemLabel,
   SidebarSection,
+  type MobileSidebarDockItem,
 } from '@/components/sidebar'`
 
-const sidebarUsageSnippet = `<Sidebar
+const sidebarUsageSnippet = `const mobileDockItems: Array<MobileSidebarDockItem> = [
+  { label: 'Home', shortLabel: 'Home', to: '/studio/home', icon: <Home /> },
+  {
+    label: 'Content manager',
+    shortLabel: 'Content',
+    to: '/studio/content-manager',
+    icon: <Video />,
+    badge: '12',
+  },
+]
+
+<Sidebar
   design="liquidGlass"
   size="md"
   density="comfortable"
@@ -160,6 +172,10 @@ const sidebarUsageSnippet = `<Sidebar
   mobileDragMode="both"
   mobileDockDragMode="both"
   mobileMaxItems={5}
+  mobileDockItems={mobileDockItems}
+  mobileDockPathname={location.pathname}
+  mobileDockPlacement="container"
+  mobileDockClassName="inset-x-3"
   aria-label="Studio navigation"
 >
   <SidebarBrand
@@ -464,7 +480,25 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
         name: 'mobileMode',
         type: "'auto' | 'off' | 'only'",
         description:
-          'Controls whether the route-aware Sidebar facade also renders the mobile dock. Compound SidebarRoot usage can keep mobile navigation in the layout layer.',
+          'Controls whether Sidebar renders the desktop rail, the mobile dock, both, or neither. auto swaps to the dock only when mobileDockItems are provided; otherwise the compound rail stays visible.',
+      },
+      {
+        name: 'children',
+        type: 'ReactNode | undefined',
+        description:
+          'Passing children uses compound mode with SidebarBrand, SidebarSection, SidebarItem, and SidebarFooter. Omitting children uses the built-in route-aware studio facade.',
+      },
+      {
+        name: 'mobileDockItems',
+        type: 'Array<MobileSidebarDockItem>',
+        description:
+          'Items rendered by the mobile dock in compound mode. This keeps route-specific navigation data in layouts while reusing the sidebar dock behavior.',
+      },
+      {
+        name: 'mobileDockPathname',
+        type: 'string',
+        description:
+          'Pathname used to resolve the active mobile dock item, usually location.pathname from TanStack Router.',
       },
       {
         name: 'mobileFluidPreset',
@@ -546,6 +580,24 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
         description: 'Maximum number of navigation items rendered inside the mobile dock.',
       },
       {
+        name: 'mobileDockPlacement',
+        type: "'container' | 'app' | 'viewport' | 'inline'",
+        description:
+          'Positions the mobile dock. container and app are layout-contained absolute placements, viewport is an opt-in fixed overlay, and inline is sticky for embedded previews.',
+      },
+      {
+        name: 'mobileDockClassName',
+        type: 'string',
+        description:
+          'Optional className for the mobile dock wrapper, useful for shell-specific insets.',
+      },
+      {
+        name: 'MobileSidebarDockItem.params',
+        type: 'Record<string, string>',
+        description:
+          'Optional TanStack Router params for dock links that point to dynamic routes such as /room/$code.',
+      },
+      {
         name: 'SidebarItem asChild',
         type: 'boolean',
         description:
@@ -561,7 +613,7 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
     sections: [
       {
         title: 'Composition model',
-        body: 'Sidebar owns reusable shell behavior. Layouts provide route-specific links, active state, dialog content, and product copy. SidebarSection creates the grouped navigation region and keeps section labels accessible in collapsed mode.',
+        body: 'Sidebar supports two modes. Passing children uses the compound shell with SidebarBrand, SidebarSection, SidebarItem, and SidebarFooter. Omitting children keeps the built-in route-aware studio facade. Layouts should still own route-specific links, active state, dialog content, and product copy.',
         code: `<Sidebar design="glass">
   <SidebarBrand title="Studio" subtitle="Creator tools" />
   <SidebarSection title="Navigation">
@@ -576,12 +628,16 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
       },
       {
         title: 'App shell usage',
-        body: 'Authenticated app layouts compose Sidebar from root pieces, then provide project routes, user avatar fallback, settings dialogs, and logout actions in the layout package.',
+        body: 'Authenticated app layouts compose Sidebar from root pieces, then pass mobileDockItems so the same route model powers the desktop rail and the bottom dock. Use mobileDockPlacement="container" inside a relative 100svh app shell so the dock sits inside the padded surface instead of the raw viewport.',
         code: `<Sidebar
   design="liquidGlass"
   motion="fluid"
   fluidPreset="balanced"
   dragMode="none"
+  mobileDockItems={mobileDockItems}
+  mobileDockPathname={location.pathname}
+  mobileDockPlacement="container"
+  mobileDockClassName="inset-x-3"
   role="navigation"
   aria-label="App navigation"
 >
@@ -641,8 +697,10 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
       },
       {
         title: 'Mobile dock tuning',
-        body: 'The route-aware Sidebar facade can render a touch-first floating dock with its own interaction profile. Use mobileFluidPreset for broad behavior, then override individual mobile* props when the dock needs stronger touch affordance than the desktop rail.',
+        body: 'Sidebar can render a touch-first floating dock with its own interaction profile. Use mobileFluidPreset for broad behavior, pass mobileDockItems for compound layouts, and keep mobileDockPlacement="container" for normal app shells. Use viewport only when an intentional fixed overlay is needed.',
         code: `<Sidebar
+  mobileDockItems={mobileDockItems}
+  mobileDockPathname={location.pathname}
   mobileFluidPreset="extreme"
   mobileHoverSize={22}
   mobileHoverScale={1.12}
@@ -654,6 +712,8 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
   mobileDragMode="both"
   mobileDockDragMode="both"
   mobileMaxItems={5}
+  mobileDockPlacement="container"
+  mobileDockClassName="inset-x-3"
 />`,
       },
       {
@@ -669,6 +729,7 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
     accessibility: [
       'Consumers provide aria-label on the Sidebar root when it acts as navigation.',
       'Active items set aria-current="page".',
+      'Mobile dock items also set aria-current and support TanStack Router params for dynamic routes.',
       'Collapsed labels remain accessible through sr-only text.',
       'Disabled items expose aria-disabled and block pointer interaction.',
       'Reduced-motion users do not receive transform-heavy sidebar entrance animation.',

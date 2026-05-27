@@ -21,12 +21,12 @@ export const VideoEditHeaderActions = ({
   onShare,
 }: VideoEditHeaderActionsProps) => {
   return (
-    <div className="flex flex-row gap-1 self-end">
-      <Button type="button" variant="secondary" onClick={onUndo}>
+    <div className="flex w-full flex-wrap justify-end gap-2 xl:self-end">
+      <Button type="button" variant="secondary" className="flex-1 sm:flex-none" onClick={onUndo}>
         Undo changes
       </Button>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" className="flex-1 sm:flex-none" disabled={isSubmitting}>
         {isSubmitting ? 'Saving...' : 'Submit'}
       </Button>
 

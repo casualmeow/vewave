@@ -32,22 +32,27 @@ export default function EditPlayer({ src }: EditPlayerProps) {
 
   return (
     <div className="flex flex-col justify-center">
-      <div className="bg-secondary p-4 rounded-lg shadow-md flex flex-col gap-2">
+      <div className="flex flex-col gap-3 rounded-2xl border bg-secondary/80 p-3 shadow-md sm:p-4">
         <MinifiedVideoPlayer
           src={src}
-          className="w-full aspect-auto"
+          className="aspect-video w-full overflow-hidden rounded-xl"
           autoPlay={false}
           muted={false}
           loop={false}
         />
-        <div className="flex flex-col">
-          <div className="text-sm">File link</div>
-          <div className="w-full flex flex-row justify-between">
-            <Button variant="link" className="p-0" type="button" onClick={handleOpenLink}>
-              {src}
+        <div className="flex min-w-0 flex-col gap-1">
+          <div className="text-sm font-medium">File link</div>
+          <div className="flex w-full min-w-0 flex-row items-center justify-between gap-2">
+            <Button
+              variant="link"
+              className="min-w-0 flex-1 justify-start overflow-hidden p-0 text-left"
+              type="button"
+              onClick={handleOpenLink}
+            >
+              <span className="truncate">{src}</span>
             </Button>
             <Tooltip text={isCopied ? 'Link copied!' : 'Copy link'}>
-              <Button variant="ghost" type="button" onClick={handleCopy}>
+              <Button variant="ghost" size="icon" type="button" onClick={handleCopy}>
                 {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </Button>
             </Tooltip>

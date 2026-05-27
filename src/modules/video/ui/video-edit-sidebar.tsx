@@ -19,7 +19,7 @@ export const VideoEditSidebar = ({
   onShare,
 }: VideoEditSidebarProps) => {
   return (
-    <div className="rightside flex flex-col gap-5 flex-1/4">
+    <aside className="order-first flex min-w-0 flex-col gap-4 xl:sticky xl:top-6 xl:order-none xl:self-start">
       <VideoEditHeaderActions
         isSubmitting={isSubmitting}
         onUndo={onUndo}
@@ -30,6 +30,6 @@ export const VideoEditSidebar = ({
       <EditPlayer src={VideoData.src} />
 
       <AccessSelector initialAccess={VideoData.access} onChange={onAccessChange} />
-    </div>
+    </aside>
   )
 }

@@ -113,7 +113,7 @@ export function AppSidebar({ className }: { className?: string }) {
       dragMode="none"
       mobileDockItems={mobileDockItems}
       mobileDockPathname={location.pathname}
-      mobileDockPlacement="app"
+      mobileDockPlacement="container"
       mobileDockClassName="inset-x-3"
       role="navigation"
       aria-label="App navigation"

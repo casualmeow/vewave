@@ -19,6 +19,7 @@ import type {
   SidebarDesign,
   SidebarDragMode,
   SidebarFluidPreset,
+  SidebarMobileDockPlacement,
   SidebarMobileMode,
   SidebarMotion,
   SidebarSize,
@@ -78,6 +79,8 @@ type SidebarShowcaseState = {
   mobileDragMode: SidebarDragMode
   mobileDockDragMode: SidebarDragMode
   mobileMaxItems: number
+  mobileDockPlacement: SidebarMobileDockPlacement
+  mobileDockClassName: string
   activeItem: SidebarDemoItemId
 }
 
@@ -107,6 +110,12 @@ const sidebarDragModes = [
   'y',
   'both',
 ] as const satisfies ReadonlyArray<SidebarDragMode>
+const sidebarMobileDockPlacements = [
+  'container',
+  'app',
+  'viewport',
+  'inline',
+] as const satisfies ReadonlyArray<SidebarMobileDockPlacement>
 const activeItems = [
   'home',
   'content',
@@ -202,6 +211,8 @@ function mobilePresetValues(fluidPreset: SidebarFluidPreset) {
     mobileDragMode: preset.dragMode,
     mobileDockDragMode: 'both',
     mobileMaxItems: 5,
+    mobileDockPlacement: 'container',
+    mobileDockClassName: 'inset-x-3',
   } satisfies Pick<
     SidebarShowcaseState,
     | 'mobileMode'
@@ -220,6 +231,8 @@ function mobilePresetValues(fluidPreset: SidebarFluidPreset) {
     | 'mobileDragMode'
     | 'mobileDockDragMode'
     | 'mobileMaxItems'
+    | 'mobileDockPlacement'
+    | 'mobileDockClassName'
   >
 }
 
@@ -254,6 +267,8 @@ function createSidebarState(
     | 'mobileDragMode'
     | 'mobileDockDragMode'
     | 'mobileMaxItems'
+    | 'mobileDockPlacement'
+    | 'mobileDockClassName'
   > & {
     dragMode?: SidebarDragMode
   },
@@ -303,6 +318,8 @@ const initialState: SidebarShowcaseState = {
   mobileDragMode: 'both',
   mobileDockDragMode: 'both',
   mobileMaxItems: 5,
+  mobileDockPlacement: 'container',
+  mobileDockClassName: 'inset-x-3',
 }
 
 const sidebarPropRows = [
@@ -340,6 +357,8 @@ const sidebarPropRows = [
   'mobileDragMode',
   'mobileDockDragMode',
   'mobileMaxItems',
+  'mobileDockPlacement',
+  'mobileDockClassName',
 ] as const satisfies ReadonlyArray<keyof SidebarShowcaseState>
 
 export function SidebarShowcaseSection() {
@@ -573,6 +592,12 @@ export function SidebarShowcaseSection() {
               options={sidebarDragModes}
               onChange={(value) => updateState('mobileDockDragMode', value)}
             />
+            <SelectField
+              label="Dock placement"
+              value={state.mobileDockPlacement}
+              options={sidebarMobileDockPlacements}
+              onChange={(value) => updateState('mobileDockPlacement', value)}
+            />
             <CheckboxField
               label="Mobile focus blur"
               checked={state.mobileFocusBlur}
@@ -717,7 +742,9 @@ export function SidebarShowcaseSection() {
   mobileLiquidIntensity={${state.mobileLiquidIntensity}}
   mobileDragMode="${state.mobileDragMode}"
   mobileDockDragMode="${state.mobileDockDragMode}"
-  mobileMaxItems={${state.mobileMaxItems}}${state.collapsed ? '\n  collapsed' : ''}
+  mobileMaxItems={${state.mobileMaxItems}}
+  mobileDockPlacement="${state.mobileDockPlacement}"
+  mobileDockClassName="${state.mobileDockClassName}"${state.collapsed ? '\n  collapsed' : ''}
 >
   <SidebarBrand title="Vewave Studio" />
   <SidebarSection title="Workspace">

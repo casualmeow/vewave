@@ -133,7 +133,7 @@ export function MobileSidebarDock({
   dragMode,
   dockDragMode = 'both',
   maxItems = 5,
-  placement = 'app',
+  placement = 'container',
 }: MobileSidebarDockProps) {
   const prefersReducedMotion = useReducedMotion()
   const canAnimate = !prefersReducedMotion
@@ -206,9 +206,11 @@ export function MobileSidebarDock({
       aria-label="Studio mobile navigation"
       data-slot="liquid-mobile-sidebar-dock"
       className={cn(
-        placement === 'app'
-          ? 'pointer-events-none fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-50 md:hidden'
-          : 'pointer-events-none fixed inset-x-0 bottom-3 z-50 px-3 pb-[env(safe-area-inset-bottom)] md:hidden',
+        placement === 'viewport'
+          ? 'pointer-events-none fixed inset-x-0 bottom-3 z-50 px-3 pb-[env(safe-area-inset-bottom)] md:hidden'
+          : placement === 'inline'
+            ? 'pointer-events-none sticky bottom-0 z-40 w-full px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:hidden'
+            : 'pointer-events-none absolute inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-40 md:hidden',
         className,
       )}
       initial={canAnimate ? { opacity: 0, y: 26, scale: 0.96 } : false}

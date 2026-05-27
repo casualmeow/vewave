@@ -23,10 +23,10 @@ interface VideoEditDetailsSectionProps {
 
 export const VideoEditDetailsSection = ({ control }: VideoEditDetailsSectionProps) => {
   return (
-    <div className="leftside flex flex-col flex-3/4 gap-5">
+    <div className="flex min-w-0 flex-col gap-5">
       <h2 className="text-2xl font-bold pt-1">Video details</h2>
 
-      <div className="grid w-full pr-6 items-center gap-4">
+      <div className="grid w-full items-center gap-4 xl:pr-2">
         <FormField
           control={control}
           name="name"

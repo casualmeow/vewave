@@ -24,7 +24,10 @@ export function AccessSelector({ initialAccess, onChange }: AccessSelectorProps)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="w-full justify-between">
+        <Button
+          variant="outline"
+          className="h-11 w-full justify-between rounded-xl bg-background/80"
+        >
           {access} <ChevronDown />
         </Button>
       </DropdownMenuTrigger>

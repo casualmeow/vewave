@@ -4,7 +4,17 @@ import type { ComponentProps } from 'react'
 import { Separator } from '@/shared/ui'
 import { cn } from '@/shared/lib/utils'
 
-export const Header = ({ className, ...props }: ComponentProps<'header'>) => {
+export interface HeaderProps extends ComponentProps<'header'> {
+  sidebarVisible: boolean
+  onSidebarVisibilityChange: (visible: boolean) => void
+}
+
+export const Header = ({
+  className,
+  sidebarVisible,
+  onSidebarVisibilityChange,
+  ...props
+}: HeaderProps) => {
   return (
     <>
       <header
@@ -14,7 +24,10 @@ export const Header = ({ className, ...props }: ComponentProps<'header'>) => {
         )}
         {...props}
       >
-        <HeaderLeft />
+        <HeaderLeft
+          sidebarVisible={sidebarVisible}
+          onSidebarVisibilityChange={onSidebarVisibilityChange}
+        />
       </header>
       <Separator orientation="horizontal" />
     </>

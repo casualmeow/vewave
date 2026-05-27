@@ -130,8 +130,8 @@ function isActivePath(pathname: string, to: string) {
 }
 
 export function Sidebar({
-  className,
   children,
+  className,
   design = 'liquidGlass',
   size = 'md',
   density = 'comfortable',
@@ -166,7 +166,7 @@ export function Sidebar({
   mobileDragMode,
   mobileDockDragMode = 'both',
   mobileMaxItems = 5,
-  mobileDockPlacement = 'app',
+  mobileDockPlacement = 'container',
   mobileDockClassName,
   mobileDockItems,
   mobileDockPathname,
@@ -174,6 +174,9 @@ export function Sidebar({
 }: SidebarProps) {
   const { pathname } = useLocation()
   const dockPathname = mobileDockPathname ?? pathname
+  const hasCustomMobileDock = Boolean(mobileDockItems?.length)
+  const shouldRenderCustomMobileDock = mobileMode !== 'off' && hasCustomMobileDock
+  const shouldUseCustomResponsiveRail = mobileMode === 'auto' && hasCustomMobileDock
   const mobileItems: Array<StudioSidebarItem> = [
     primaryLinks[0],
     primaryLinks[3],
@@ -184,16 +187,15 @@ export function Sidebar({
 
   if (children !== undefined) {
     return (
-      <nav className="contents" aria-label={props['aria-label'] ?? 'Sidebar navigation'}>
+      <nav className="contents" aria-label="Sidebar navigation" {...props}>
         {mobileMode !== 'only' ? (
           <div
             className={cn(
-              mobileMode === 'auto' ? 'hidden shrink-0 md:block' : 'shrink-0',
+              shouldUseCustomResponsiveRail ? 'hidden shrink-0 md:block' : 'shrink-0',
               className,
             )}
           >
             <SidebarRoot
-              {...props}
               design={design}
               size={size}
               density={density}
@@ -218,7 +220,7 @@ export function Sidebar({
           </div>
         ) : null}
 
-        {mobileMode !== 'off' && mobileDockItems?.length ? (
+        {shouldRenderCustomMobileDock && mobileDockItems ? (
           <MobileSidebarDock
             items={mobileDockItems}
             pathname={dockPathname}
@@ -248,7 +250,9 @@ export function Sidebar({
   return (
     <nav className="contents" aria-label="Studio navigation" {...props}>
       {mobileMode !== 'only' ? (
-        <div className={cn('hidden shrink-0 md:block', className)}>
+        <div
+          className={cn(mobileMode === 'auto' ? 'hidden shrink-0 md:block' : 'shrink-0', className)}
+        >
           <SidebarRoot
             design={design}
             size={size}

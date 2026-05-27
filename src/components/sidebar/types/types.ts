@@ -16,7 +16,7 @@ export type SidebarMotion = 'none' | 'soft' | 'fluid'
 export type SidebarFluidPreset = 'subtle' | 'balanced' | 'expressive' | 'extreme'
 export type SidebarDragMode = 'none' | 'x' | 'y' | 'both'
 export type SidebarMobileMode = 'auto' | 'off' | 'only'
-export type SidebarMobileDockPlacement = 'app' | 'viewport'
+export type SidebarMobileDockPlacement = 'container' | 'app' | 'viewport' | 'inline'
 
 export type SidebarResolvedFluidConfig = {
   hoverScale: number
