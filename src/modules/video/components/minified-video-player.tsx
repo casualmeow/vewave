@@ -24,7 +24,7 @@ interface VideoPlayerProps {
   loop?: boolean
 }
 
-export const MinifiedVideoPlayer = memo(function MinifiedVideoPlayer({
+export const MinifiedVideoPlayer = memo(function ({
   src,
   poster,
   className,

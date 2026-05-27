@@ -3,12 +3,13 @@ import { Callout } from 'fumadocs-ui/components/callout'
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/layouts/docs/page'
 import { ArrowRight, CheckCircle2, ExternalLink } from 'lucide-react'
 import { motion } from 'motion/react'
-
 import { DocsCodeBlock, DocsPropTable, DocsSection } from './component-doc-primitives'
+import type { ReactNode } from 'react'
+
 import type { ComponentDoc } from '../content/component-docs-content'
 import { Button } from '@/shared/ui'
 
-export function ComponentDocPage({ doc }: { doc: ComponentDoc }) {
+export function ComponentDocPage({ doc, showcase }: { doc: ComponentDoc; showcase?: ReactNode }) {
   const Icon = doc.icon
 
   return (
@@ -61,6 +62,14 @@ export function ComponentDocPage({ doc }: { doc: ComponentDoc }) {
             Component docs now live in this UI-kit documentation route. Component folders should
             keep implementation, tests, and public exports, while /docs owns usage documentation.
           </Callout>
+
+          {showcase ? (
+            <DocsSection title="Playground">
+              <div className="overflow-hidden rounded-xl border border-zinc-200 bg-[#f8faf9] p-2 shadow-sm">
+                {showcase}
+              </div>
+            </DocsSection>
+          ) : null}
 
           <DocsSection title="API">
             <DocsPropTable rows={doc.apiRows} />

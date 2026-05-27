@@ -7,7 +7,6 @@ import {
   FileCode2,
   GitBranch,
   Layers3,
-  MonitorPlay,
   Paintbrush,
   PanelLeft,
   Route,
@@ -18,11 +17,12 @@ import {
 import type { LucideIcon } from 'lucide-react'
 
 import type { ComponentDocRoute } from './component-docs-content'
+import type { SharedUiDocRoute } from './shared-ui-docs-nav'
 
 export type DocsNavItem = {
   title: string
   description: string
-  to: '/docs' | '/docs/ui' | '/ui/showcase' | ComponentDocRoute
+  to: '/docs' | '/docs/ui' | ComponentDocRoute | SharedUiDocRoute
   icon: LucideIcon
   exact?: boolean
 }
@@ -72,10 +72,10 @@ export const docsNavItems = [
     exact: true,
   },
   {
-    title: 'Showcase',
-    description: 'Live component catalog for visual inspection.',
-    to: '/ui/showcase',
-    icon: MonitorPlay,
+    title: 'Shared UI',
+    description: 'Low-level primitives with one page per shared component.',
+    to: '/docs/ui/components/shared',
+    icon: Layers3,
     exact: false,
   },
 ] as const satisfies ReadonlyArray<DocsNavItem>
@@ -153,7 +153,7 @@ export const uiPrinciples = [
   {
     title: 'Showcase First',
     description:
-      'Complex UI should have a live, state-driven showcase instead of static screenshots or one-off route demos.',
+      'Complex UI should have live, state-driven examples embedded in its docs page instead of static screenshots or one-off route demos.',
     icon: Sparkles,
   },
 ] as const
@@ -205,15 +205,16 @@ export const uiComponentDocs = [
     title: 'Shared UI',
     status: 'Low-level primitives',
     description:
-      'Button, Card, Dialog, Form, Select, Slider, Tabs, Tooltip, and other building blocks used by modules.',
-    notes: ['CVA variants', 'Radix primitives', 'Tailwind tokens', 'barrel exports'],
+      'Button, Card, Dialog, Form, Select, Slider, Tabs, Tooltip, and other building blocks used by modules, each with its own docs page.',
+    notes: ['per-component docs', 'CVA variants', 'Radix primitives', 'barrel exports'],
+    to: '/docs/ui/components/shared',
     icon: Wrench,
   },
   {
-    title: 'Showcase Catalog',
-    status: 'Route-level UI catalog',
+    title: 'Docs Playgrounds',
+    status: 'Embedded component examples',
     description:
-      'The /ui/showcase route demonstrates reusable components with controls, presets, and live preview states.',
+      'Component docs now own their live controls, presets, and preview states so API documentation and behavior stay together.',
     notes: ['module-owned state', 'live previews', 'component controls', 'developer-facing docs'],
     icon: Code2,
   },

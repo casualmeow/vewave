@@ -1,3 +1,6 @@
+export * from './mobile-sidebar-dock'
+export * from './settings'
+export * from './sidebar'
 export * from './sidebar-brand'
 export * from './sidebar-context'
 export * from './sidebar-footer'

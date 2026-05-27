@@ -19,6 +19,7 @@ import type {
   SidebarDesign,
   SidebarDragMode,
   SidebarFluidPreset,
+  SidebarMobileMode,
   SidebarMotion,
   SidebarSize,
 } from '@/components/sidebar'
@@ -61,6 +62,22 @@ type SidebarShowcaseState = {
   focusDimOpacity: number
   liquidIntensity: number
   dragMode: SidebarDragMode
+  mobileMode: SidebarMobileMode
+  mobileFluidPreset: SidebarFluidPreset
+  mobileHoverSize: number
+  mobileHoverScale: number
+  mobileActiveHoverScale: number
+  mobileDragScale: number
+  mobileMagneticStrength: number
+  mobileMagneticVerticalStrength: number
+  mobileTiltStrength: number
+  mobileFocusBlur: boolean
+  mobileFocusBlurAmount: number
+  mobileFocusDimOpacity: number
+  mobileLiquidIntensity: number
+  mobileDragMode: SidebarDragMode
+  mobileDockDragMode: SidebarDragMode
+  mobileMaxItems: number
   activeItem: SidebarDemoItemId
 }
 
@@ -73,6 +90,11 @@ const sidebarDesigns = [
 const sidebarSizes = ['sm', 'md', 'lg'] as const satisfies ReadonlyArray<SidebarSize>
 const sidebarDensities = ['comfortable', 'compact'] as const satisfies ReadonlyArray<SidebarDensity>
 const sidebarMotionModes = ['fluid', 'soft', 'none'] as const satisfies ReadonlyArray<SidebarMotion>
+const sidebarMobileModes = [
+  'auto',
+  'off',
+  'only',
+] as const satisfies ReadonlyArray<SidebarMobileMode>
 const sidebarFluidPresets = [
   'subtle',
   'balanced',
@@ -160,6 +182,47 @@ function fluidPresetValues(fluidPreset: SidebarFluidPreset) {
   return SIDEBAR_FLUID_PRESETS[fluidPreset]
 }
 
+function mobilePresetValues(fluidPreset: SidebarFluidPreset) {
+  const preset = fluidPresetValues(fluidPreset)
+
+  return {
+    mobileMode: 'auto',
+    mobileFluidPreset: fluidPreset,
+    mobileHoverSize: Math.max(18, preset.hoverSize),
+    mobileHoverScale: preset.hoverScale,
+    mobileActiveHoverScale: preset.activeHoverScale,
+    mobileDragScale: preset.dragScale,
+    mobileMagneticStrength: preset.magneticStrength,
+    mobileMagneticVerticalStrength: preset.magneticVerticalStrength,
+    mobileTiltStrength: preset.tiltStrength,
+    mobileFocusBlur: preset.focusBlur,
+    mobileFocusBlurAmount: preset.focusBlurAmount,
+    mobileFocusDimOpacity: preset.focusDimOpacity,
+    mobileLiquidIntensity: preset.liquidIntensity,
+    mobileDragMode: preset.dragMode,
+    mobileDockDragMode: 'both',
+    mobileMaxItems: 5,
+  } satisfies Pick<
+    SidebarShowcaseState,
+    | 'mobileMode'
+    | 'mobileFluidPreset'
+    | 'mobileHoverSize'
+    | 'mobileHoverScale'
+    | 'mobileActiveHoverScale'
+    | 'mobileDragScale'
+    | 'mobileMagneticStrength'
+    | 'mobileMagneticVerticalStrength'
+    | 'mobileTiltStrength'
+    | 'mobileFocusBlur'
+    | 'mobileFocusBlurAmount'
+    | 'mobileFocusDimOpacity'
+    | 'mobileLiquidIntensity'
+    | 'mobileDragMode'
+    | 'mobileDockDragMode'
+    | 'mobileMaxItems'
+  >
+}
+
 function createSidebarState(
   state: Omit<
     SidebarShowcaseState,
@@ -175,6 +238,22 @@ function createSidebarState(
     | 'focusDimOpacity'
     | 'liquidIntensity'
     | 'dragMode'
+    | 'mobileMode'
+    | 'mobileFluidPreset'
+    | 'mobileHoverSize'
+    | 'mobileHoverScale'
+    | 'mobileActiveHoverScale'
+    | 'mobileDragScale'
+    | 'mobileMagneticStrength'
+    | 'mobileMagneticVerticalStrength'
+    | 'mobileTiltStrength'
+    | 'mobileFocusBlur'
+    | 'mobileFocusBlurAmount'
+    | 'mobileFocusDimOpacity'
+    | 'mobileLiquidIntensity'
+    | 'mobileDragMode'
+    | 'mobileDockDragMode'
+    | 'mobileMaxItems'
   > & {
     dragMode?: SidebarDragMode
   },
@@ -195,6 +274,7 @@ function createSidebarState(
     focusDimOpacity: preset.focusDimOpacity,
     liquidIntensity: preset.liquidIntensity,
     dragMode: state.dragMode ?? preset.dragMode,
+    ...mobilePresetValues('extreme'),
   }
 }
 
@@ -207,6 +287,22 @@ const initialState: SidebarShowcaseState = {
   fluidPreset: 'expressive',
   activeItem: 'content',
   ...fluidPresetValues('expressive'),
+  mobileMode: 'auto',
+  mobileFluidPreset: 'extreme',
+  mobileHoverSize: 22,
+  mobileHoverScale: 1.12,
+  mobileActiveHoverScale: 1.08,
+  mobileDragScale: 1.2,
+  mobileMagneticStrength: 18,
+  mobileMagneticVerticalStrength: 12,
+  mobileTiltStrength: 5.8,
+  mobileFocusBlur: true,
+  mobileFocusBlurAmount: 6,
+  mobileFocusDimOpacity: 0.32,
+  mobileLiquidIntensity: 1.8,
+  mobileDragMode: 'both',
+  mobileDockDragMode: 'both',
+  mobileMaxItems: 5,
 }
 
 const sidebarPropRows = [
@@ -228,6 +324,22 @@ const sidebarPropRows = [
   'focusDimOpacity',
   'liquidIntensity',
   'dragMode',
+  'mobileMode',
+  'mobileFluidPreset',
+  'mobileHoverSize',
+  'mobileHoverScale',
+  'mobileActiveHoverScale',
+  'mobileDragScale',
+  'mobileMagneticStrength',
+  'mobileMagneticVerticalStrength',
+  'mobileTiltStrength',
+  'mobileFocusBlur',
+  'mobileFocusBlurAmount',
+  'mobileFocusDimOpacity',
+  'mobileLiquidIntensity',
+  'mobileDragMode',
+  'mobileDockDragMode',
+  'mobileMaxItems',
 ] as const satisfies ReadonlyArray<keyof SidebarShowcaseState>
 
 export function SidebarShowcaseSection() {
@@ -245,6 +357,13 @@ export function SidebarShowcaseSection() {
       ...current,
       fluidPreset,
       ...fluidPresetValues(fluidPreset),
+    }))
+  }
+
+  const updateMobileFluidPreset = (mobileFluidPreset: SidebarFluidPreset) => {
+    setState((current) => ({
+      ...current,
+      ...mobilePresetValues(mobileFluidPreset),
     }))
   }
 
@@ -429,6 +548,129 @@ export function SidebarShowcaseSection() {
             />
           </ControlCard>
 
+          <ControlCard title="Mobile dock props">
+            <SelectField
+              label="Mobile mode"
+              value={state.mobileMode}
+              options={sidebarMobileModes}
+              onChange={(value) => updateState('mobileMode', value)}
+            />
+            <SelectField
+              label="Mobile fluid preset"
+              value={state.mobileFluidPreset}
+              options={sidebarFluidPresets}
+              onChange={updateMobileFluidPreset}
+            />
+            <SelectField
+              label="Mobile drag mode"
+              value={state.mobileDragMode}
+              options={sidebarDragModes}
+              onChange={(value) => updateState('mobileDragMode', value)}
+            />
+            <SelectField
+              label="Dock drag mode"
+              value={state.mobileDockDragMode}
+              options={sidebarDragModes}
+              onChange={(value) => updateState('mobileDockDragMode', value)}
+            />
+            <CheckboxField
+              label="Mobile focus blur"
+              checked={state.mobileFocusBlur}
+              onChange={(checked) => updateState('mobileFocusBlur', checked)}
+            />
+            <SliderField
+              label="Mobile max items"
+              value={state.mobileMaxItems}
+              min={3}
+              max={6}
+              step={1}
+              onChange={(value) => updateState('mobileMaxItems', value)}
+            />
+            <SliderField
+              label="Mobile hover size"
+              value={state.mobileHoverSize}
+              min={0}
+              max={32}
+              step={1}
+              unit="px"
+              onChange={(value) => updateState('mobileHoverSize', value)}
+            />
+            <SliderField
+              label="Mobile hover scale"
+              value={state.mobileHoverScale}
+              min={1}
+              max={1.2}
+              step={0.005}
+              onChange={(value) => updateState('mobileHoverScale', value)}
+            />
+            <SliderField
+              label="Mobile active scale"
+              value={state.mobileActiveHoverScale}
+              min={1}
+              max={1.16}
+              step={0.005}
+              onChange={(value) => updateState('mobileActiveHoverScale', value)}
+            />
+            <SliderField
+              label="Mobile drag scale"
+              value={state.mobileDragScale}
+              min={1}
+              max={1.25}
+              step={0.005}
+              onChange={(value) => updateState('mobileDragScale', value)}
+            />
+            <SliderField
+              label="Mobile magnetic strength"
+              value={state.mobileMagneticStrength}
+              min={0}
+              max={32}
+              step={1}
+              onChange={(value) => updateState('mobileMagneticStrength', value)}
+            />
+            <SliderField
+              label="Mobile vertical magnet"
+              value={state.mobileMagneticVerticalStrength}
+              min={0}
+              max={20}
+              step={1}
+              onChange={(value) => updateState('mobileMagneticVerticalStrength', value)}
+            />
+            <SliderField
+              label="Mobile tilt strength"
+              value={state.mobileTiltStrength}
+              min={0}
+              max={10}
+              step={0.1}
+              unit="deg"
+              onChange={(value) => updateState('mobileTiltStrength', value)}
+            />
+            <SliderField
+              label="Mobile focus blur"
+              value={state.mobileFocusBlurAmount}
+              min={0}
+              max={12}
+              step={0.25}
+              unit="px"
+              onChange={(value) => updateState('mobileFocusBlurAmount', value)}
+            />
+            <SliderField
+              label="Mobile dim opacity"
+              value={state.mobileFocusDimOpacity}
+              min={0.2}
+              max={1}
+              step={0.01}
+              onChange={(value) => updateState('mobileFocusDimOpacity', value)}
+            />
+            <SliderField
+              label="Mobile liquid intensity"
+              value={state.mobileLiquidIntensity}
+              min={0.3}
+              max={2}
+              step={0.05}
+              onChange={(value) => updateState('mobileLiquidIntensity', value)}
+            />
+          </ControlCard>
+
           <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm leading-6 text-zinc-600">
             <div className="font-medium text-zinc-950">Current design intent</div>
             <p className="mt-1">{designDescriptions[state.design]}</p>
@@ -459,7 +701,23 @@ export function SidebarShowcaseSection() {
   focusBlurAmount={${state.focusBlurAmount}}
   focusDimOpacity={${state.focusDimOpacity}}
   liquidIntensity={${state.liquidIntensity}}
-  dragMode="${state.dragMode}"${state.collapsed ? ' collapsed' : ''}
+  dragMode="${state.dragMode}"
+  mobileMode="${state.mobileMode}"
+  mobileFluidPreset="${state.mobileFluidPreset}"
+  mobileHoverSize={${state.mobileHoverSize}}
+  mobileHoverScale={${state.mobileHoverScale}}
+  mobileActiveHoverScale={${state.mobileActiveHoverScale}}
+  mobileDragScale={${state.mobileDragScale}}
+  mobileMagneticStrength={${state.mobileMagneticStrength}}
+  mobileMagneticVerticalStrength={${state.mobileMagneticVerticalStrength}}
+  mobileTiltStrength={${state.mobileTiltStrength}}
+  mobileFocusBlur={${state.mobileFocusBlur}}
+  mobileFocusBlurAmount={${state.mobileFocusBlurAmount}}
+  mobileFocusDimOpacity={${state.mobileFocusDimOpacity}}
+  mobileLiquidIntensity={${state.mobileLiquidIntensity}}
+  mobileDragMode="${state.mobileDragMode}"
+  mobileDockDragMode="${state.mobileDockDragMode}"
+  mobileMaxItems={${state.mobileMaxItems}}${state.collapsed ? '\n  collapsed' : ''}
 >
   <SidebarBrand title="Vewave Studio" />
   <SidebarSection title="Workspace">
@@ -739,7 +997,8 @@ function SidebarPropsMatrix({ state }: { state: SidebarShowcaseState }) {
         <div>
           <h3 className="text-sm font-semibold text-zinc-950">Props passed to Sidebar</h3>
           <p className="mt-1 text-xs leading-5 text-zinc-500">
-            Every configurable root prop is wired into the live preview.
+            Desktop interaction props drive the live preview; mobile dock props are exposed in the
+            generated responsive usage snippet.
           </p>
         </div>
         <div className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs text-zinc-500">

@@ -12,6 +12,7 @@ import {
 
 import { StudioSettingsDialog } from './studio-settings-dialog'
 import type { LucideIcon } from 'lucide-react'
+import type { MobileSidebarDockItem } from '@/components/sidebar'
 import {
   Sidebar,
   SidebarBrand,
@@ -37,6 +38,7 @@ import { cn } from '@/shared/lib/utils'
 
 type StudioSidebarItem = {
   label: string
+  shortLabel?: string
   to:
     | '/studio/home'
     | '/studio/channel-settings'
@@ -49,10 +51,21 @@ type StudioSidebarItem = {
 
 const studioNavigationItems: ReadonlyArray<StudioSidebarItem> = [
   { label: 'Home', to: '/studio/home', icon: Home },
-  { label: 'Channel Settings', to: '/studio/channel-settings', icon: SlidersHorizontal },
+  {
+    label: 'Channel Settings',
+    shortLabel: 'Settings',
+    to: '/studio/channel-settings',
+    icon: SlidersHorizontal,
+  },
   { label: 'Analytics', to: '/studio/analytics', icon: BarChart3 },
-  { label: 'Content manager', to: '/studio/content-manager', icon: Video, badge: '12' },
-  { label: 'Community', to: '/studio/community', icon: MessageCircle },
+  {
+    label: 'Content manager',
+    shortLabel: 'Content',
+    to: '/studio/content-manager',
+    icon: Video,
+    badge: '12',
+  },
+  { label: 'Community', shortLabel: 'Social', to: '/studio/community', icon: MessageCircle },
 ]
 
 function isActiveRoute(pathname: string, to: StudioSidebarItem['to']) {
@@ -61,6 +74,17 @@ function isActiveRoute(pathname: string, to: StudioSidebarItem['to']) {
 
 export function StudioSidebar({ className }: { className?: string }) {
   const location = useLocation()
+  const mobileDockItems: Array<MobileSidebarDockItem> = studioNavigationItems.map((item) => {
+    const Icon = item.icon
+
+    return {
+      label: item.label,
+      shortLabel: item.shortLabel,
+      to: item.to,
+      icon: <Icon />,
+      badge: item.badge,
+    }
+  })
 
   return (
     <Sidebar
@@ -68,6 +92,10 @@ export function StudioSidebar({ className }: { className?: string }) {
       size="md"
       density="comfortable"
       motion="fluid"
+      mobileDockItems={mobileDockItems}
+      mobileDockPathname={location.pathname}
+      mobileDockPlacement="app"
+      mobileDockClassName="inset-x-3"
       aria-label="Studio navigation"
       className={cn('mr-2 shrink-0', className)}
     >

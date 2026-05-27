@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { Callout } from 'fumadocs-ui/components/callout'
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/layouts/docs/page'
-import { ArrowRight, Check, Code2, ExternalLink } from 'lucide-react'
+import { ArrowRight, Check, Code2 } from 'lucide-react'
 import { motion } from 'motion/react'
 
 import { uiComponentDocs, uiPrinciples } from '../content/docs-content'
@@ -42,14 +42,15 @@ export function DocsUiPage() {
                   Docs explain the rules. Showcase proves the behavior.
                 </h2>
                 <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-600">
-                  Keep component API documentation close to each component package, and use
-                  /ui/showcase for live controls, animation presets, and responsive preview states.
+                  Keep component API documentation close to each component package, and use the
+                  component docs pages for live controls, animation presets, and responsive preview
+                  states.
                 </p>
               </div>
               <Button asChild>
-                <Link to="/ui/showcase">
-                  Open showcase
-                  <ExternalLink className="size-4" />
+                <Link to="/docs/ui/components">
+                  Open component docs
+                  <ArrowRight className="size-4" />
                 </Link>
               </Button>
             </div>
@@ -77,8 +78,8 @@ export function DocsUiPage() {
           </section>
 
           <Callout type="idea" title="UI docs workflow">
-            Use this page for standing conventions, /docs/ui/components for exact public APIs, and
-            /ui/showcase for interactive component behavior.
+            Use this page for standing conventions and /docs/ui/components for exact public APIs
+            plus live component playgrounds.
           </Callout>
 
           <section>

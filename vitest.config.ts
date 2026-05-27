@@ -17,7 +17,13 @@ export default defineConfig({
       reporter: ['text', 'json', 'html'],
       reportsDirectory: './coverage',
       include: ['src/**/*.{ts,tsx}'],
-      exclude: ['**/*.d.ts', 'src/vitest.setup.ts', 'src/**/*.stories.tsx', 'src/**/__tests__/**'],
+      exclude: [
+        '**/*.d.ts',
+        'src/vitest.setup.ts',
+        'src/**/*.stories.tsx',
+        'node_modules/',
+        'src/**/__tests__/**',
+      ],
     },
   },
   resolve: {

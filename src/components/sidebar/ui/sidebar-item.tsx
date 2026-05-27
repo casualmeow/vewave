@@ -7,7 +7,7 @@ import {
   useSpring,
   useTransform,
 } from 'motion/react'
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import {
   SIDEBAR_FLUID_TRANSITION,
   SIDEBAR_MAGNETIC_TRANSITION,
@@ -37,6 +37,8 @@ function toMotionDragMode(mode: SidebarDragMode) {
 export function SidebarItem({
   ref,
   asChild = false,
+  icon,
+  badge,
   href,
   target,
   rel,
@@ -44,8 +46,6 @@ export function SidebarItem({
   value,
   active = false,
   disabled = false,
-  icon,
-  badge,
   hoverScale,
   activeHoverScale,
   dragScale,
@@ -74,9 +74,22 @@ export function SidebarItem({
     fluidConfig,
     focusedItemKey,
     setFocusedItemKey,
+    activeItemKey,
+    setActiveItemKey,
   } = useSidebarContext()
   const generatedId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const itemKey = value ?? href ?? generatedId
+
+  useEffect(() => {
+    if (!active) return
+
+    setActiveItemKey(itemKey)
+
+    return () => {
+      setActiveItemKey((current) => (current === itemKey ? null : current))
+    }
+  }, [active, itemKey, setActiveItemKey])
+
   const prefersReducedMotion = useReducedMotion()
   const [isHovered, setIsHovered] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -97,8 +110,12 @@ export function SidebarItem({
   const resolvedFocusDimOpacity = focusDimOpacity ?? fluidConfig.focusDimOpacity
   const resolvedLiquidIntensity = liquidIntensity ?? fluidConfig.liquidIntensity
   const resolvedDragMode = dragMode ?? fluidConfig.dragMode
+  const effectiveFocusedItemKey = focusedItemKey ?? activeItemKey
   const hasFocusedSibling = Boolean(
-    resolvedFocusBlur && focusedItemKey && focusedItemKey !== itemKey && canAnimate,
+    resolvedFocusBlur &&
+      effectiveFocusedItemKey &&
+      effectiveFocusedItemKey !== itemKey &&
+      canAnimate,
   )
 
   const x = useMotionValue(0)
@@ -223,7 +240,7 @@ export function SidebarItem({
   return (
     <motion.div
       data-slot="liquid-sidebar-item-shell"
-      data-focused={focusedItemKey === itemKey ? 'true' : 'false'}
+      data-focused={effectiveFocusedItemKey === itemKey ? 'true' : 'false'}
       data-deemphasized={hasFocusedSibling ? 'true' : 'false'}
       className="group/sidebar-item-shell relative isolate [--item-pointer-glow:0] [--item-pointer-x:50%] [--item-pointer-y:50%]"
       style={itemStyle}

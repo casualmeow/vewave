@@ -1,6 +1,7 @@
 import {
   Component,
   GalleryHorizontalEnd,
+  Layers3,
   MousePointerClick,
   PanelLeft,
   PanelTop,
@@ -9,13 +10,14 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
-export type ComponentDocSlug = 'header' | 'resizable-card' | 'sidebar'
+export type ComponentDocSlug = 'header' | 'resizable-card' | 'sidebar' | 'shared'
 
 export type ComponentDocRoute =
   | '/docs/ui/components'
   | '/docs/ui/components/header'
   | '/docs/ui/components/resizable-card'
   | '/docs/ui/components/sidebar'
+  | '/docs/ui/components/shared'
 
 export type ComponentDocLink = {
   slug: ComponentDocSlug
@@ -147,6 +149,17 @@ const sidebarUsageSnippet = `<Sidebar
   focusDimOpacity={0.46}
   liquidIntensity={1.25}
   dragMode="both"
+  mobileFluidPreset="extreme"
+  mobileHoverSize={22}
+  mobileHoverScale={1.12}
+  mobileActiveHoverScale={1.08}
+  mobileDragScale={1.2}
+  mobileFocusBlur
+  mobileFocusBlurAmount={6}
+  mobileFocusDimOpacity={0.32}
+  mobileDragMode="both"
+  mobileDockDragMode="both"
+  mobileMaxItems={5}
   aria-label="Studio navigation"
 >
   <SidebarBrand
@@ -448,6 +461,91 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
           'Controls drag direction for liquid item shells when motion is fluid. Use none for conservative navigation.',
       },
       {
+        name: 'mobileMode',
+        type: "'auto' | 'off' | 'only'",
+        description:
+          'Controls whether the route-aware Sidebar facade also renders the mobile dock. Compound SidebarRoot usage can keep mobile navigation in the layout layer.',
+      },
+      {
+        name: 'mobileFluidPreset',
+        type: "'subtle' | 'balanced' | 'expressive' | 'extreme'",
+        description:
+          'Mobile dock preset. Defaults to the desktop fluidPreset when omitted, but can be stronger for touch-first dock interactions.',
+      },
+      {
+        name: 'mobileHoverSize',
+        type: 'number',
+        description: 'Pixel expansion for the mobile dock liquid hover and active material.',
+      },
+      {
+        name: 'mobileHoverScale',
+        type: 'number',
+        description:
+          'Scale applied to inactive mobile dock items on hover/fine pointer interaction.',
+      },
+      {
+        name: 'mobileActiveHoverScale',
+        type: 'number',
+        description:
+          'Scale applied to the active mobile dock item on hover/fine pointer interaction.',
+      },
+      {
+        name: 'mobileDragScale',
+        type: 'number',
+        description: 'Scale applied while dragging a mobile dock item.',
+      },
+      {
+        name: 'mobileMagneticStrength',
+        type: 'number',
+        description: 'Horizontal magnetic pointer offset strength for mobile dock items.',
+      },
+      {
+        name: 'mobileMagneticVerticalStrength',
+        type: 'number',
+        description: 'Vertical magnetic pointer offset strength for mobile dock items.',
+      },
+      {
+        name: 'mobileTiltStrength',
+        type: 'number',
+        description: 'Maximum mobile dock item tilt angle for fluid pointer motion.',
+      },
+      {
+        name: 'mobileFocusBlur',
+        type: 'boolean',
+        description:
+          'Dims and blurs sibling dock items while one mobile item is focused or hovered.',
+      },
+      {
+        name: 'mobileFocusBlurAmount',
+        type: 'number',
+        description: 'Blur radius in pixels for mobile dock focus attenuation.',
+      },
+      {
+        name: 'mobileFocusDimOpacity',
+        type: 'number',
+        description: 'Opacity applied to sibling mobile dock items during focus attenuation.',
+      },
+      {
+        name: 'mobileLiquidIntensity',
+        type: 'number',
+        description: 'Multiplier for mobile dock liquid selector and hover material effects.',
+      },
+      {
+        name: 'mobileDragMode',
+        type: "'none' | 'x' | 'y' | 'both'",
+        description: 'Drag direction for individual mobile dock items.',
+      },
+      {
+        name: 'mobileDockDragMode',
+        type: "'none' | 'x' | 'y' | 'both'",
+        description: 'Drag direction for the entire floating mobile dock surface.',
+      },
+      {
+        name: 'mobileMaxItems',
+        type: 'number',
+        description: 'Maximum number of navigation items rendered inside the mobile dock.',
+      },
+      {
         name: 'SidebarItem asChild',
         type: 'boolean',
         description:
@@ -474,6 +572,35 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
       </Link>
     </SidebarItem>
   </SidebarSection>
+</Sidebar>`,
+      },
+      {
+        title: 'App shell usage',
+        body: 'Authenticated app layouts compose Sidebar from root pieces, then provide project routes, user avatar fallback, settings dialogs, and logout actions in the layout package.',
+        code: `<Sidebar
+  design="liquidGlass"
+  motion="fluid"
+  fluidPreset="balanced"
+  dragMode="none"
+  role="navigation"
+  aria-label="App navigation"
+>
+  <SidebarBrand
+    visual={<AvatarFallback>VW</AvatarFallback>}
+    title="Vewave"
+    subtitle="Watch workspace"
+  />
+  <SidebarSection title="Workspace">
+    <SidebarItem asChild active>
+      <Link to="/projects">
+        <SidebarItemIcon><FolderKanban /></SidebarItemIcon>
+        <SidebarItemLabel>Projects</SidebarItemLabel>
+      </Link>
+    </SidebarItem>
+  </SidebarSection>
+  <SidebarFooter>
+    <SidebarItem type="button" icon={<Settings />}>Settings</SidebarItem>
+  </SidebarFooter>
 </Sidebar>`,
       },
       {
@@ -513,6 +640,23 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
 />`,
       },
       {
+        title: 'Mobile dock tuning',
+        body: 'The route-aware Sidebar facade can render a touch-first floating dock with its own interaction profile. Use mobileFluidPreset for broad behavior, then override individual mobile* props when the dock needs stronger touch affordance than the desktop rail.',
+        code: `<Sidebar
+  mobileFluidPreset="extreme"
+  mobileHoverSize={22}
+  mobileHoverScale={1.12}
+  mobileActiveHoverScale={1.08}
+  mobileDragScale={1.2}
+  mobileFocusBlur
+  mobileFocusBlurAmount={6}
+  mobileFocusDimOpacity={0.32}
+  mobileDragMode="both"
+  mobileDockDragMode="both"
+  mobileMaxItems={5}
+/>`,
+      },
+      {
         title: 'Collapsed sidebars',
         body: 'Collapsed mode hides visible labels with sr-only text instead of removing names from assistive technology.',
         code: `<Sidebar collapsed aria-label="Primary navigation">
@@ -528,6 +672,100 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
       'Collapsed labels remain accessible through sr-only text.',
       'Disabled items expose aria-disabled and block pointer interaction.',
       'Reduced-motion users do not receive transform-heavy sidebar entrance animation.',
+    ],
+  },
+  shared: {
+    slug: 'shared',
+    title: 'Shared UI',
+    eyebrow: 'Primitives / shared layer',
+    description:
+      'Low-level shadcn/Radix-style primitives for forms, actions, surfaces, and overlays. Each shared primitive has its own docs route.',
+    to: '/docs/ui/components/shared',
+    icon: Layers3,
+    importSnippet: `import {
+  Button,
+  Card,
+  Dialog,
+  DropdownMenu,
+  Form,
+  Input,
+  Progress,
+  SecureInput,
+  Select,
+  Sheet,
+  Slider,
+  Tabs,
+  Table,
+} from '@/shared/ui'`,
+    usageSnippet: `<Card>
+  <CardHeader>
+    <CardTitle>Room defaults</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Input placeholder="Room title" />
+    <Button>Create</Button>
+  </CardContent>
+</Card>`,
+    apiRows: [
+      {
+        name: 'Button',
+        type: "variant: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'",
+        description: 'Base action primitive with CVA variants and asChild composition.',
+      },
+      {
+        name: 'Input / SecureInput / RegisterPasswordInput',
+        type: 'input primitives and password helpers',
+        description:
+          'Input supports optional tooltips. SecureInput adds visibility toggle behavior. RegisterPasswordInput adds strength feedback.',
+      },
+      {
+        name: 'Form helpers',
+        type: 'React Hook Form wrappers',
+        description:
+          'Form, FormField, FormItem, FormControl, FormLabel, FormDescription, and FormMessage.',
+      },
+      {
+        name: 'Checkbox / Select / Slider / Tabs',
+        type: 'Radix primitives',
+        description: 'Accessible interactive controls with project Tailwind tokens.',
+      },
+      {
+        name: 'Dialog / Sheet / DropdownMenu / Tooltip',
+        type: 'surface primitives',
+        description:
+          'Generic overlays and menus. Product-specific content, titles, and route behavior belong in modules.',
+      },
+      {
+        name: 'Card / Table / Progress / Avatar / Separator',
+        type: 'display primitives',
+        description:
+          'Generic layout, data, progress, identity, and divider primitives for module composition.',
+      },
+      {
+        name: 'Cropper / SpinIcon / AccessSelector',
+        type: 'specialized helpers',
+        description:
+          'Small reusable helpers for image cropping, status motion, and access-level selection.',
+      },
+    ],
+    sections: [
+      {
+        title: 'Primitive inventory',
+        body: 'The Shared UI page documents the actual src/shared/ui files: actions, forms, overlays, surfaces, data display, feedback, motion helpers, and specialized editing helpers.',
+      },
+      {
+        title: 'Promote behavior upward',
+        body: 'When a primitive needs reusable state, slots, or animation choreography, wrap it in src/components or compose it in a module.',
+      },
+      {
+        title: 'Live docs',
+        body: 'The shared UI catalog links to independent primitive pages for forms, overlays, tables, progress, tabs, password helpers, and motion status icons.',
+      },
+    ],
+    accessibility: [
+      'Radix-backed primitives preserve keyboard and ARIA behavior.',
+      'Buttons and controls keep visible focus styles.',
+      'Dialogs and sheets must receive route/module-specific titles and descriptions.',
     ],
   },
 }
@@ -554,6 +792,13 @@ export const componentDocLinks: Array<ComponentDocLink> = [
     to: componentDocs.sidebar.to,
     icon: componentDocs.sidebar.icon,
   },
+  {
+    slug: 'shared',
+    title: componentDocs.shared.title,
+    description: componentDocs.shared.description,
+    to: componentDocs.shared.to,
+    icon: componentDocs.shared.icon,
+  },
 ]
 
 export const componentDocsHighlights = [
@@ -566,7 +811,7 @@ export const componentDocsHighlights = [
   {
     title: 'Live examples',
     description:
-      'Docs explain the public API. /ui/showcase stays responsible for interactive playground states.',
+      'Docs explain the public API and embed the interactive playground for each complex component.',
     icon: MousePointerClick,
   },
   {

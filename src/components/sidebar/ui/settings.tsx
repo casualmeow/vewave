@@ -229,6 +229,7 @@ export function SidebarSettingsDialog() {
   const [focusedTab, setFocusedTab] = useState<string | null>(null)
   const layoutId = `${useId().replace(/[^a-zA-Z0-9_-]/g, '')}-settings-fluid-tab`
   const selectedTab = tabs.find((tab) => tab.value === activeTab) ?? tabs[0]
+  const effectiveFocusedTab = focusedTab ?? activeTab
   const Icon = selectedTab.icon
 
   return (
@@ -243,8 +244,8 @@ export function SidebarSettingsDialog() {
           <FluidSettingsTab
             key={tab.value}
             active={activeTab === tab.value}
-            focused={focusedTab === tab.value}
-            deemphasized={Boolean(focusedTab && focusedTab !== tab.value)}
+            focused={effectiveFocusedTab === tab.value}
+            deemphasized={Boolean(effectiveFocusedTab && effectiveFocusedTab !== tab.value)}
             layoutId={layoutId}
             tab={tab}
             onFocusTab={() => setFocusedTab(tab.value)}

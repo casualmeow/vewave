@@ -5,6 +5,8 @@ import type {
   HTMLAttributes,
   ReactNode,
   Ref,
+  Dispatch,
+  SetStateAction,
 } from 'react'
 
 export type SidebarDesign = 'solid' | 'glass' | 'liquidGlass' | 'fluent'
@@ -13,6 +15,8 @@ export type SidebarDensity = 'compact' | 'comfortable'
 export type SidebarMotion = 'none' | 'soft' | 'fluid'
 export type SidebarFluidPreset = 'subtle' | 'balanced' | 'expressive' | 'extreme'
 export type SidebarDragMode = 'none' | 'x' | 'y' | 'both'
+export type SidebarMobileMode = 'auto' | 'off' | 'only'
+export type SidebarMobileDockPlacement = 'app' | 'viewport'
 
 export type SidebarResolvedFluidConfig = {
   hoverScale: number
@@ -40,7 +44,9 @@ export type SidebarContextValue = {
   fluidPreset: SidebarFluidPreset
   fluidConfig: SidebarResolvedFluidConfig
   focusedItemKey: string | null
-  setFocusedItemKey: (key: string | null) => void
+  setFocusedItemKey: Dispatch<SetStateAction<string | null>>
+  activeItemKey: string | null
+  setActiveItemKey: Dispatch<SetStateAction<string | null>>
 }
 
 export interface SidebarRootProps
@@ -77,6 +83,24 @@ export interface SidebarRootProps
   focusDimOpacity?: number
   liquidIntensity?: number
   dragMode?: SidebarDragMode
+  mobileMode?: SidebarMobileMode
+  mobileFluidPreset?: SidebarFluidPreset
+  mobileHoverScale?: number
+  mobileActiveHoverScale?: number
+  mobileDragScale?: number
+  mobileHoverSize?: number
+  mobileMagneticStrength?: number
+  mobileMagneticVerticalStrength?: number
+  mobileTiltStrength?: number
+  mobileFocusBlur?: boolean
+  mobileFocusBlurAmount?: number
+  mobileFocusDimOpacity?: number
+  mobileLiquidIntensity?: number
+  mobileDragMode?: SidebarDragMode
+  mobileDockDragMode?: SidebarDragMode
+  mobileMaxItems?: number
+  mobileDockPlacement?: SidebarMobileDockPlacement
+  mobileDockClassName?: string
   children: ReactNode
 }
 
@@ -105,6 +129,8 @@ export interface SidebarItemProps
   extends Omit<HTMLAttributes<HTMLElement>, 'children' | 'aria-current'> {
   ref?: Ref<HTMLElement>
   asChild?: boolean
+  icon?: ReactNode
+  badge?: ReactNode
   href?: string
   target?: HTMLAttributeAnchorTarget
   rel?: string
@@ -112,8 +138,6 @@ export interface SidebarItemProps
   value?: string
   active?: boolean
   disabled?: boolean
-  icon?: ReactNode
-  badge?: ReactNode
   hoverScale?: number
   activeHoverScale?: number
   dragScale?: number
@@ -126,6 +150,24 @@ export interface SidebarItemProps
   focusDimOpacity?: number
   liquidIntensity?: number
   dragMode?: SidebarDragMode
+  mobileMode?: SidebarMobileMode
+  mobileFluidPreset?: SidebarFluidPreset
+  mobileHoverScale?: number
+  mobileActiveHoverScale?: number
+  mobileDragScale?: number
+  mobileHoverSize?: number
+  mobileMagneticStrength?: number
+  mobileMagneticVerticalStrength?: number
+  mobileTiltStrength?: number
+  mobileFocusBlur?: boolean
+  mobileFocusBlurAmount?: number
+  mobileFocusDimOpacity?: number
+  mobileLiquidIntensity?: number
+  mobileDragMode?: SidebarDragMode
+  mobileDockDragMode?: SidebarDragMode
+  mobileMaxItems?: number
+  mobileDockPlacement?: SidebarMobileDockPlacement
+  mobileDockClassName?: string
   children: ReactNode
 }
 

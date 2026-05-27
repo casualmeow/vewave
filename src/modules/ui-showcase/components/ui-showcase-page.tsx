@@ -1,98 +1,86 @@
-import { Code2, PanelLeft, PanelTop, StretchHorizontal } from 'lucide-react'
-import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
+import { ArrowRight, Code2, Layers3, PanelLeft, PanelTop, StretchHorizontal } from 'lucide-react'
+import { motion } from 'motion/react'
 
-import { HeaderShowcaseSection } from './header-showcase-section'
-import { ResizableCardShowcaseSection } from './resizable-card-showcase'
-import { SidebarShowcaseSection } from './sidebar-showcase-section'
 import { Button } from '@/shared/ui'
 
-type ShowcaseComponentId = 'sidebar' | 'header' | 'resizable-card'
-
-const showcaseComponents = [
+const componentPlaygrounds = [
   {
-    id: 'sidebar',
     label: 'Sidebar',
-    description: 'Navigation shell with liquid-glass controls and full prop tuning.',
+    description: 'Liquid-glass navigation shell with every interaction prop wired into controls.',
+    to: '/docs/ui/components/sidebar',
     icon: PanelLeft,
   },
   {
-    id: 'header',
     label: 'Header',
-    description: 'Scroll-aware header playground.',
+    description: 'Scroll-aware header playground with slots, collapse, and motion controls.',
+    to: '/docs/ui/components/header',
     icon: PanelTop,
   },
   {
-    id: 'resizable-card',
     label: 'ResizableCard',
-    description: 'Expandable/resizable card animation playground.',
+    description: 'Expandable card presentations, resize settings, and animation presets.',
+    to: '/docs/ui/components/resizable-card',
     icon: StretchHorizontal,
   },
-] as const satisfies ReadonlyArray<{
-  id: ShowcaseComponentId
-  label: string
-  description: string
-  icon: typeof PanelLeft
-}>
+  {
+    label: 'Shared UI',
+    description: 'Button, form, surface, dialog, tabs, and other shared primitive examples.',
+    to: '/docs/ui/components/shared',
+    icon: Layers3,
+  },
+] as const
 
 export function UiShowcasePage() {
-  const [activeComponent, setActiveComponent] = useState<ShowcaseComponentId>('sidebar')
-  const activeConfig =
-    showcaseComponents.find((item) => item.id === activeComponent) ?? showcaseComponents[0]
-  const ActiveIcon = activeConfig.icon
-
   return (
-    <div className="min-h-screen bg-[#f8faf9] text-zinc-950">
-      <main className="mx-auto flex w-full max-w-[92rem] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-wrap items-start justify-between gap-5">
-            <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
-                <Code2 className="size-4" />
-                UI playground
-              </div>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight text-zinc-950 sm:text-5xl">
-                {activeConfig.label}
-              </h1>
-              <p className="mt-2 text-base leading-7 text-zinc-600">{activeConfig.description}</p>
-            </div>
-
-            <div className="grid min-w-64 gap-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-zinc-950">
-                <ActiveIcon className="size-4 text-teal-700" />
-                Component
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {showcaseComponents.map((item) => {
-                  const Icon = item.icon
-                  const active = item.id === activeComponent
-
-                  return (
-                    <Button
-                      key={item.id}
-                      type="button"
-                      variant={active ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setActiveComponent(item.id)}
-                      className={active ? 'bg-zinc-950 text-white' : 'bg-white'}
-                    >
-                      <Icon className="size-4" />
-                      {item.label}
-                    </Button>
-                  )
-                })}
-              </div>
-            </div>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_18%_8%,rgba(20,184,166,0.16),transparent_26rem),radial-gradient(circle_at_82%_0%,rgba(14,165,233,0.14),transparent_24rem),linear-gradient(135deg,#f8fafc,#f1f5f9)] text-zinc-950">
+      <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center gap-8 px-4 py-10 sm:px-6 lg:px-8">
+        <motion.section
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.44 }}
+          className="rounded-[2rem] border border-white/70 bg-white/82 p-6 shadow-[0_28px_90px_rgba(15,23,42,0.12)] backdrop-blur-xl sm:p-8"
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
+            <Code2 className="size-4" />
+            Showcase moved
           </div>
+          <h1 className="mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-zinc-950 sm:text-6xl">
+            Component playgrounds now live inside the docs.
+          </h1>
+          <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-600">
+            The standalone `/ui/showcase` route is kept as a navigation bridge. Open a component
+            docs page to see its API, examples, and live controls in one place.
+          </p>
+        </motion.section>
 
-          <div className="mt-5 rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm leading-6 text-zinc-600">
-            One focused component is rendered at a time. Use the controls inside the active
-            playground to inspect real props and live state.
-          </div>
+        <section className="grid gap-4 md:grid-cols-2">
+          {componentPlaygrounds.map((item, index) => {
+            const Icon = item.icon
+
+            return (
+              <motion.article
+                key={item.label}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05, duration: 0.42 }}
+                className="rounded-[1.5rem] border border-zinc-200 bg-white p-5 shadow-sm"
+              >
+                <div className="grid size-11 place-items-center rounded-2xl bg-zinc-950 text-white shadow-sm">
+                  <Icon className="size-5" />
+                </div>
+                <h2 className="mt-4 text-2xl font-semibold tracking-tight">{item.label}</h2>
+                <p className="mt-2 min-h-12 text-sm leading-6 text-zinc-600">{item.description}</p>
+                <Button asChild className="mt-5 rounded-full">
+                  <Link to={item.to}>
+                    Open docs playground
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+              </motion.article>
+            )
+          })}
         </section>
-
-        {activeComponent === 'sidebar' ? <SidebarShowcaseSection /> : null}
-        {activeComponent === 'header' ? <HeaderShowcaseSection /> : null}
-        {activeComponent === 'resizable-card' ? <ResizableCardShowcaseSection /> : null}
       </main>
     </div>
   )
