@@ -5,28 +5,28 @@ import { Separator } from '@/shared/ui'
 import { cn } from '@/shared/lib/utils'
 
 export interface HeaderProps extends ComponentProps<'header'> {
-  sidebarVisible: boolean
-  onSidebarVisibilityChange: (visible: boolean) => void
+  onSidebarVisibilityChange?: () => void
+  sidebarVisible?: boolean
 }
 
 export const Header = ({
   className,
-  sidebarVisible,
   onSidebarVisibilityChange,
+  sidebarVisible = true,
   ...props
 }: HeaderProps) => {
   return (
     <>
       <header
         className={cn(
-          'border-b-[1px] border-border p-6 h-18 flex items-center font-medium',
+          'flex h-18 items-center border-b-[1px] border-border p-6 font-medium',
           className,
         )}
         {...props}
       >
         <HeaderLeft
-          sidebarVisible={sidebarVisible}
           onSidebarVisibilityChange={onSidebarVisibilityChange}
+          sidebarVisible={sidebarVisible}
         />
       </header>
       <Separator orientation="horizontal" />

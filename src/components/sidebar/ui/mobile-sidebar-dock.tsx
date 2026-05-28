@@ -23,7 +23,6 @@ export type MobileSidebarDockItem = {
   label: string
   shortLabel?: string
   to: string
-  params?: Record<string, string>
   icon: ReactNode
   badge?: ReactNode
   disabled?: boolean
@@ -530,7 +529,6 @@ function MobileSidebarDockButton({
 
       <Link
         to={item.to as never}
-        params={item.params as never}
         aria-current={active ? 'page' : undefined}
         aria-disabled={item.disabled || undefined}
         tabIndex={item.disabled ? -1 : undefined}

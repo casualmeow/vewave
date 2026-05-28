@@ -1,14 +1,17 @@
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { PanelRightClose } from 'lucide-react'
 import { useMatches } from '@tanstack/react-router'
 
 import { Button, Separator } from '@/shared/ui'
 
 export interface HeaderLeftProps {
-  sidebarVisible: boolean
-  onSidebarVisibilityChange: (visible: boolean) => void
+  onSidebarVisibilityChange?: () => void
+  sidebarVisible?: boolean
 }
 
-export const HeaderLeft = ({ sidebarVisible, onSidebarVisibilityChange }: HeaderLeftProps) => {
+export const HeaderLeft = ({
+  onSidebarVisibilityChange,
+  sidebarVisible = true,
+}: HeaderLeftProps) => {
   const matches = useMatches()
 
   const getLastRouteSegment = (): string => {
@@ -17,22 +20,19 @@ export const HeaderLeft = ({ sidebarVisible, onSidebarVisibilityChange }: Header
   }
 
   return (
-    <div className="flex gap-4 h-full items-center">
+    <div className="flex h-full items-center gap-4">
       <Button
-        type="button"
         variant="ghost"
         size="icon"
-        aria-label={sidebarVisible ? 'Hide studio navigation' : 'Show studio navigation'}
-        aria-pressed={sidebarVisible}
-        onClick={() => onSidebarVisibilityChange(!sidebarVisible)}
+        className="hidden md:inline-flex"
+        aria-label={sidebarVisible ? 'Hide sidebar' : 'Show sidebar'}
+        aria-pressed={!sidebarVisible}
+        onClick={onSidebarVisibilityChange}
+        disabled={!onSidebarVisibilityChange}
       >
-        {sidebarVisible ? (
-          <PanelLeftClose className="size-5" />
-        ) : (
-          <PanelLeftOpen className="size-5" />
-        )}
+        <PanelRightClose className="size-5" />
       </Button>
-      <Separator orientation="vertical" />
+      <Separator orientation="vertical" className="hidden md:block" />
       <div>{getLastRouteSegment()}</div>
     </div>
   )

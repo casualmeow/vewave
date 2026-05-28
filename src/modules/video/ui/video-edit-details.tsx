@@ -23,10 +23,10 @@ interface VideoEditDetailsSectionProps {
 
 export const VideoEditDetailsSection = ({ control }: VideoEditDetailsSectionProps) => {
   return (
-    <div className="flex min-w-0 flex-col gap-5">
-      <h2 className="text-2xl font-bold pt-1">Video details</h2>
+    <section className="min-w-0 flex-1 space-y-5 xl:basis-3/4">
+      <h2 className="pt-1 text-2xl font-bold">Video details</h2>
 
-      <div className="grid w-full items-center gap-4 xl:pr-2">
+      <div className="grid w-full min-w-0 items-center gap-4 xl:pr-6">
         <FormField
           control={control}
           name="name"
@@ -87,7 +87,7 @@ export const VideoEditDetailsSection = ({ control }: VideoEditDetailsSectionProp
               <FormLabel>Playlists</FormLabel>
               <FormControl>
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-full h-10">
+                  <SelectTrigger className="h-10 w-full">
                     <SelectValue placeholder="Select a playlist" />
                   </SelectTrigger>
                   <SelectContent>
@@ -105,6 +105,6 @@ export const VideoEditDetailsSection = ({ control }: VideoEditDetailsSectionProp
           )}
         />
       </div>
-    </div>
+    </section>
   )
 }

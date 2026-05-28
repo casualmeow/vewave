@@ -68,19 +68,25 @@ const studioNavigationItems: ReadonlyArray<StudioSidebarItem> = [
   { label: 'Community', shortLabel: 'Social', to: '/studio/community', icon: MessageCircle },
 ]
 
+function isVideoEditRoute(pathname: string) {
+  return /^\/studio\/video\/(?:edit\/[^/]+|[^/]+\/edit)\/?$/.test(pathname)
+}
+
 function isActiveRoute(pathname: string, to: StudioSidebarItem['to']) {
-  if (to === '/studio/content-manager' && pathname.startsWith('/studio/video')) {
+  if (to === '/studio/content-manager' && isVideoEditRoute(pathname)) {
     return true
   }
 
   return pathname === to || pathname.startsWith(`${to}/`)
 }
 
+function getDockPathname(pathname: string) {
+  return isVideoEditRoute(pathname) ? '/studio/content-manager' : pathname
+}
+
 export function StudioSidebar({ className }: { className?: string }) {
   const location = useLocation()
-  const activePathname = location.pathname.startsWith('/studio/video')
-    ? '/studio/content-manager'
-    : location.pathname
+  const dockPathname = getDockPathname(location.pathname)
   const mobileDockItems: Array<MobileSidebarDockItem> = studioNavigationItems.map((item) => {
     const Icon = item.icon
 
@@ -94,39 +100,19 @@ export function StudioSidebar({ className }: { className?: string }) {
   })
 
   return (
-    <>
-      <Sidebar
-        design="liquidGlass"
-        size="md"
-        density="comfortable"
-        motion="fluid"
-        mobileMode="off"
-        aria-label="Studio desktop navigation"
-        className={cn('mr-2 hidden shrink-0 md:block', className)}
-      >
-        <StudioSidebarContent pathname={location.pathname} />
-      </Sidebar>
-
-      <Sidebar
-        design="liquidGlass"
-        size="md"
-        density="comfortable"
-        motion="fluid"
-        mobileMode="only"
-        mobileDockItems={mobileDockItems}
-        mobileDockPathname={activePathname}
-        mobileDockPlacement="viewport"
-        aria-label="Studio mobile navigation"
-      >
-        <span className="sr-only">Studio mobile navigation</span>
-      </Sidebar>
-    </>
-  )
-}
-
-function StudioSidebarContent({ pathname }: { pathname: string }) {
-  return (
-    <>
+    <Sidebar
+      design="liquidGlass"
+      size="md"
+      density="comfortable"
+      motion="fluid"
+      mobileMode="auto"
+      mobileDockItems={mobileDockItems}
+      mobileDockPathname={dockPathname}
+      mobileDockPlacement="app"
+      mobileDockClassName="inset-x-3 z-50"
+      aria-label="Studio navigation"
+      className={cn('z-30 mr-2 shrink-0', className)}
+    >
       <div className="flex min-h-0 flex-1 flex-col">
         <SidebarBrand
           visual={
@@ -148,10 +134,10 @@ function StudioSidebarContent({ pathname }: { pathname: string }) {
         <SidebarSection title="Studio">
           {studioNavigationItems.map((item) => {
             const Icon = item.icon
-            const active = isActiveRoute(pathname, item.to)
+            const active = isActiveRoute(location.pathname, item.to)
 
             return (
-              <SidebarItem key={item.to} asChild active={active} badge={item.badge}>
+              <SidebarItem key={item.to} asChild active={active} value={item.to} badge={item.badge}>
                 <Link to={item.to}>
                   <SidebarItemIcon>
                     <Icon />
@@ -172,7 +158,7 @@ function StudioSidebarContent({ pathname }: { pathname: string }) {
       <SidebarFooter>
         <Dialog>
           <DialogTrigger asChild>
-            <SidebarItem type="button" icon={<Settings />}>
+            <SidebarItem type="button" icon={<Settings />} value="settings">
               Settings
             </SidebarItem>
           </DialogTrigger>
@@ -184,13 +170,13 @@ function StudioSidebarContent({ pathname }: { pathname: string }) {
 
         <Sheet>
           <SheetTrigger asChild>
-            <SidebarItem type="button" icon={<MessageSquarePlus />}>
+            <SidebarItem type="button" icon={<MessageSquarePlus />} value="feedback">
               Feedback
             </SidebarItem>
           </SheetTrigger>
           <SheetContent side="right" />
         </Sheet>
       </SidebarFooter>
-    </>
+    </Sidebar>
   )
 }

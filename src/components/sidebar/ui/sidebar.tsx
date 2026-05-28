@@ -129,9 +129,15 @@ function isActivePath(pathname: string, to: string) {
   return pathname === to || pathname.startsWith(`${to}/`)
 }
 
+function getDefaultMobileItems() {
+  return [primaryLinks[0], primaryLinks[3], primaryLinks[2], primaryLinks[4], quickLinks[0]].filter(
+    (item): item is StudioSidebarItem => Boolean(item),
+  )
+}
+
 export function Sidebar({
-  children,
   className,
+  children,
   design = 'liquidGlass',
   size = 'md',
   density = 'comfortable',
@@ -166,7 +172,7 @@ export function Sidebar({
   mobileDragMode,
   mobileDockDragMode = 'both',
   mobileMaxItems = 5,
-  mobileDockPlacement = 'container',
+  mobileDockPlacement = 'app',
   mobileDockClassName,
   mobileDockItems,
   mobileDockPathname,
@@ -174,28 +180,21 @@ export function Sidebar({
 }: SidebarProps) {
   const { pathname } = useLocation()
   const dockPathname = mobileDockPathname ?? pathname
-  const hasCustomMobileDock = Boolean(mobileDockItems?.length)
-  const shouldRenderCustomMobileDock = mobileMode !== 'off' && hasCustomMobileDock
-  const shouldUseCustomResponsiveRail = mobileMode === 'auto' && hasCustomMobileDock
-  const mobileItems: Array<StudioSidebarItem> = [
-    primaryLinks[0],
-    primaryLinks[3],
-    primaryLinks[2],
-    primaryLinks[4],
-    quickLinks[0],
-  ].filter((item): item is StudioSidebarItem => Boolean(item))
+  const fallbackMobileItems = getDefaultMobileItems()
+  const effectiveMobileItems = mobileDockItems ?? fallbackMobileItems
 
   if (children !== undefined) {
     return (
-      <nav className="contents" aria-label="Sidebar navigation" {...props}>
+      <nav className="contents" aria-label={props['aria-label'] ?? 'Sidebar navigation'}>
         {mobileMode !== 'only' ? (
           <div
             className={cn(
-              shouldUseCustomResponsiveRail ? 'hidden shrink-0 md:block' : 'shrink-0',
+              mobileMode === 'auto' ? 'hidden shrink-0 md:block' : 'shrink-0',
               className,
             )}
           >
             <SidebarRoot
+              {...props}
               design={design}
               size={size}
               density={density}
@@ -220,9 +219,9 @@ export function Sidebar({
           </div>
         ) : null}
 
-        {shouldRenderCustomMobileDock && mobileDockItems ? (
+        {mobileMode !== 'off' && effectiveMobileItems.length ? (
           <MobileSidebarDock
-            items={mobileDockItems}
+            items={effectiveMobileItems}
             pathname={dockPathname}
             fluidPreset={mobileFluidPreset ?? fluidPreset}
             hoverScale={mobileHoverScale ?? hoverScale}
@@ -250,9 +249,7 @@ export function Sidebar({
   return (
     <nav className="contents" aria-label="Studio navigation" {...props}>
       {mobileMode !== 'only' ? (
-        <div
-          className={cn(mobileMode === 'auto' ? 'hidden shrink-0 md:block' : 'shrink-0', className)}
-        >
+        <div className={cn('hidden shrink-0 md:block', className)}>
           <SidebarRoot
             design={design}
             size={size}
@@ -364,7 +361,7 @@ export function Sidebar({
 
       {mobileMode !== 'off' ? (
         <MobileSidebarDock
-          items={mobileItems}
+          items={effectiveMobileItems}
           pathname={dockPathname}
           fluidPreset={mobileFluidPreset ?? fluidPreset}
           hoverScale={mobileHoverScale ?? hoverScale}

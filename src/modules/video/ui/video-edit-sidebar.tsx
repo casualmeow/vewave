@@ -19,7 +19,7 @@ export const VideoEditSidebar = ({
   onShare,
 }: VideoEditSidebarProps) => {
   return (
-    <aside className="order-first flex min-w-0 flex-col gap-4 xl:sticky xl:top-6 xl:order-none xl:self-start">
+    <aside className="flex w-full min-w-0 flex-col gap-5 xl:max-w-[24rem] xl:basis-1/4">
       <VideoEditHeaderActions
         isSubmitting={isSubmitting}
         onUndo={onUndo}
