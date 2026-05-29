@@ -1,18 +1,13 @@
 import { Link, useLocation } from '@tanstack/react-router'
-import {
-  BarChart3,
-  Clapperboard,
-  Home,
-  MessageCircle,
-  MessageSquarePlus,
-  Settings,
-  SlidersHorizontal,
-  Video,
-} from 'lucide-react'
+import { Clapperboard, MessageSquarePlus, Settings } from 'lucide-react'
 
 import { StudioSettingsDialog } from './studio-settings-dialog'
-import type { LucideIcon } from 'lucide-react'
-import type { MobileSidebarDockItem } from '@/components/sidebar'
+import {
+  getStudioDockPathname,
+  getStudioMobileDockItems,
+  isStudioSidebarItemActive,
+  studioNavigationItems,
+} from './studio-sidebar-items'
 import {
   Sidebar,
   SidebarBrand,
@@ -21,6 +16,7 @@ import {
   SidebarItemIcon,
   SidebarItemLabel,
   SidebarSection,
+  useStudioSidebar,
 } from '@/components/sidebar'
 import {
   Avatar,
@@ -36,68 +32,11 @@ import {
 } from '@/shared/ui'
 import { cn } from '@/shared/lib/utils'
 
-type StudioSidebarItem = {
-  label: string
-  shortLabel?: string
-  to:
-    | '/studio/home'
-    | '/studio/channel-settings'
-    | '/studio/analytics'
-    | '/studio/content-manager'
-    | '/studio/community'
-  icon: LucideIcon
-  badge?: string
-}
-
-const studioNavigationItems: ReadonlyArray<StudioSidebarItem> = [
-  { label: 'Home', to: '/studio/home', icon: Home },
-  {
-    label: 'Channel Settings',
-    shortLabel: 'Settings',
-    to: '/studio/channel-settings',
-    icon: SlidersHorizontal,
-  },
-  { label: 'Analytics', to: '/studio/analytics', icon: BarChart3 },
-  {
-    label: 'Content manager',
-    shortLabel: 'Content',
-    to: '/studio/content-manager',
-    icon: Video,
-    badge: '12',
-  },
-  { label: 'Community', shortLabel: 'Social', to: '/studio/community', icon: MessageCircle },
-]
-
-function isVideoEditRoute(pathname: string) {
-  return /^\/studio\/video\/(?:edit\/[^/]+|[^/]+\/edit)\/?$/.test(pathname)
-}
-
-function isActiveRoute(pathname: string, to: StudioSidebarItem['to']) {
-  if (to === '/studio/content-manager' && isVideoEditRoute(pathname)) {
-    return true
-  }
-
-  return pathname === to || pathname.startsWith(`${to}/`)
-}
-
-function getDockPathname(pathname: string) {
-  return isVideoEditRoute(pathname) ? '/studio/content-manager' : pathname
-}
-
 export function StudioSidebar({ className }: { className?: string }) {
   const location = useLocation()
-  const dockPathname = getDockPathname(location.pathname)
-  const mobileDockItems: Array<MobileSidebarDockItem> = studioNavigationItems.map((item) => {
-    const Icon = item.icon
-
-    return {
-      label: item.label,
-      shortLabel: item.shortLabel,
-      to: item.to,
-      icon: <Icon />,
-      badge: item.badge,
-    }
-  })
+  const { desktopOpen } = useStudioSidebar()
+  const dockPathname = getStudioDockPathname(location.pathname)
+  const mobileDockItems = getStudioMobileDockItems()
 
   return (
     <Sidebar
@@ -111,7 +50,7 @@ export function StudioSidebar({ className }: { className?: string }) {
       mobileDockPlacement="app"
       mobileDockClassName="inset-x-3 z-50"
       aria-label="Studio navigation"
-      className={cn('z-30 mr-2 shrink-0', className)}
+      className={cn('z-30 mr-2 shrink-0', !desktopOpen && 'md:hidden', className)}
     >
       <div className="flex min-h-0 flex-1 flex-col">
         <SidebarBrand
@@ -134,7 +73,7 @@ export function StudioSidebar({ className }: { className?: string }) {
         <SidebarSection title="Studio">
           {studioNavigationItems.map((item) => {
             const Icon = item.icon
-            const active = isActiveRoute(location.pathname, item.to)
+            const active = isStudioSidebarItemActive(location.pathname, item.to)
 
             return (
               <SidebarItem key={item.to} asChild active={active} value={item.to} badge={item.badge}>

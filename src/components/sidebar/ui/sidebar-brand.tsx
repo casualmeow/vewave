@@ -1,5 +1,5 @@
 import { sidebarBrandVariants } from '../constants'
-import { useSidebarContext } from './sidebar-context'
+import { useSidebarContext } from '../hooks'
 import type { SidebarBrandProps } from '../types'
 import { cn } from '@/shared/lib/utils'
 

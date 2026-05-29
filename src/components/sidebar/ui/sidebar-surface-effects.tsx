@@ -1,6 +1,12 @@
-import type { SidebarDesign } from '../types'
+import type { SidebarDesign, SidebarFilterIds } from '../types'
 
-export function SidebarSurfaceEffects({ design }: { design: SidebarDesign }) {
+export function SidebarSurfaceEffects({
+  design,
+  filterIds,
+}: {
+  design: SidebarDesign
+  filterIds?: SidebarFilterIds
+}) {
   if (design === 'solid') {
     return null
   }
@@ -20,7 +26,10 @@ export function SidebarSurfaceEffects({ design }: { design: SidebarDesign }) {
       <>
         <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_8%,rgba(255,255,255,0.70),transparent_16rem),radial-gradient(circle_at_110%_22%,rgba(125,211,252,0.32),transparent_15rem),radial-gradient(circle_at_0%_82%,rgba(45,212,191,0.28),transparent_16rem)]" />
         <span className="pointer-events-none absolute inset-0 opacity-[var(--sidebar-glass-spot-opacity)] transition-opacity duration-150 [background:radial-gradient(circle_at_var(--sidebar-pointer-x)_var(--sidebar-pointer-y),rgba(255,255,255,0.95),rgba(255,255,255,0.36)_9rem,transparent_14rem)]" />
-        <span className="pointer-events-none absolute inset-0 opacity-55 mix-blend-screen [filter:url(#vewave-sidebar-refraction)] [background:radial-gradient(ellipse_at_var(--sidebar-glass-sheen-x)_var(--sidebar-glass-sheen-y),rgba(255,255,255,0.55),transparent_28%),linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.42)_18%,transparent_32%,transparent_100%)]" />
+        <span
+          className="pointer-events-none absolute inset-0 opacity-55 mix-blend-screen [background:radial-gradient(ellipse_at_var(--sidebar-glass-sheen-x)_var(--sidebar-glass-sheen-y),rgba(255,255,255,0.55),transparent_28%),linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.42)_18%,transparent_32%,transparent_100%)]"
+          style={filterIds ? { filter: `url(#${filterIds.refraction})` } : undefined}
+        />
         <span className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/95 to-transparent" />
         <span className="pointer-events-none absolute inset-y-7 left-0 w-px bg-gradient-to-b from-transparent via-white/75 to-transparent" />
         <span className="pointer-events-none absolute inset-y-8 right-0 w-px bg-gradient-to-b from-transparent via-teal-100/55 to-transparent" />

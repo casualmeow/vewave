@@ -1,38 +1,21 @@
 import { Slot } from '@radix-ui/react-slot'
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-} from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useId, useState } from 'react'
 import {
   SIDEBAR_FLUID_TRANSITION,
-  SIDEBAR_MAGNETIC_TRANSITION,
   SIDEBAR_SOFT_TRANSITION,
   sidebarActiveIndicatorVariants,
   sidebarBadgeVariants,
   sidebarItemVariants,
 } from '../constants'
-import { useSidebarContext } from './sidebar-context'
+import { useFluidTransform, useRafCssVariables, useSidebarContext } from '../hooks'
+import { getPointerProgress, toMotionDragMode } from '../helpers'
 import type { MotionStyle } from 'motion/react'
 import type { FocusEvent as ReactFocusEvent, PointerEvent as ReactPointerEvent, Ref } from 'react'
-import type { SidebarDragMode, SidebarItemPartProps, SidebarItemProps } from '../types'
+import type { SidebarItemPartProps, SidebarItemProps } from '../types'
 import { cn } from '@/shared/lib/utils'
 
 type ItemShellStyle = MotionStyle & Record<`--${string}`, string | number>
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max)
-}
-
-function toMotionDragMode(mode: SidebarDragMode) {
-  if (mode === 'none') return false
-  if (mode === 'both') return true
-  return mode
-}
 
 export function SidebarItem({
   ref,
@@ -66,6 +49,7 @@ export function SidebarItem({
 }: SidebarItemProps) {
   const {
     scopeId,
+    filterIds,
     design,
     size,
     collapsed,
@@ -93,6 +77,7 @@ export function SidebarItem({
   const prefersReducedMotion = useReducedMotion()
   const [isHovered, setIsHovered] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
+  const setCssVariables = useRafCssVariables()
   const canAnimate = motionPreset !== 'none' && !prefersReducedMotion
   const canFluid = interactiveGlass && !disabled
   const transition = motionPreset === 'fluid' ? SIDEBAR_FLUID_TRANSITION : SIDEBAR_SOFT_TRANSITION
@@ -118,24 +103,13 @@ export function SidebarItem({
       canAnimate,
   )
 
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-  const tiltX = useMotionValue(0)
-  const tiltY = useMotionValue(0)
-  const springX = useSpring(x, SIDEBAR_MAGNETIC_TRANSITION)
-  const springY = useSpring(y, SIDEBAR_MAGNETIC_TRANSITION)
-  const springTiltX = useSpring(tiltX, { stiffness: 420, damping: 34, mass: 0.62 })
-  const springTiltY = useSpring(tiltY, { stiffness: 420, damping: 34, mass: 0.62 })
-  const rotateX = useTransform(
-    springTiltY,
-    [-1, 1],
-    [`${resolvedTiltStrength}deg`, `${-resolvedTiltStrength}deg`],
-  )
-  const rotateY = useTransform(
-    springTiltX,
-    [-1, 1],
-    [`${-resolvedTiltStrength}deg`, `${resolvedTiltStrength}deg`],
-  )
+  const { fluidTransformStyle, updateFluidTransform, resetFluidTransform } = useFluidTransform({
+    enabled: canFluid,
+    magneticStrength: resolvedMagneticStrength,
+    magneticVerticalStrength: resolvedMagneticVerticalStrength,
+    tiltStrength: resolvedTiltStrength,
+    perspective: 900,
+  })
 
   const liquidInset = isDragging
     ? -resolvedHoverSize * 1.45
@@ -151,58 +125,47 @@ export function SidebarItem({
     '--item-pointer-y': '50%',
     '--item-hover-size': `${resolvedHoverSize}px`,
     '--item-liquid-intensity': resolvedLiquidIntensity,
-    x: canFluid ? springX : undefined,
-    y: canFluid ? springY : undefined,
-    rotateX: canFluid ? rotateX : undefined,
-    rotateY: canFluid ? rotateY : undefined,
-    transformPerspective: canFluid ? 900 : undefined,
-    transformStyle: canFluid ? 'preserve-3d' : undefined,
+    ...fluidTransformStyle,
   } satisfies ItemShellStyle
-
-  const resetMotion = () => {
-    x.set(0)
-    y.set(0)
-    tiltX.set(0)
-    tiltY.set(0)
-  }
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (!canFluid) return
 
-    const rect = event.currentTarget.getBoundingClientRect()
-    const localX = event.clientX - rect.left
-    const localY = event.clientY - rect.top
-    const percentX = clamp((localX / rect.width) * 100, 0, 100)
-    const percentY = clamp((localY / rect.height) * 100, 0, 100)
-    const normalizedX = (percentX / 100 - 0.5) * 2
-    const normalizedY = (percentY / 100 - 0.5) * 2
+    const progress = getPointerProgress({
+      clientX: event.clientX,
+      clientY: event.clientY,
+      rect: event.currentTarget.getBoundingClientRect(),
+    })
 
-    event.currentTarget.style.setProperty('--item-pointer-x', `${percentX}%`)
-    event.currentTarget.style.setProperty('--item-pointer-y', `${percentY}%`)
-    event.currentTarget.style.setProperty('--item-pointer-glow', '1')
+    setCssVariables(event.currentTarget, {
+      '--item-pointer-x': `${progress.percentX}%`,
+      '--item-pointer-y': `${progress.percentY}%`,
+      '--item-pointer-glow': '1',
+    })
 
-    x.set(normalizedX * resolvedMagneticStrength)
-    y.set(normalizedY * resolvedMagneticVerticalStrength)
-    tiltX.set(normalizedX)
-    tiltY.set(normalizedY)
+    updateFluidTransform(progress.normalizedX, progress.normalizedY)
   }
 
   const handlePointerEnter = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (canFluid) {
       setIsHovered(true)
       setFocusedItemKey(itemKey)
-      event.currentTarget.style.setProperty('--item-pointer-glow', '1')
+      setCssVariables(event.currentTarget, {
+        '--item-pointer-glow': '1',
+      })
     }
   }
 
   const handlePointerLeave = (event: ReactPointerEvent<HTMLDivElement>) => {
     setIsHovered(false)
     setIsDragging(false)
-    event.currentTarget.style.setProperty('--item-pointer-x', '50%')
-    event.currentTarget.style.setProperty('--item-pointer-y', '50%')
-    event.currentTarget.style.setProperty('--item-pointer-glow', '0')
+    setCssVariables(event.currentTarget, {
+      '--item-pointer-x': '50%',
+      '--item-pointer-y': '50%',
+      '--item-pointer-glow': '0',
+    })
     setFocusedItemKey(null)
-    resetMotion()
+    resetFluidTransform()
   }
 
   const handleFocusCapture = (event: ReactFocusEvent<HTMLDivElement>) => {
@@ -283,14 +246,14 @@ export function SidebarItem({
       }}
       onDragEnd={() => {
         setIsDragging(false)
-        resetMotion()
+        resetFluidTransform()
       }}
     >
       {design === 'liquidGlass' ? (
         <motion.span
           aria-hidden="true"
           className="pointer-events-none absolute rounded-[1.6rem] border border-white/0 bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),rgba(255,255,255,0.64),rgba(255,255,255,0.14)_35%,transparent_64%),linear-gradient(135deg,rgba(255,255,255,0.22),rgba(255,255,255,0.05))] opacity-[calc(var(--item-pointer-glow)*0.95)] shadow-[inset_0_1px_0_rgba(255,255,255,0.50)] backdrop-blur-sm transition-[opacity,border-color] duration-150 group-hover/sidebar-item-shell:border-white/32"
-          style={{ filter: canFluid ? 'url(#vewave-sidebar-refraction)' : undefined }}
+          style={{ filter: canFluid ? `url(#${filterIds.refraction})` : undefined }}
           animate={{
             top: liquidInset,
             right: liquidInset,
@@ -307,7 +270,7 @@ export function SidebarItem({
             key="fluid-field"
             aria-hidden="true"
             className="pointer-events-none absolute overflow-hidden rounded-[1.7rem] border border-white/40 bg-[linear-gradient(135deg,rgba(255,255,255,0.40),rgba(255,255,255,0.10)_45%,rgba(153,246,228,0.24))] shadow-[0_20px_52px_rgba(15,23,42,0.16),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl"
-            style={{ filter: 'url(#vewave-sidebar-refraction)' }}
+            style={{ filter: `url(#${filterIds.refraction})` }}
             initial={{ opacity: 0, scale: 0.82, top: 0, right: 0, bottom: 0, left: 0 }}
             animate={{
               opacity: isDragging ? 0.92 : 0.62,
@@ -321,7 +284,7 @@ export function SidebarItem({
             transition={transition}
           >
             <span className="absolute inset-0 bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),rgba(255,255,255,0.92),transparent_42%)]" />
-            <span className="absolute inset-0 [filter:url(#vewave-sidebar-goo-strong)]">
+            <span className="absolute inset-0" style={{ filter: `url(#${filterIds.gooStrong})` }}>
               <motion.span
                 className="absolute -left-6 top-1/2 size-20 -translate-y-1/2 rounded-full bg-teal-100/35"
                 animate={canAnimate ? { x: [0, 11, -4, 0], scale: [1, 1.28, 0.96, 1] } : undefined}
@@ -360,10 +323,16 @@ export function SidebarItem({
             left: liquidInset,
           }}
         >
-          <span className="pointer-events-none absolute inset-0 [filter:url(#vewave-sidebar-refraction)]" />
+          <span
+            className="pointer-events-none absolute inset-0"
+            style={{ filter: `url(#${filterIds.refraction})` }}
+          />
           <span className="pointer-events-none absolute inset-x-2 top-0 h-px bg-gradient-to-r from-transparent via-white/95 to-transparent" />
           <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),rgba(255,255,255,0.90),transparent_38%)] opacity-[calc(0.35+var(--item-pointer-glow)*0.55)]" />
-          <span className="pointer-events-none absolute inset-0 [filter:url(#vewave-sidebar-goo-strong)]">
+          <span
+            className="pointer-events-none absolute inset-0"
+            style={{ filter: `url(#${filterIds.gooStrong})` }}
+          >
             <motion.span
               className="absolute -left-4 top-1/2 size-16 -translate-y-1/2 rounded-full bg-teal-100/36"
               animate={canAnimate ? { x: [0, 8, -3, 0], scale: [1, 1.18, 0.94, 1] } : undefined}

@@ -33,8 +33,30 @@ export type SidebarResolvedFluidConfig = {
   dragMode: SidebarDragMode
 }
 
+export type SidebarFluidInteractionProps = {
+  hoverScale?: number
+  activeHoverScale?: number
+  dragScale?: number
+  hoverSize?: number
+  magneticStrength?: number
+  magneticVerticalStrength?: number
+  tiltStrength?: number
+  focusBlur?: boolean
+  focusBlurAmount?: number
+  focusDimOpacity?: number
+  liquidIntensity?: number
+  dragMode?: SidebarDragMode
+}
+
+export type SidebarFilterIds = {
+  goo: string
+  gooStrong: string
+  refraction: string
+}
+
 export type SidebarContextValue = {
   scopeId: string
+  filterIds: SidebarFilterIds
   design: SidebarDesign
   size: SidebarSize
   density: SidebarDensity
@@ -71,36 +93,18 @@ export interface SidebarRootProps
   collapsed?: boolean
   motion?: SidebarMotion
   fluidPreset?: SidebarFluidPreset
-  hoverScale?: number
-  activeHoverScale?: number
-  dragScale?: number
-  hoverSize?: number
-  magneticStrength?: number
-  magneticVerticalStrength?: number
-  tiltStrength?: number
-  focusBlur?: boolean
-  focusBlurAmount?: number
-  focusDimOpacity?: number
-  liquidIntensity?: number
-  dragMode?: SidebarDragMode
-  mobileMode?: SidebarMobileMode
-  mobileFluidPreset?: SidebarFluidPreset
-  mobileHoverScale?: number
-  mobileActiveHoverScale?: number
-  mobileDragScale?: number
-  mobileHoverSize?: number
-  mobileMagneticStrength?: number
-  mobileMagneticVerticalStrength?: number
-  mobileTiltStrength?: number
-  mobileFocusBlur?: boolean
-  mobileFocusBlurAmount?: number
-  mobileFocusDimOpacity?: number
-  mobileLiquidIntensity?: number
-  mobileDragMode?: SidebarDragMode
-  mobileDockDragMode?: SidebarDragMode
-  mobileMaxItems?: number
-  mobileDockPlacement?: SidebarMobileDockPlacement
-  mobileDockClassName?: string
+  hoverScale?: SidebarFluidInteractionProps['hoverScale']
+  activeHoverScale?: SidebarFluidInteractionProps['activeHoverScale']
+  dragScale?: SidebarFluidInteractionProps['dragScale']
+  hoverSize?: SidebarFluidInteractionProps['hoverSize']
+  magneticStrength?: SidebarFluidInteractionProps['magneticStrength']
+  magneticVerticalStrength?: SidebarFluidInteractionProps['magneticVerticalStrength']
+  tiltStrength?: SidebarFluidInteractionProps['tiltStrength']
+  focusBlur?: SidebarFluidInteractionProps['focusBlur']
+  focusBlurAmount?: SidebarFluidInteractionProps['focusBlurAmount']
+  focusDimOpacity?: SidebarFluidInteractionProps['focusDimOpacity']
+  liquidIntensity?: SidebarFluidInteractionProps['liquidIntensity']
+  dragMode?: SidebarFluidInteractionProps['dragMode']
   children: ReactNode
 }
 
@@ -138,36 +142,18 @@ export interface SidebarItemProps
   value?: string
   active?: boolean
   disabled?: boolean
-  hoverScale?: number
-  activeHoverScale?: number
-  dragScale?: number
-  hoverSize?: number
-  magneticStrength?: number
-  magneticVerticalStrength?: number
-  tiltStrength?: number
-  focusBlur?: boolean
-  focusBlurAmount?: number
-  focusDimOpacity?: number
-  liquidIntensity?: number
-  dragMode?: SidebarDragMode
-  mobileMode?: SidebarMobileMode
-  mobileFluidPreset?: SidebarFluidPreset
-  mobileHoverScale?: number
-  mobileActiveHoverScale?: number
-  mobileDragScale?: number
-  mobileHoverSize?: number
-  mobileMagneticStrength?: number
-  mobileMagneticVerticalStrength?: number
-  mobileTiltStrength?: number
-  mobileFocusBlur?: boolean
-  mobileFocusBlurAmount?: number
-  mobileFocusDimOpacity?: number
-  mobileLiquidIntensity?: number
-  mobileDragMode?: SidebarDragMode
-  mobileDockDragMode?: SidebarDragMode
-  mobileMaxItems?: number
-  mobileDockPlacement?: SidebarMobileDockPlacement
-  mobileDockClassName?: string
+  hoverScale?: SidebarFluidInteractionProps['hoverScale']
+  activeHoverScale?: SidebarFluidInteractionProps['activeHoverScale']
+  dragScale?: SidebarFluidInteractionProps['dragScale']
+  hoverSize?: SidebarFluidInteractionProps['hoverSize']
+  magneticStrength?: SidebarFluidInteractionProps['magneticStrength']
+  magneticVerticalStrength?: SidebarFluidInteractionProps['magneticVerticalStrength']
+  tiltStrength?: SidebarFluidInteractionProps['tiltStrength']
+  focusBlur?: SidebarFluidInteractionProps['focusBlur']
+  focusBlurAmount?: SidebarFluidInteractionProps['focusBlurAmount']
+  focusDimOpacity?: SidebarFluidInteractionProps['focusDimOpacity']
+  liquidIntensity?: SidebarFluidInteractionProps['liquidIntensity']
+  dragMode?: SidebarFluidInteractionProps['dragMode']
   children: ReactNode
 }
 

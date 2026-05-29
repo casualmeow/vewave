@@ -1,7 +1,9 @@
 import { Bell, Bot, Home, Settings, User } from 'lucide-react'
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
 import { useId, useState } from 'react'
-import { SIDEBAR_FLUID_TRANSITION, SIDEBAR_MAGNETIC_TRANSITION } from '../constants'
+import { SIDEBAR_FLUID_TRANSITION } from '../constants'
+import { useFinePointer, useFluidTransform, useRafCssVariables } from '../hooks'
+import { getPointerProgress } from '../helpers'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 
 import { cn } from '@/shared/lib/utils'
@@ -44,6 +46,7 @@ function FluidSettingsTab({
   focused,
   deemphasized,
   layoutId,
+  gooFilterId,
   tab,
   onFocusTab,
   onReleaseFocus,
@@ -53,59 +56,40 @@ function FluidSettingsTab({
   focused: boolean
   deemphasized: boolean
   layoutId: string
+  gooFilterId: string
   tab: (typeof tabs)[number]
   onFocusTab: () => void
   onReleaseFocus: () => void
   onSelect: () => void
 }) {
   const prefersReducedMotion = useReducedMotion()
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-  const tiltX = useMotionValue(0)
-  const tiltY = useMotionValue(0)
-  const springX = useSpring(x, SIDEBAR_MAGNETIC_TRANSITION)
-  const springY = useSpring(y, SIDEBAR_MAGNETIC_TRANSITION)
-  const rotateX = useTransform(
-    useSpring(tiltY, SIDEBAR_MAGNETIC_TRANSITION),
-    [-1, 1],
-    ['4.8deg', '-4.8deg'],
-  )
-  const rotateY = useTransform(
-    useSpring(tiltX, SIDEBAR_MAGNETIC_TRANSITION),
-    [-1, 1],
-    ['-5.2deg', '5.2deg'],
-  )
+  const finePointer = useFinePointer()
+  const canUsePointerMotion = !prefersReducedMotion && finePointer
+  const setCssVariables = useRafCssVariables()
+  const { fluidTransformStyle, updateFluidTransform, resetFluidTransform } = useFluidTransform({
+    enabled: canUsePointerMotion,
+    magneticStrength: 16,
+    magneticVerticalStrength: 9,
+    tiltStrength: 5.2,
+    perspective: 700,
+  })
   const Icon = tab.icon
 
-  const reset = () => {
-    x.set(0)
-    y.set(0)
-    tiltX.set(0)
-    tiltY.set(0)
-  }
-
   const handlePointerMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
-    if (prefersReducedMotion) return
+    if (!canUsePointerMotion) return
 
-    const rect = event.currentTarget.getBoundingClientRect()
-    const localX = event.clientX - rect.left
-    const localY = event.clientY - rect.top
-    const normalizedX = (localX / rect.width - 0.5) * 2
-    const normalizedY = (localY / rect.height - 0.5) * 2
+    const progress = getPointerProgress({
+      clientX: event.clientX,
+      clientY: event.clientY,
+      rect: event.currentTarget.getBoundingClientRect(),
+    })
 
-    event.currentTarget.style.setProperty(
-      '--tab-pointer-x',
-      `${Math.max(0, Math.min(100, (localX / rect.width) * 100))}%`,
-    )
-    event.currentTarget.style.setProperty(
-      '--tab-pointer-y',
-      `${Math.max(0, Math.min(100, (localY / rect.height) * 100))}%`,
-    )
+    setCssVariables(event.currentTarget, {
+      '--tab-pointer-x': `${progress.percentX}%`,
+      '--tab-pointer-y': `${progress.percentY}%`,
+    })
 
-    x.set(normalizedX * 16)
-    y.set(normalizedY * 9)
-    tiltX.set(normalizedX)
-    tiltY.set(normalizedY)
+    updateFluidTransform(progress.normalizedX, progress.normalizedY)
   }
 
   return (
@@ -120,17 +104,7 @@ function FluidSettingsTab({
         'focus-visible:ring-2 focus-visible:ring-teal-300/60',
         active ? 'text-zinc-950' : 'text-zinc-600 hover:text-zinc-950',
       )}
-      style={
-        prefersReducedMotion
-          ? undefined
-          : {
-              x: springX,
-              y: springY,
-              rotateX,
-              rotateY,
-              transformPerspective: 700,
-            }
-      }
+      style={!canUsePointerMotion ? undefined : fluidTransformStyle}
       animate={
         prefersReducedMotion
           ? undefined
@@ -139,19 +113,23 @@ function FluidSettingsTab({
               opacity: deemphasized ? 0.4 : 1,
             }
       }
-      drag={!prefersReducedMotion}
+      drag={canUsePointerMotion}
       dragConstraints={{ left: -15, right: 15, top: -10, bottom: 10 }}
       dragElastic={0.42}
       dragMomentum={false}
       dragSnapToOrigin
-      whileHover={prefersReducedMotion ? undefined : { scale: active ? 1.055 : 1.09 }}
-      whileTap={prefersReducedMotion ? undefined : { scale: 0.94 }}
-      whileDrag={prefersReducedMotion ? undefined : { scale: 1.16, zIndex: 30 }}
+      whileHover={canUsePointerMotion ? { scale: active ? 1.055 : 1.09 } : undefined}
+      whileTap={canUsePointerMotion ? { scale: 0.94 } : undefined}
+      whileDrag={canUsePointerMotion ? { scale: 1.16, zIndex: 30 } : undefined}
       transition={SIDEBAR_FLUID_TRANSITION}
       onPointerEnter={onFocusTab}
       onPointerMove={handlePointerMove}
-      onPointerLeave={() => {
-        reset()
+      onPointerLeave={(event) => {
+        setCssVariables(event.currentTarget, {
+          '--tab-pointer-x': '50%',
+          '--tab-pointer-y': '50%',
+        })
+        resetFluidTransform()
         onReleaseFocus()
       }}
       onFocus={onFocusTab}
@@ -183,7 +161,7 @@ function FluidSettingsTab({
           }}
           transition={SIDEBAR_FLUID_TRANSITION}
         >
-          <span className="absolute inset-0 [filter:url(#vewave-sidebar-goo-strong)]">
+          <span className="absolute inset-0" style={{ filter: `url(#${gooFilterId})` }}>
             <motion.span
               className="absolute -left-5 top-1/2 size-16 -translate-y-1/2 rounded-full bg-teal-100/40"
               animate={
@@ -227,13 +205,30 @@ function FluidSettingsTab({
 export function SidebarSettingsDialog() {
   const [activeTab, setActiveTab] = useState(tabs[0].value)
   const [focusedTab, setFocusedTab] = useState<string | null>(null)
-  const layoutId = `${useId().replace(/[^a-zA-Z0-9_-]/g, '')}-settings-fluid-tab`
+  const scopeId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
+  const layoutId = `${scopeId}-settings-fluid-tab`
+  const gooFilterId = `${scopeId}-settings-goo`
   const selectedTab = tabs.find((tab) => tab.value === activeTab) ?? tabs[0]
   const effectiveFocusedTab = focusedTab ?? activeTab
   const Icon = selectedTab.icon
 
   return (
     <div className="flex w-full flex-col gap-4 md:flex-row md:items-start">
+      <svg aria-hidden="true" className="pointer-events-none absolute size-0" focusable="false">
+        <defs>
+          <filter id={gooFilterId}>
+            <feGaussianBlur in="SourceGraphic" stdDeviation="11" result="blur" />
+            <feColorMatrix
+              in="blur"
+              mode="matrix"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 28 -14"
+              result="goo"
+            />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+          </filter>
+        </defs>
+      </svg>
+
       <div
         role="tablist"
         aria-label="Studio settings sections"
@@ -247,6 +242,7 @@ export function SidebarSettingsDialog() {
             focused={effectiveFocusedTab === tab.value}
             deemphasized={Boolean(effectiveFocusedTab && effectiveFocusedTab !== tab.value)}
             layoutId={layoutId}
+            gooFilterId={gooFilterId}
             tab={tab}
             onFocusTab={() => setFocusedTab(tab.value)}
             onReleaseFocus={() => setFocusedTab(null)}

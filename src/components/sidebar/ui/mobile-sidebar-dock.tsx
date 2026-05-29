@@ -1,17 +1,22 @@
 import { Link } from '@tanstack/react-router'
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react'
-import { useId, useMemo, useState } from 'react'
+import { motion, useReducedMotion } from 'motion/react'
+import { useId, useState } from 'react'
+import { SIDEBAR_FLUID_TRANSITION } from '../constants'
 import {
-  SIDEBAR_FLUID_PRESETS,
-  SIDEBAR_FLUID_TRANSITION,
-  SIDEBAR_MAGNETIC_TRANSITION,
-} from '../constants'
+  useFinePointer,
+  useFluidTransform,
+  useRafCssVariables,
+  useResolvedFluidConfig,
+} from '../hooks'
+import { getPointerProgress, toMotionDragMode } from '../helpers'
 import type { MotionStyle } from 'motion/react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from 'react'
+import type { LinkProps } from '@tanstack/react-router'
 
 import type {
   SidebarDragMode,
   SidebarFluidPreset,
+  SidebarFluidInteractionProps,
   SidebarMobileDockPlacement,
   SidebarResolvedFluidConfig,
 } from '../types'
@@ -22,100 +27,32 @@ type MobileDockStyle = MotionStyle & Record<`--${string}`, string | number>
 export type MobileSidebarDockItem = {
   label: string
   shortLabel?: string
-  to: string
+  to: NonNullable<LinkProps['to']>
+  params?: LinkProps['params']
   icon: ReactNode
   badge?: ReactNode
   disabled?: boolean
 }
 
-export interface MobileSidebarDockProps {
+export interface MobileSidebarDockProps extends SidebarFluidInteractionProps {
   items: Array<MobileSidebarDockItem>
   pathname: string
+  ariaLabel?: string
   className?: string
   fluidPreset?: SidebarFluidPreset
-  hoverScale?: number
-  activeHoverScale?: number
-  dragScale?: number
-  hoverSize?: number
-  magneticStrength?: number
-  magneticVerticalStrength?: number
-  tiltStrength?: number
-  focusBlur?: boolean
-  focusBlurAmount?: number
-  focusDimOpacity?: number
-  liquidIntensity?: number
-  dragMode?: SidebarDragMode
   dockDragMode?: SidebarDragMode
   maxItems?: number
   placement?: SidebarMobileDockPlacement
 }
 
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max)
-}
-
-function toMotionDragMode(mode: SidebarDragMode) {
-  if (mode === 'none') return false
-  if (mode === 'both') return true
-  return mode
-}
-
-function isActivePath(pathname: string, to: string) {
+function isActivePath(pathname: string, to: LinkProps['to']) {
   return pathname === to || pathname.startsWith(`${to}/`)
-}
-
-function useResolvedFluidConfig({
-  fluidPreset = 'extreme',
-  hoverScale,
-  activeHoverScale,
-  dragScale,
-  hoverSize,
-  magneticStrength,
-  magneticVerticalStrength,
-  tiltStrength,
-  focusBlur,
-  focusBlurAmount,
-  focusDimOpacity,
-  liquidIntensity,
-  dragMode,
-}: Omit<MobileSidebarDockProps, 'items' | 'pathname' | 'className' | 'dockDragMode' | 'maxItems'>) {
-  return useMemo<SidebarResolvedFluidConfig>(() => {
-    const preset = SIDEBAR_FLUID_PRESETS[fluidPreset]
-
-    return {
-      hoverScale: hoverScale ?? preset.hoverScale,
-      activeHoverScale: activeHoverScale ?? preset.activeHoverScale,
-      dragScale: dragScale ?? preset.dragScale,
-      hoverSize: hoverSize ?? Math.max(12, preset.hoverSize),
-      magneticStrength: magneticStrength ?? preset.magneticStrength,
-      magneticVerticalStrength: magneticVerticalStrength ?? preset.magneticVerticalStrength,
-      tiltStrength: tiltStrength ?? preset.tiltStrength,
-      focusBlur: focusBlur ?? preset.focusBlur,
-      focusBlurAmount: focusBlurAmount ?? preset.focusBlurAmount,
-      focusDimOpacity: focusDimOpacity ?? preset.focusDimOpacity,
-      liquidIntensity: liquidIntensity ?? preset.liquidIntensity,
-      dragMode: dragMode ?? preset.dragMode,
-    }
-  }, [
-    activeHoverScale,
-    dragMode,
-    dragScale,
-    fluidPreset,
-    focusBlur,
-    focusBlurAmount,
-    focusDimOpacity,
-    hoverScale,
-    hoverSize,
-    liquidIntensity,
-    magneticStrength,
-    magneticVerticalStrength,
-    tiltStrength,
-  ])
 }
 
 export function MobileSidebarDock({
   items,
   pathname,
+  ariaLabel = 'Mobile navigation',
   className,
   fluidPreset = 'extreme',
   hoverScale,
@@ -135,7 +72,9 @@ export function MobileSidebarDock({
   placement = 'container',
 }: MobileSidebarDockProps) {
   const prefersReducedMotion = useReducedMotion()
+  const finePointer = useFinePointer()
   const canAnimate = !prefersReducedMotion
+  const canTrackPointer = canAnimate && finePointer
   const scopeId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const [focusedItemKey, setFocusedItemKey] = useState<string | null>(null)
   const visibleItems = items.slice(0, maxItems)
@@ -143,6 +82,7 @@ export function MobileSidebarDock({
   const effectiveFocusedItemKey = focusedItemKey ?? activeItemKey
   const config = useResolvedFluidConfig({
     fluidPreset,
+    minHoverSize: 12,
     hoverScale,
     activeHoverScale,
     dragScale,
@@ -156,53 +96,51 @@ export function MobileSidebarDock({
     liquidIntensity,
     dragMode,
   })
-
-  const pointerX = useMotionValue(0)
-  const pointerY = useMotionValue(0)
-  const springPointerX = useSpring(pointerX, { stiffness: 180, damping: 28, mass: 0.72 })
-  const springPointerY = useSpring(pointerY, { stiffness: 180, damping: 28, mass: 0.72 })
-  const rotateX = useTransform(springPointerY, [-1, 1], ['1.6deg', '-1.6deg'])
-  const rotateY = useTransform(springPointerX, [-1, 1], ['-1.4deg', '1.4deg'])
+  const setCssVariables = useRafCssVariables()
+  const { fluidTransformStyle, updateFluidTransform, resetFluidTransform } = useFluidTransform({
+    enabled: canTrackPointer,
+    magneticStrength: 0,
+    magneticVerticalStrength: 0,
+    tiltStrength: 1.45,
+    perspective: 1100,
+    tiltSpring: { stiffness: 180, damping: 28, mass: 0.72 },
+  })
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!canAnimate) return
+    if (!canTrackPointer) return
 
-    const rect = event.currentTarget.getBoundingClientRect()
-    const localX = event.clientX - rect.left
-    const localY = event.clientY - rect.top
-    const normalizedX = (localX / rect.width - 0.5) * 2
-    const normalizedY = (localY / rect.height - 0.5) * 2
+    const progress = getPointerProgress({
+      clientX: event.clientX,
+      clientY: event.clientY,
+      rect: event.currentTarget.getBoundingClientRect(),
+    })
 
-    event.currentTarget.style.setProperty('--mobile-dock-pointer-x', `${localX}px`)
-    event.currentTarget.style.setProperty('--mobile-dock-pointer-y', `${localY}px`)
-    event.currentTarget.style.setProperty(
-      '--mobile-dock-sheen-x',
-      `${clamp((localX / rect.width) * 100, 0, 100)}%`,
-    )
-    event.currentTarget.style.setProperty(
-      '--mobile-dock-sheen-y',
-      `${clamp((localY / rect.height) * 100, 0, 100)}%`,
-    )
-    event.currentTarget.style.setProperty('--mobile-dock-glow-opacity', '0.86')
+    setCssVariables(event.currentTarget, {
+      '--mobile-dock-pointer-x': `${progress.localX}px`,
+      '--mobile-dock-pointer-y': `${progress.localY}px`,
+      '--mobile-dock-sheen-x': `${progress.percentX}%`,
+      '--mobile-dock-sheen-y': `${progress.percentY}%`,
+      '--mobile-dock-glow-opacity': '0.86',
+    })
 
-    pointerX.set(normalizedX)
-    pointerY.set(normalizedY)
+    updateFluidTransform(progress.normalizedX, progress.normalizedY)
   }
 
   const handlePointerLeave = (event: ReactPointerEvent<HTMLDivElement>) => {
-    event.currentTarget.style.setProperty('--mobile-dock-pointer-x', '50%')
-    event.currentTarget.style.setProperty('--mobile-dock-pointer-y', '50%')
-    event.currentTarget.style.setProperty('--mobile-dock-sheen-x', '22%')
-    event.currentTarget.style.setProperty('--mobile-dock-sheen-y', '12%')
-    event.currentTarget.style.setProperty('--mobile-dock-glow-opacity', '0.28')
+    setCssVariables(event.currentTarget, {
+      '--mobile-dock-pointer-x': '50%',
+      '--mobile-dock-pointer-y': '50%',
+      '--mobile-dock-sheen-x': '22%',
+      '--mobile-dock-sheen-y': '12%',
+      '--mobile-dock-glow-opacity': '0.28',
+    })
     setFocusedItemKey(null)
-    pointerX.set(0)
-    pointerY.set(0)
+    resetFluidTransform()
   }
 
   return (
     <motion.div
-      aria-label="Studio mobile navigation"
+      aria-label={ariaLabel}
       data-slot="liquid-mobile-sidebar-dock"
       className={cn(
         placement === 'viewport'
@@ -219,9 +157,7 @@ export function MobileSidebarDock({
       <motion.div
         className="pointer-events-auto relative mx-auto max-w-[27rem] overflow-visible rounded-[2.05rem] border border-white/55 bg-[linear-gradient(135deg,rgba(255,255,255,0.64),rgba(255,255,255,0.22)_42%,rgba(226,252,247,0.38))] p-2 shadow-[0_24px_80px_rgba(15,23,42,0.30),0_10px_34px_rgba(20,184,166,0.16),inset_0_1px_0_rgba(255,255,255,0.92),inset_0_-1px_0_rgba(255,255,255,0.34)] backdrop-blur-3xl backdrop-saturate-200 [--mobile-dock-glow-opacity:0.28] [--mobile-dock-pointer-x:50%] [--mobile-dock-pointer-y:50%] [--mobile-dock-sheen-x:22%] [--mobile-dock-sheen-y:12%] supports-[backdrop-filter]:bg-white/24"
         style={{
-          rotateX: canAnimate ? rotateX : undefined,
-          rotateY: canAnimate ? rotateY : undefined,
-          transformPerspective: 1100,
+          ...fluidTransformStyle,
         }}
         drag={canAnimate ? toMotionDragMode(dockDragMode) : false}
         dragConstraints={{ left: -18, right: 18, top: -10, bottom: 10 }}
@@ -295,6 +231,7 @@ export function MobileSidebarDock({
               refractionId={`${scopeId}-mobile-dock-refraction`}
               config={config}
               canAnimate={canAnimate}
+              canTrackPointer={canTrackPointer}
               effectiveFocusedItemKey={effectiveFocusedItemKey}
               setFocusedItemKey={setFocusedItemKey}
             />
@@ -313,6 +250,7 @@ interface MobileSidebarDockButtonProps {
   refractionId: string
   config: SidebarResolvedFluidConfig
   canAnimate: boolean
+  canTrackPointer: boolean
   effectiveFocusedItemKey: string | null
   setFocusedItemKey: (key: string | null) => void
 }
@@ -325,6 +263,7 @@ function MobileSidebarDockButton({
   refractionId,
   config,
   canAnimate,
+  canTrackPointer,
   effectiveFocusedItemKey,
   setFocusedItemKey,
 }: MobileSidebarDockButtonProps) {
@@ -336,24 +275,15 @@ function MobileSidebarDockButton({
       effectiveFocusedItemKey !== item.to &&
       canAnimate,
   )
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-  const tiltX = useMotionValue(0)
-  const tiltY = useMotionValue(0)
-  const springX = useSpring(x, SIDEBAR_MAGNETIC_TRANSITION)
-  const springY = useSpring(y, SIDEBAR_MAGNETIC_TRANSITION)
-  const springTiltX = useSpring(tiltX, { stiffness: 420, damping: 32, mass: 0.58 })
-  const springTiltY = useSpring(tiltY, { stiffness: 420, damping: 32, mass: 0.58 })
-  const rotateX = useTransform(
-    springTiltY,
-    [-1, 1],
-    [`${config.tiltStrength}deg`, `${-config.tiltStrength}deg`],
-  )
-  const rotateY = useTransform(
-    springTiltX,
-    [-1, 1],
-    [`${-config.tiltStrength}deg`, `${config.tiltStrength}deg`],
-  )
+  const setCssVariables = useRafCssVariables()
+  const { fluidTransformStyle, updateFluidTransform, resetFluidTransform } = useFluidTransform({
+    enabled: canTrackPointer && !item.disabled,
+    magneticStrength: config.magneticStrength,
+    magneticVerticalStrength: config.magneticVerticalStrength,
+    tiltStrength: config.tiltStrength,
+    perspective: 800,
+    tiltSpring: { stiffness: 420, damping: 32, mass: 0.58 },
+  })
   const liquidInset = isDragging
     ? -config.hoverSize * 1.35
     : isHovered
@@ -366,50 +296,37 @@ function MobileSidebarDockButton({
     '--dock-item-pointer-x': '50%',
     '--dock-item-pointer-y': '50%',
     '--dock-item-glow-opacity': isHovered || isDragging ? 1 : active ? 0.62 : 0,
-    x: canAnimate ? springX : undefined,
-    y: canAnimate ? springY : undefined,
-    rotateX: canAnimate ? rotateX : undefined,
-    rotateY: canAnimate ? rotateY : undefined,
-    transformPerspective: canAnimate ? 800 : undefined,
-    transformStyle: canAnimate ? 'preserve-3d' : undefined,
+    ...fluidTransformStyle,
   } satisfies MobileDockStyle
 
-  const resetMotion = () => {
-    x.set(0)
-    y.set(0)
-    tiltX.set(0)
-    tiltY.set(0)
-  }
-
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!canAnimate || item.disabled) return
+    if (!canTrackPointer || item.disabled) return
 
-    const rect = event.currentTarget.getBoundingClientRect()
-    const localX = event.clientX - rect.left
-    const localY = event.clientY - rect.top
-    const percentX = clamp((localX / rect.width) * 100, 0, 100)
-    const percentY = clamp((localY / rect.height) * 100, 0, 100)
-    const normalizedX = (percentX / 100 - 0.5) * 2
-    const normalizedY = (percentY / 100 - 0.5) * 2
+    const progress = getPointerProgress({
+      clientX: event.clientX,
+      clientY: event.clientY,
+      rect: event.currentTarget.getBoundingClientRect(),
+    })
 
-    event.currentTarget.style.setProperty('--dock-item-pointer-x', `${percentX}%`)
-    event.currentTarget.style.setProperty('--dock-item-pointer-y', `${percentY}%`)
-    event.currentTarget.style.setProperty('--dock-item-glow-opacity', '1')
+    setCssVariables(event.currentTarget, {
+      '--dock-item-pointer-x': `${progress.percentX}%`,
+      '--dock-item-pointer-y': `${progress.percentY}%`,
+      '--dock-item-glow-opacity': '1',
+    })
 
-    x.set(normalizedX * config.magneticStrength)
-    y.set(normalizedY * config.magneticVerticalStrength)
-    tiltX.set(normalizedX)
-    tiltY.set(normalizedY)
+    updateFluidTransform(progress.normalizedX, progress.normalizedY)
   }
 
   const handlePointerLeave = (event: ReactPointerEvent<HTMLDivElement>) => {
     setIsHovered(false)
     setIsDragging(false)
-    event.currentTarget.style.setProperty('--dock-item-pointer-x', '50%')
-    event.currentTarget.style.setProperty('--dock-item-pointer-y', '50%')
-    event.currentTarget.style.setProperty('--dock-item-glow-opacity', active ? '0.62' : '0')
+    setCssVariables(event.currentTarget, {
+      '--dock-item-pointer-x': '50%',
+      '--dock-item-pointer-y': '50%',
+      '--dock-item-glow-opacity': active ? '0.62' : '0',
+    })
     setFocusedItemKey(null)
-    resetMotion()
+    resetFluidTransform()
   }
 
   return (
@@ -466,7 +383,7 @@ function MobileSidebarDockButton({
       }}
       onDragEnd={() => {
         setIsDragging(false)
-        resetMotion()
+        resetFluidTransform()
       }}
     >
       <motion.span
@@ -528,7 +445,8 @@ function MobileSidebarDockButton({
       ) : null}
 
       <Link
-        to={item.to as never}
+        to={item.to}
+        params={item.params}
         aria-current={active ? 'page' : undefined}
         aria-disabled={item.disabled || undefined}
         tabIndex={item.disabled ? -1 : undefined}

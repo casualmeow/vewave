@@ -1,5 +1,5 @@
 import { sidebarSectionVariants } from '../constants'
-import { useSidebarContext } from './sidebar-context'
+import { useSidebarContext } from '../hooks'
 import type { SidebarSectionProps } from '../types'
 import { cn } from '@/shared/lib/utils'
 

@@ -174,6 +174,7 @@ const sidebarUsageSnippet = `const mobileDockItems: Array<MobileSidebarDockItem>
   mobileMaxItems={5}
   mobileDockItems={mobileDockItems}
   mobileDockPathname={location.pathname}
+  mobileDockAriaLabel="Studio mobile navigation"
   mobileDockPlacement="container"
   mobileDockClassName="inset-x-3"
   aria-label="Studio navigation"
@@ -484,9 +485,9 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
       },
       {
         name: 'children',
-        type: 'ReactNode | undefined',
+        type: 'ReactNode',
         description:
-          'Passing children uses compound mode with SidebarBrand, SidebarSection, SidebarItem, and SidebarFooter. Omitting children uses the built-in route-aware studio facade.',
+          'Required compound content, usually SidebarBrand, SidebarSection, SidebarItem, and SidebarFooter. Route-aware app/studio sidebars should live in layout modules and compose these pieces.',
       },
       {
         name: 'mobileDockItems',
@@ -499,6 +500,11 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
         type: 'string',
         description:
           'Pathname used to resolve the active mobile dock item, usually location.pathname from TanStack Router.',
+      },
+      {
+        name: 'mobileDockAriaLabel',
+        type: 'string',
+        description: 'Accessible label for the mobile dock nav. Defaults to Mobile navigation.',
       },
       {
         name: 'mobileFluidPreset',
@@ -613,7 +619,7 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
     sections: [
       {
         title: 'Composition model',
-        body: 'Sidebar supports two modes. Passing children uses the compound shell with SidebarBrand, SidebarSection, SidebarItem, and SidebarFooter. Omitting children keeps the built-in route-aware studio facade. Layouts should still own route-specific links, active state, dialog content, and product copy.',
+        body: 'Sidebar is a compound shell built from SidebarBrand, SidebarSection, SidebarItem, and SidebarFooter. Layout modules own route-specific links, active state, dialog content, and product copy, then pass those pieces into the reusable component.',
         code: `<Sidebar design="glass">
   <SidebarBrand title="Studio" subtitle="Creator tools" />
   <SidebarSection title="Navigation">
@@ -636,6 +642,7 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
   dragMode="none"
   mobileDockItems={mobileDockItems}
   mobileDockPathname={location.pathname}
+  mobileDockAriaLabel="App mobile navigation"
   mobileDockPlacement="container"
   mobileDockClassName="inset-x-3"
   role="navigation"
@@ -662,9 +669,23 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
       {
         title: 'Liquid glass and fluent variants',
         body: 'Use liquidGlass when the shell sits over a rich background and should show a fluid active highlight. Use fluent when the app needs a calmer acrylic-style panel. All variants share the same component API.',
-        code: `<Sidebar design="liquidGlass" motion="fluid" />
-<Sidebar design="glass" />
-<Sidebar design="fluent" />`,
+        code: `<Sidebar design="liquidGlass" motion="fluid" aria-label="Liquid navigation">
+  <SidebarSection title="Workspace">
+    <SidebarItem active icon={<Home />}>Home</SidebarItem>
+  </SidebarSection>
+</Sidebar>
+
+<Sidebar design="glass" aria-label="Glass navigation">
+  <SidebarSection title="Workspace">
+    <SidebarItem active icon={<Home />}>Home</SidebarItem>
+  </SidebarSection>
+</Sidebar>
+
+<Sidebar design="fluent" aria-label="Fluent navigation">
+  <SidebarSection title="Workspace">
+    <SidebarItem active icon={<Home />}>Home</SidebarItem>
+  </SidebarSection>
+</Sidebar>`,
       },
       {
         title: 'Fluid active highlight',
@@ -701,6 +722,7 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
         code: `<Sidebar
   mobileDockItems={mobileDockItems}
   mobileDockPathname={location.pathname}
+  mobileDockAriaLabel="Workspace mobile navigation"
   mobileFluidPreset="extreme"
   mobileHoverSize={22}
   mobileHoverScale={1.12}
@@ -728,6 +750,7 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
     ],
     accessibility: [
       'Consumers provide aria-label on the Sidebar root when it acts as navigation.',
+      'Use mobileDockAriaLabel when the floating dock needs a more specific accessible name.',
       'Active items set aria-current="page".',
       'Mobile dock items also set aria-current and support TanStack Router params for dynamic routes.',
       'Collapsed labels remain accessible through sr-only text.',

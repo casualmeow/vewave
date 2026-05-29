@@ -1,6 +1,5 @@
 export * from './sidebar'
 export * from './sidebar-brand'
-export * from './sidebar-context'
 export * from './sidebar-footer'
 export * from './sidebar-item'
 export * from './sidebar-root'

@@ -1,5 +1,5 @@
 import { sidebarFooterVariants } from '../constants'
-import { useSidebarContext } from './sidebar-context'
+import { useSidebarContext } from '../hooks'
 import type { SidebarFooterProps } from '../types'
 import { cn } from '@/shared/lib/utils'
 

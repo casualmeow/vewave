@@ -7,7 +7,7 @@
 - zustand for state management
 - zod for schema validation
 - React Query for data fetching
-- Motion for animation where already used
+- Motion/gsap for animation where already used
 - CVA / variant-driven styling where already used by reusable components
 
 ## General Working Rules
@@ -29,11 +29,6 @@
 
 Use this area for reusable component-level building blocks that may contain internal logic,
 animation, and local UI substructure.
-
-Current examples include:
-
-- Header
-- ResizableCard
 
 Rules:
 
