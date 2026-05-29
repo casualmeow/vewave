@@ -10,11 +10,13 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
-export type ComponentDocSlug = 'header' | 'resizable-card' | 'sidebar' | 'shared'
+export type ComponentDocSlug = 'glass' | 'header' | 'tabs' | 'resizable-card' | 'sidebar' | 'shared'
 
 export type ComponentDocRoute =
   | '/docs/ui/components'
+  | '/docs/ui/components/glass'
   | '/docs/ui/components/header'
+  | '/docs/ui/components/tabs'
   | '/docs/ui/components/resizable-card'
   | '/docs/ui/components/sidebar'
   | '/docs/ui/components/shared'
@@ -59,7 +61,7 @@ const headerImportSnippet = `import {
 
 const headerUsageSnippet = `<>
   <Header
-    variant="glass"
+    variant="liquidGlass"
     size="lg"
     initialWidth="min(94vw, 76rem)"
     collapsedWidth="min(68vw, 48rem)"
@@ -75,9 +77,69 @@ const headerUsageSnippet = `<>
       </HeaderNav>
     }
     actions={<HeaderButton>Create room</HeaderButton>}
+    interactiveGlass
+    fluidPreset="balanced"
+    magneticStrength={7}
+    tiltStrength={2.2}
+    liquidIntensity={1}
   />
   <HeaderSpacer size="lg" topOffset={12} />
 </>`
+
+const glassImportSnippet = `import {
+  GLASS_FLUID_PRESETS,
+  GLASS_FLUID_TRANSITION,
+  getPointerProgress,
+  toMotionDragMode,
+  useResolvedGlassFluidConfig,
+  type GlassFluidPreset,
+  type GlassFluidInteractionProps,
+} from '@/components/glass'`
+
+const glassUsageSnippet = `function LiquidItem(props: GlassFluidInteractionProps & { active?: boolean }) {
+  const config = useResolvedGlassFluidConfig({
+    fluidPreset: 'balanced',
+    minHoverSize: 2,
+    ...props,
+  })
+
+  return (
+    <motion.button
+      drag={toMotionDragMode(config.dragMode)}
+      whileHover={{ scale: props.active ? config.activeHoverScale : config.hoverScale }}
+      whileDrag={{ scale: config.dragScale }}
+      transition={GLASS_FLUID_TRANSITION}
+      className="rounded-full border bg-white/40 px-4 py-2 backdrop-blur-xl"
+    >
+      Liquid control
+    </motion.button>
+  )
+}`
+
+const tabsImportSnippet = `import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/tabs'`
+
+const tabsUsageSnippet = `<Tabs defaultValue="overview" design="liquidGlass" motion="fluid" fluidPreset="balanced">
+  <TabsList>
+    <TabsTrigger value="overview">Overview</TabsTrigger>
+    <TabsTrigger value="analytics" badge="12">Analytics</TabsTrigger>
+    <TabsTrigger value="settings">Settings</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="overview" inset>
+    Project overview content.
+  </TabsContent>
+  <TabsContent value="analytics" inset>
+    Analytics content.
+  </TabsContent>
+  <TabsContent value="settings" inset>
+    Settings content.
+  </TabsContent>
+</Tabs>`
 
 const resizableCardImportSnippet = `import {
   ResizableCards,
@@ -203,12 +265,110 @@ const sidebarUsageSnippet = `const mobileDockItems: Array<MobileSidebarDockItem>
 </Sidebar>`
 
 export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
+  glass: {
+    slug: 'glass',
+    title: 'Glass',
+    eyebrow: 'Motion / liquid interaction foundation',
+    description:
+      'Shared glass-interaction utilities used by Header, Sidebar, and Tabs for fluid presets, magnetic pointer motion, drag behavior, and reduced-motion-aware animation tuning.',
+    to: '/docs/ui/components/glass',
+    icon: Sparkles,
+    importSnippet: glassImportSnippet,
+    usageSnippet: glassUsageSnippet,
+    apiRows: [
+      {
+        name: 'GlassFluidPreset',
+        type: "'subtle' | 'balanced' | 'expressive' | 'extreme'",
+        description:
+          'Named interaction profiles for hover scale, active scale, drag scale, magnetic offset, tilt, focus blur, and liquid intensity.',
+      },
+      {
+        name: 'GlassFluidInteractionProps',
+        type: 'hoverScale, activeHoverScale, dragScale, hoverSize, magneticStrength, magneticVerticalStrength, tiltStrength, focusBlur, focusBlurAmount, focusDimOpacity, liquidIntensity, dragMode',
+        description:
+          'Override props shared by fluid components. Components should resolve them through useResolvedGlassFluidConfig instead of duplicating defaults.',
+      },
+      {
+        name: 'useResolvedGlassFluidConfig',
+        type: '(options) => GlassResolvedFluidConfig',
+        description:
+          'Merges a fluid preset with per-component overrides and optional minimum hover size.',
+      },
+      {
+        name: 'useFinePointer',
+        type: '() => boolean',
+        description:
+          'Detects whether pointer-reactive glass effects should run. Touch/coarse pointer surfaces can stay calmer.',
+      },
+      {
+        name: 'useFluidTransform',
+        type: '({ enabled, magneticStrength, magneticVerticalStrength, tiltStrength, perspective, tiltSpring })',
+        description:
+          'Produces transform style and update/reset handlers for magnetic pointer and tilt motion.',
+      },
+      {
+        name: 'useRafCssVariables',
+        type: '() => (node, variables) => void',
+        description:
+          'Batches CSS variable writes through requestAnimationFrame for pointer-driven highlights.',
+      },
+      {
+        name: 'getPointerProgress',
+        type: '({ clientX, clientY, rect })',
+        description:
+          'Converts pointer coordinates into local, percent, and normalized values used by glass highlights.',
+      },
+      {
+        name: 'toMotionDragMode',
+        type: "('none' | 'x' | 'y' | 'both') => false | true | 'x' | 'y'",
+        description:
+          'Maps the public dragMode prop to Motion drag values without leaking Motion-specific types into component APIs.',
+      },
+      {
+        name: 'GLASS_FLUID_TRANSITION / GLASS_SOFT_TRANSITION',
+        type: 'Motion transition objects',
+        description:
+          'Central spring presets used by fluid controls so Header, Sidebar, and Tabs do not scatter animation constants.',
+      },
+    ],
+    sections: [
+      {
+        title: 'Role in the component layer',
+        body: 'Glass is not a route or visual component by itself. It is the reusable interaction layer that keeps liquid-glass controls consistent across complex component packages.',
+      },
+      {
+        title: 'Presets before magic numbers',
+        body: 'Start with fluidPreset and override individual numbers only for a specific shell or control. This keeps Header, Sidebar, and Tabs visually related.',
+        code: `<Header variant="liquidGlass" fluidPreset="balanced" />
+
+<Tabs design="liquidGlass" fluidPreset="expressive">
+  ...
+</Tabs>`,
+      },
+      {
+        title: 'Pointer and touch behavior',
+        body: 'Use useFinePointer or component-level interactiveGlass props to keep heavy pointer effects away from coarse-pointer mobile contexts.',
+        code: `const finePointer = useFinePointer()
+const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMotion`,
+      },
+      {
+        title: 'CSS variable updates',
+        body: 'Pointer highlights should write CSS variables through useRafCssVariables so movement remains smooth without forcing React state updates on every pointer event.',
+      },
+    ],
+    accessibility: [
+      'Glass utilities do not add semantics; consuming controls must preserve button, tab, link, or nav semantics.',
+      'Reduced-motion users should receive opacity or instant-state fallbacks instead of transform-heavy motion.',
+      'Fine-pointer checks prevent desktop-only hover physics from becoming touch-first noise.',
+      'Text and icons should stay outside blurred/refraction layers so content remains sharp.',
+    ],
+  },
   header: {
     slug: 'header',
     title: 'Header',
     eyebrow: 'Navigation / layout primitive',
     description:
-      'A React 19 scroll-reactive header with composition slots, animated width collapse, glass visuals, and reduced-motion handling.',
+      'A React 19 scroll-reactive header with composition slots, animated width collapse, liquid/telegram glass variants, pointer-reactive shine, and reduced-motion handling.',
     to: '/docs/ui/components/header',
     icon: PanelTop,
     importSnippet: headerImportSnippet,
@@ -216,13 +376,20 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
     apiRows: [
       {
         name: 'variant',
-        type: "'glass' | 'glassDark' | 'glassLight' | 'solid' | 'gradient' | 'glow'",
-        description: 'Controls the visual skin of the fixed or sticky header surface.',
+        type: "'glass' | 'glassDark' | 'glassLight' | 'liquidGlass' | 'telegramGlass' | 'solid' | 'gradient' | 'glow'",
+        description:
+          'Controls the visual skin of the fixed, sticky, or absolute header surface. liquidGlass and telegramGlass enable the newest glass material layer.',
       },
       {
         name: 'size',
         type: "'sm' | 'md' | 'lg'",
         description: 'Controls height, padding, and slot scale.',
+      },
+      {
+        name: 'position',
+        type: "'fixed' | 'sticky' | 'absolute'",
+        description:
+          'Controls header positioning. Use fixed with HeaderSpacer for normal landing/app surfaces.',
       },
       {
         name: 'collapseBehavior',
@@ -245,6 +412,35 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
         description: 'Optional local scroll container for embedded previews and isolated surfaces.',
       },
       {
+        name: 'hideOnScrollDown / revealAtTop',
+        type: 'boolean / number',
+        description:
+          'Hides the header while scrolling down and reveals it again near the top or when focus enters the header.',
+      },
+      {
+        name: 'blurIntensity',
+        type: "'none' | 'sm' | 'md' | 'lg' | 'xl'",
+        description:
+          'Controls the backdrop blur amount used by glass variants through the --header-blur CSS variable.',
+      },
+      {
+        name: 'interactiveGlass',
+        type: 'boolean',
+        description:
+          'Enables fine-pointer shine, refraction filter, and fluid transform effects for interactive glass variants.',
+      },
+      {
+        name: 'fluidPreset',
+        type: "'subtle' | 'balanced' | 'expressive' | 'extreme'",
+        description: 'Uses the shared glass preset system for pointer-responsive liquid behavior.',
+      },
+      {
+        name: 'magneticStrength / magneticVerticalStrength / tiltStrength / liquidIntensity',
+        type: 'number',
+        description:
+          'Optional low-level glass tuning values passed into the shared glass interaction resolver.',
+      },
+      {
         name: 'slotClassNames',
         type: 'HeaderSlotClassNames',
         description: 'Scoped class overrides for inner, logo, navigation, actions, and children.',
@@ -254,7 +450,7 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
       {
         title: 'Spacing model',
         body: 'Use HeaderSpacer below fixed headers so page content does not render underneath the header.',
-        code: `<Header variant="solid" logo={<HeaderLogo text="Vewave" href="/" />} />
+        code: `<Header variant="liquidGlass" logo={<HeaderLogo text="Vewave" href="/" />} />
 <HeaderSpacer size="md" />`,
       },
       {
@@ -268,6 +464,27 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
 />`,
       },
       {
+        title: 'Liquid and Telegram glass',
+        body: 'liquidGlass is the richer floating material for expressive pages. telegramGlass is calmer and works well for compact app navigation. Both reuse the shared Glass fluid preset system.',
+        code: `<Header
+  variant="telegramGlass"
+  interactiveGlass
+  fluidPreset="subtle"
+  blurIntensity="lg"
+  logo={<HeaderLogo text="Vewave" href="/" />}
+/>`,
+      },
+      {
+        title: 'Embedded scroll previews',
+        body: 'Pass scrollContainerRef when the header is rendered inside a local scroll surface instead of relying on document scroll.',
+        code: `const scrollRef = useRef<HTMLDivElement>(null)
+
+<div ref={scrollRef} className="h-96 overflow-auto">
+  <Header scrollContainerRef={scrollRef} position="sticky" />
+  ...
+</div>`,
+      },
+      {
         title: 'Slot composition',
         body: 'Header logic stays in the component package. Layouts provide project-specific logo, links, and actions.',
       },
@@ -278,6 +495,158 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
       'Disabled nav items expose aria-disabled and cannot be activated.',
       'Loading buttons expose aria-busy.',
       'Hidden-on-scroll headers reveal when focus enters the header.',
+    ],
+  },
+  tabs: {
+    slug: 'tabs',
+    title: 'Tabs',
+    eyebrow: 'Navigation / segmented control',
+    description:
+      'A Radix Tabs wrapper with solid, glass, liquid-glass, and Telegram-style surfaces, moving shared-layout active indicators, icons, badges, vertical orientation, and shared glass interaction tuning.',
+    to: '/docs/ui/components/tabs',
+    icon: GalleryHorizontalEnd,
+    importSnippet: tabsImportSnippet,
+    usageSnippet: tabsUsageSnippet,
+    apiRows: [
+      {
+        name: 'design',
+        type: "'solid' | 'glass' | 'liquidGlass' | 'telegramGlass'",
+        description:
+          'Visual treatment for the tab list and active indicator. liquidGlass uses the strongest moving material effect.',
+      },
+      {
+        name: 'size',
+        type: "'sm' | 'md' | 'lg'",
+        description: 'Controls trigger height, padding, and list radius.',
+      },
+      {
+        name: 'orientation',
+        type: "'horizontal' | 'vertical'",
+        description:
+          'Passed to Radix Tabs and used by the list variants for row or column layouts.',
+      },
+      {
+        name: 'fullWidth',
+        type: 'boolean',
+        description:
+          'Makes the root/list/triggers stretch across the available inline size. Useful for toolbar tabs.',
+      },
+      {
+        name: 'motion',
+        type: "'none' | 'soft' | 'fluid'",
+        description:
+          'Controls active-indicator motion, hover scaling, dragging, and reduced-motion fallback behavior.',
+      },
+      {
+        name: 'fluidPreset',
+        type: "'subtle' | 'balanced' | 'expressive' | 'extreme'",
+        description:
+          'Shared glass preset for hover scale, magnetic offset, tilt, focus blur, and liquid intensity.',
+      },
+      {
+        name: 'interactiveGlass',
+        type: 'boolean',
+        description:
+          'Enables pointer-reactive refraction and shine when the device supports fine pointer input.',
+      },
+      {
+        name: 'value / defaultValue / onValueChange',
+        type: 'string / string / (value: string) => void',
+        description:
+          'Controlled and uncontrolled Radix Tabs value API. The component tracks activeValue for shared indicator placement.',
+      },
+      {
+        name: 'TabsTrigger.icon / badge',
+        type: 'ReactNode',
+        description:
+          'Optional trigger adornments rendered before and after the label when asChild is not used.',
+      },
+      {
+        name: 'TabsTrigger asChild',
+        type: 'boolean',
+        description:
+          'Preserves Radix asChild composition for custom trigger content while retaining shell effects.',
+      },
+      {
+        name: 'TabsContent inset',
+        type: 'boolean',
+        description:
+          'Adds a subtle bordered inset surface around tab content for docs/settings panels.',
+      },
+      {
+        name: 'hoverScale / activeHoverScale / dragScale / hoverSize',
+        type: 'number',
+        description:
+          'Per-trigger overrides for liquid sizing and scale behavior. Defaults come from fluidPreset.',
+      },
+      {
+        name: 'magneticStrength / magneticVerticalStrength / tiltStrength',
+        type: 'number',
+        description:
+          'Per-trigger pointer transform tuning values inherited from the Glass package.',
+      },
+      {
+        name: 'focusBlur / focusBlurAmount / focusDimOpacity',
+        type: 'boolean / number / number',
+        description:
+          'Dims and blurs sibling triggers while one trigger is hovered, focused, or dragged.',
+      },
+      {
+        name: 'liquidIntensity / dragMode',
+        type: "number / 'none' | 'x' | 'y' | 'both'",
+        description:
+          'Controls liquid highlight intensity and Motion drag direction for fluid triggers.',
+      },
+    ],
+    sections: [
+      {
+        title: 'Component shape',
+        body: 'Tabs wraps Radix Root/List/Trigger/Content with Vewave glass motion. The public API remains Radix-compatible while adding design and fluid props.',
+        code: `<Tabs defaultValue="account" design="telegramGlass" motion="soft">
+  <TabsList>
+    <TabsTrigger value="account">Account</TabsTrigger>
+    <TabsTrigger value="billing">Billing</TabsTrigger>
+  </TabsList>
+  <TabsContent value="account">Account settings</TabsContent>
+  <TabsContent value="billing">Billing settings</TabsContent>
+</Tabs>`,
+      },
+      {
+        title: 'Liquid active indicator',
+        body: 'The active trigger renders a shared-layout material layer behind sharp text and icons. Do not place blur filters on the trigger content itself.',
+      },
+      {
+        title: 'Vertical settings tabs',
+        body: 'Use vertical orientation for settings sidebars. Keep content panels readable and use inset only when a framed surface helps scanning.',
+        code: `<Tabs defaultValue="profile" orientation="vertical" design="glass" motion="soft">
+  <TabsList>
+    <TabsTrigger value="profile">Profile</TabsTrigger>
+    <TabsTrigger value="security">Security</TabsTrigger>
+  </TabsList>
+  <TabsContent value="profile" inset>Profile form</TabsContent>
+  <TabsContent value="security" inset>Security form</TabsContent>
+</Tabs>`,
+      },
+      {
+        title: 'Fluid tuning',
+        body: 'Use fluidPreset for most cases. Override individual fluid values only when the tab group is a hero control or a touch-first dock-like surface.',
+        code: `<Tabs
+  design="liquidGlass"
+  motion="fluid"
+  fluidPreset="expressive"
+  hoverSize={10}
+  magneticStrength={11}
+  tiltStrength={3.5}
+  dragMode="both"
+/>`,
+      },
+    ],
+    accessibility: [
+      'Radix Tabs supplies tablist, tab, and panel semantics.',
+      'Keyboard navigation and focus management remain Radix-backed.',
+      'Disabled triggers are non-interactive and visibly dimmed.',
+      'Reduced-motion users do not receive fluid shared-layout movement.',
+      'Text and icons remain above glass/refraction layers so labels stay readable.',
     ],
   },
   'resizable-card': {
@@ -856,11 +1225,25 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
 
 export const componentDocLinks: Array<ComponentDocLink> = [
   {
+    slug: 'glass',
+    title: componentDocs.glass.title,
+    description: componentDocs.glass.description,
+    to: componentDocs.glass.to,
+    icon: componentDocs.glass.icon,
+  },
+  {
     slug: 'header',
     title: componentDocs.header.title,
     description: componentDocs.header.description,
     to: componentDocs.header.to,
     icon: componentDocs.header.icon,
+  },
+  {
+    slug: 'tabs',
+    title: componentDocs.tabs.title,
+    description: componentDocs.tabs.description,
+    to: componentDocs.tabs.to,
+    icon: componentDocs.tabs.icon,
   },
   {
     slug: 'resizable-card',

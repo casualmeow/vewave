@@ -55,7 +55,7 @@ export function StudioSidebar({ className }: { className?: string }) {
       <div className="flex min-h-0 flex-1 flex-col">
         <SidebarBrand
           visual={
-            <Avatar className="size-14 border border-white/55 shadow-sm">
+            <Avatar className="size-14 shadow-sm">
               <AvatarImage src="https://github.com/shadcn.png" alt="Studio channel avatar" />
               <AvatarFallback>VC</AvatarFallback>
             </Avatar>
@@ -83,7 +83,7 @@ export function StudioSidebar({ className }: { className?: string }) {
                   </SidebarItemIcon>
                   <SidebarItemLabel>{item.label}</SidebarItemLabel>
                   {item.badge ? (
-                    <span className="ml-auto rounded-full bg-zinc-950/85 px-2 py-0.5 text-[0.68rem] font-semibold leading-none text-white shadow-sm">
+                    <span className="ml-auto rounded-full bg-background px-2 py-0.5 text-[0.68rem] font-semibold leading-none text-white shadow-sm">
                       {item.badge}
                     </span>
                   ) : null}

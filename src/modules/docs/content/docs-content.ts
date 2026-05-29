@@ -6,6 +6,7 @@ import {
   Component,
   FileCode2,
   GitBranch,
+  GalleryHorizontalEnd,
   Layers3,
   Paintbrush,
   PanelLeft,
@@ -50,10 +51,24 @@ export const docsNavItems = [
     exact: false,
   },
   {
+    title: 'Glass',
+    description: 'Shared liquid-glass presets, hooks, and pointer interaction helpers.',
+    to: '/docs/ui/components/glass',
+    icon: Sparkles,
+    exact: true,
+  },
+  {
     title: 'Header',
-    description: 'Scroll-aware top navigation component.',
+    description: 'Scroll-aware top navigation component with liquid glass variants.',
     to: '/docs/ui/components/header',
     icon: Route,
+    exact: true,
+  },
+  {
+    title: 'Tabs',
+    description: 'Radix tabs with solid, glass, liquid, and Telegram-style surfaces.',
+    to: '/docs/ui/components/tabs',
+    icon: GalleryHorizontalEnd,
     exact: true,
   },
   {
@@ -160,18 +175,36 @@ export const uiPrinciples = [
 
 export const uiComponentDocs = [
   {
+    title: 'Glass',
+    status: 'Shared liquid interaction layer',
+    description:
+      'Presets, hooks, and motion helpers used by liquid-glass Header, Sidebar, and Tabs implementations.',
+    notes: ['fluid presets', 'pointer progress', 'RAF CSS variables', 'motion drag helpers'],
+    to: '/docs/ui/components/glass',
+    icon: Sparkles,
+  },
+  {
     title: 'Header',
     status: 'React 19 ref-as-prop component',
     description:
       'Composed from Header, HeaderLogo, HeaderNav, HeaderNavItem, HeaderButton, and HeaderSpacer.',
     notes: [
       'scroll-aware collapse',
+      'liquid/telegram glass',
       'manual collapse mode',
-      'glass/glow variants',
       'slot-based API',
     ],
     to: '/docs/ui/components/header',
     icon: Route,
+  },
+  {
+    title: 'Tabs',
+    status: 'Radix tabs with glass material variants',
+    description:
+      'Compound Tabs, TabsList, TabsTrigger, and TabsContent components with moving active indicators and fluid interaction tuning.',
+    notes: ['solid/glass/liquid designs', 'icons and badges', 'vertical tabs', 'fluid presets'],
+    to: '/docs/ui/components/tabs',
+    icon: GalleryHorizontalEnd,
   },
   {
     title: 'ResizableCard',
