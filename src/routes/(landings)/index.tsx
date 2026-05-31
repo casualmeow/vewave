@@ -72,7 +72,7 @@ function LandingIndexPage() {
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="rounded-full px-6">
-                <Link to="/register" className="inline-flex items-center gap-2">
+                <Link to="/sign-up" className="inline-flex items-center gap-2">
                   Start free
                   <ArrowRight className="size-4" />
                 </Link>

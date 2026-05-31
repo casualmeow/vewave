@@ -5,6 +5,9 @@ const user = {
   id: '11111111-1111-1111-1111-111111111111',
   name: 'Jane Doe',
   email: 'jane@example.com',
+  username: null,
+  avatarUrl: null,
+  bio: null,
 }
 
 describe('auth store', () => {

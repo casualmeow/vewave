@@ -10,6 +10,7 @@ type RetriableRequestConfig = InternalAxiosRequestConfig & {
 export const httpClient = axios.create({
   baseURL: apiUrl,
   withCredentials: true,
+  timeout: 8000,
 })
 
 httpClient.interceptors.request.use((config) => {
@@ -30,6 +31,7 @@ httpClient.interceptors.response.use(
     const isAuthEndpoint = [
       '/api/auth/login',
       '/api/auth/logout',
+      '/api/auth/passkey',
       '/api/auth/refresh',
       '/api/auth/register',
     ].some((endpoint) => requestUrl.includes(endpoint))

@@ -1,6 +1,6 @@
 import { Slot } from '@radix-ui/react-slot'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { useEffect, useId, useState } from 'react'
+import { useId, useState } from 'react'
 import {
   SIDEBAR_FLUID_TRANSITION,
   SIDEBAR_SOFT_TRANSITION,
@@ -27,6 +27,7 @@ export function SidebarItem({
   rel,
   type = 'button',
   value,
+  focusGroup,
   active = false,
   disabled = false,
   hoverScale,
@@ -58,21 +59,10 @@ export function SidebarItem({
     fluidConfig,
     focusedItemKey,
     setFocusedItemKey,
-    activeItemKey,
-    setActiveItemKey,
   } = useSidebarContext()
   const generatedId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const itemKey = value ?? href ?? generatedId
-
-  useEffect(() => {
-    if (!active) return
-
-    setActiveItemKey(itemKey)
-
-    return () => {
-      setActiveItemKey((current) => (current === itemKey ? null : current))
-    }
-  }, [active, itemKey, setActiveItemKey])
+  const interactionKey = focusGroup ?? itemKey
 
   const prefersReducedMotion = useReducedMotion()
   const [isHovered, setIsHovered] = useState(false)
@@ -95,13 +85,14 @@ export function SidebarItem({
   const resolvedFocusDimOpacity = focusDimOpacity ?? fluidConfig.focusDimOpacity
   const resolvedLiquidIntensity = liquidIntensity ?? fluidConfig.liquidIntensity
   const resolvedDragMode = dragMode ?? fluidConfig.dragMode
-  const effectiveFocusedItemKey = focusedItemKey ?? activeItemKey
+  const effectiveFocusedItemKey = focusedItemKey
   const hasFocusedSibling = Boolean(
     resolvedFocusBlur &&
       effectiveFocusedItemKey &&
-      effectiveFocusedItemKey !== itemKey &&
+      effectiveFocusedItemKey !== interactionKey &&
       canAnimate,
   )
+  const deemphasizedOpacity = active ? 1 : resolvedFocusDimOpacity
 
   const { fluidTransformStyle, updateFluidTransform, resetFluidTransform } = useFluidTransform({
     enabled: canFluid,
@@ -149,7 +140,7 @@ export function SidebarItem({
   const handlePointerEnter = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (canFluid) {
       setIsHovered(true)
-      setFocusedItemKey(itemKey)
+      setFocusedItemKey(interactionKey)
       setCssVariables(event.currentTarget, {
         '--item-pointer-glow': '1',
       })
@@ -169,7 +160,7 @@ export function SidebarItem({
   }
 
   const handleFocusCapture = (event: ReactFocusEvent<HTMLDivElement>) => {
-    setFocusedItemKey(itemKey)
+    setFocusedItemKey(interactionKey)
     onFocusCapture?.(event)
   }
 
@@ -203,7 +194,7 @@ export function SidebarItem({
   return (
     <motion.div
       data-slot="liquid-sidebar-item-shell"
-      data-focused={effectiveFocusedItemKey === itemKey ? 'true' : 'false'}
+      data-focused={effectiveFocusedItemKey === interactionKey ? 'true' : 'false'}
       data-deemphasized={hasFocusedSibling ? 'true' : 'false'}
       className="group/sidebar-item-shell relative isolate [--item-pointer-glow:0] [--item-pointer-x:50%] [--item-pointer-y:50%]"
       style={itemStyle}
@@ -213,7 +204,7 @@ export function SidebarItem({
               filter: hasFocusedSibling
                 ? `blur(${resolvedFocusBlurAmount}px) saturate(0.76) contrast(0.92)`
                 : 'blur(0px) saturate(1) contrast(1)',
-              opacity: hasFocusedSibling ? resolvedFocusDimOpacity : 1,
+              opacity: hasFocusedSibling ? deemphasizedOpacity : 1,
             }
           : undefined
       }
@@ -242,7 +233,7 @@ export function SidebarItem({
       onBlurCapture={handleBlurCapture}
       onDragStart={() => {
         setIsDragging(true)
-        setFocusedItemKey(itemKey)
+        setFocusedItemKey(interactionKey)
       }}
       onDragEnd={() => {
         setIsDragging(false)

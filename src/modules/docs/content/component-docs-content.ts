@@ -984,6 +984,12 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
         description:
           'Optional shorthand slots for button-style items. Use SidebarItemIcon, SidebarItemLabel, and SidebarItemBadge when composing asChild links.',
       },
+      {
+        name: 'SidebarItem focusGroup',
+        type: 'string',
+        description:
+          'Groups related items for interaction focus. Useful for disclosure triggers and their children so the group stays emphasized while siblings dim on hover, focus, or drag.',
+      },
     ],
     sections: [
       {
@@ -1058,13 +1064,35 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
       },
       {
         title: 'Fluid active highlight',
-        body: 'The liquidGlass variant renders a scoped shared-layout selector behind the active item. Item content stays sharp above it, and fine-pointer devices only add a small shell shine rather than per-item glass cards.',
+        body: 'The liquidGlass variant renders a scoped shared-layout selector behind the active item. Item content stays sharp above it. Focus blur is interaction-driven only: active items do not dim siblings until a user hovers, focuses, or drags an item.',
         code: `<Sidebar design="liquidGlass" motion="fluid" fluidPreset="balanced">
   <SidebarSection title="Workspace">
     <SidebarItem active icon={<Home />}>Home</SidebarItem>
     <SidebarItem icon={<Video />} badge="12">Content</SidebarItem>
   </SidebarSection>
 </Sidebar>`,
+      },
+      {
+        title: 'Grouped disclosure focus',
+        body: 'Use the same focusGroup on a collapsible parent and its nested items when the group should behave as one focused region. This keeps opened room/server lists readable while the surrounding sidebar can still dim during interaction.',
+        code: `<SidebarSection title="Rooms">
+  <SidebarItem
+    type="button"
+    value="rooms"
+    focusGroup="rooms"
+    aria-expanded={open}
+  >
+    Rooms
+  </SidebarItem>
+
+  {open ? (
+    <SidebarItem asChild value="room-DEMO42" focusGroup="rooms">
+      <Link to="/room/$code" params={{ code: 'DEMO42' }}>
+        <SidebarItemLabel>Friday watch room</SidebarItemLabel>
+      </Link>
+    </SidebarItem>
+  ) : null}
+</SidebarSection>`,
       },
       {
         title: 'Interaction tuning',

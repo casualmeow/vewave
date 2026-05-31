@@ -3,7 +3,7 @@ import { defineConfig } from 'orval'
 export default defineConfig({
   vewave: {
     input: {
-      target: 'http://localhost:3001/openapi/json',
+      target: 'http://127.0.0.1:3001/openapi/json',
     },
     output: {
       mode: 'tags-split',

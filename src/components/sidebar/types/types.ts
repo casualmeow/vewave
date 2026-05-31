@@ -67,8 +67,6 @@ export type SidebarContextValue = {
   fluidConfig: SidebarResolvedFluidConfig
   focusedItemKey: string | null
   setFocusedItemKey: Dispatch<SetStateAction<string | null>>
-  activeItemKey: string | null
-  setActiveItemKey: Dispatch<SetStateAction<string | null>>
 }
 
 export interface SidebarRootProps
@@ -140,6 +138,7 @@ export interface SidebarItemProps
   rel?: string
   type?: ButtonHTMLAttributes<HTMLButtonElement>['type']
   value?: string
+  focusGroup?: string
   active?: boolean
   disabled?: boolean
   hoverScale?: SidebarFluidInteractionProps['hoverScale']

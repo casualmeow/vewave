@@ -65,7 +65,6 @@ export function SidebarRoot({
   const motionTransition =
     motionPreset === 'fluid' ? SIDEBAR_FLUID_TRANSITION : SIDEBAR_SOFT_TRANSITION
   const [focusedItemKey, setFocusedItemKey] = useState<string | null>(null)
-  const [activeItemKey, setActiveItemKey] = useState<string | null>(null)
   const setCssVariables = useRafCssVariables()
 
   const fluidConfig = useResolvedFluidConfig({
@@ -115,8 +114,6 @@ export function SidebarRoot({
       fluidConfig,
       focusedItemKey,
       setFocusedItemKey,
-      activeItemKey,
-      setActiveItemKey,
     }),
     [
       collapsed,
@@ -125,7 +122,6 @@ export function SidebarRoot({
       fluidConfig,
       fluidPreset,
       focusedItemKey,
-      activeItemKey,
       interactiveGlass,
       motionPreset,
       scopeId,

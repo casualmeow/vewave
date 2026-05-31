@@ -1,15 +1,33 @@
 import { Link, useLocation } from '@tanstack/react-router'
+import { AnimatePresence, motion } from 'motion/react'
 import {
-  FolderKanban,
+  ChevronDown,
   LifeBuoy,
+  LogIn,
   LogOut,
-  PlusCircle,
   Settings,
   Sparkles,
+  UserRound,
   UsersRound,
 } from 'lucide-react'
+import { useState } from 'react'
 
-import type { MobileSidebarDockItem } from '@/components/sidebar'
+import {
+  appPinnedRooms,
+  appPrimaryItems,
+  appRecentRooms,
+  appServers,
+  getAppMobileDockItems,
+  getRoomIcon,
+  isAppPrimaryItemActive,
+  isRoomActive,
+  roomsCollapseValue,
+  serversCollapseValue,
+  type AppSidebarRoomItem,
+  type AppSidebarServerItem,
+} from '../app-sidebar-items'
+import type { ReactNode } from 'react'
+import type { AuthStatus, AuthUser } from '@/modules/auth/model/types'
 import {
   Sidebar,
   SidebarBrand,
@@ -19,11 +37,12 @@ import {
   SidebarItemLabel,
   SidebarSection,
 } from '@/components/sidebar'
-import { useLogout, useAuthStore } from '@/modules/auth'
+import { useAuthStore, useLogout } from '@/modules/auth'
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -31,29 +50,9 @@ import {
   DialogTitle,
   DialogTrigger,
   Separator,
+  SpinIcon,
 } from '@/shared/ui'
 import { cn } from '@/shared/lib/utils'
-
-type AppNavItem = {
-  label: string
-  shortLabel?: string
-  to: '/projects' | '/create' | '/room/$code'
-  params?: { code: string }
-  icon: typeof FolderKanban
-  badge?: string
-}
-
-const appNavItems: ReadonlyArray<AppNavItem> = [
-  { label: 'Projects', to: '/projects', icon: FolderKanban },
-  { label: 'New project', shortLabel: 'Create', to: '/create', icon: PlusCircle, badge: 'Create' },
-  {
-    label: 'Demo room',
-    shortLabel: 'Room',
-    to: '/room/$code',
-    params: { code: 'DEMO42' },
-    icon: UsersRound,
-  },
-]
 
 function getInitials(name?: string | null, email?: string | null) {
   const source = name?.trim() || email?.trim() || 'Vewave User'
@@ -66,31 +65,36 @@ function getInitials(name?: string | null, email?: string | null) {
   return source.slice(0, 2).toUpperCase()
 }
 
-function isActiveRoute(pathname: string, item: AppNavItem) {
-  if (item.to === '/room/$code') {
-    return pathname.startsWith('/room/')
-  }
-
-  return pathname === item.to || pathname.startsWith(`${item.to}/`)
-}
-
 export function AppSidebar({ className }: { className?: string }) {
   const location = useLocation()
   const logout = useLogout()
+  const status = useAuthStore((state) => state.status)
   const user = useAuthStore((state) => state.user)
   const initials = getInitials(user?.name, user?.email)
-  const mobileDockItems: Array<MobileSidebarDockItem> = appNavItems.map((item) => {
-    const Icon = item.icon
-
-    return {
-      label: item.label,
-      shortLabel: item.shortLabel,
-      to: item.to,
-      params: item.params,
-      icon: <Icon />,
-      badge: item.badge,
-    }
-  })
+  const identitySubtitle = user?.username ? `@${user.username}` : user?.email
+  const mobileDockItems = getAppMobileDockItems()
+  const sessionMobileDockItems =
+    status === 'authenticated'
+      ? [
+          ...mobileDockItems.slice(0, 4),
+          {
+            id: 'profile',
+            label: 'Profile',
+            to: '/profile' as const,
+            icon: <UserRound />,
+          },
+        ]
+      : status === 'anonymous'
+        ? [
+            ...mobileDockItems.slice(0, 4),
+            {
+              id: 'sign-in',
+              label: 'Sign in',
+              to: '/sign-in' as const,
+              icon: <LogIn />,
+            },
+          ]
+        : mobileDockItems
 
   return (
     <Sidebar
@@ -111,99 +115,379 @@ export function AppSidebar({ className }: { className?: string }) {
       focusDimOpacity={0.68}
       liquidIntensity={0.9}
       dragMode="none"
-      mobileDockItems={mobileDockItems}
+      mobileMode="auto"
+      mobileDockItems={sessionMobileDockItems}
       mobileDockPathname={location.pathname}
       mobileDockPlacement="container"
-      mobileDockClassName="inset-x-3"
+      mobileDockClassName="inset-x-3 z-50"
+      mobileMaxItems={5}
+      mobileFluidPreset="expressive"
+      mobileHoverSize={18}
+      mobileDragMode="both"
+      mobileDockDragMode="both"
       role="navigation"
       aria-label="App navigation"
-      className={cn('hidden shrink-0 md:flex', className)}
+      className={cn('z-30 mr-2 shrink-0', className)}
     >
+      <div className="flex min-h-0 flex-1 flex-col">
+        <AppSidebarIdentity
+          status={status}
+          user={user}
+          initials={initials}
+          subtitle={identitySubtitle}
+        />
+
+        <div className="min-h-0 flex-1 overflow-y-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <SidebarSection title="Workspace">
+            {appPrimaryItems.map((item) => {
+              const Icon = item.icon
+
+              return (
+                <SidebarItem
+                  key={item.to}
+                  asChild
+                  active={isAppPrimaryItemActive(location.pathname, item)}
+                  value={item.to}
+                  badge={item.badge}
+                >
+                  <Link to={item.to}>
+                    <SidebarItemIcon>
+                      <Icon />
+                    </SidebarItemIcon>
+                    <SidebarItemLabel>{item.label}</SidebarItemLabel>
+                    {item.badge ? (
+                      <span className="relative z-10 ml-auto rounded-full bg-zinc-950/85 px-2 py-0.5 text-[0.68rem] font-semibold leading-none text-white shadow-sm">
+                        {item.badge}
+                      </span>
+                    ) : null}
+                  </Link>
+                </SidebarItem>
+              )
+            })}
+          </SidebarSection>
+
+          <SidebarSection title="History">
+            {appRecentRooms.map((room) => (
+              <RoomSidebarItem
+                key={room.code}
+                room={room}
+                active={isRoomActive(location.pathname, room.code)}
+              />
+            ))}
+          </SidebarSection>
+
+          <AppSidebarDisclosure
+            title="Rooms"
+            icon={<UsersRound />}
+            value={roomsCollapseValue}
+            defaultOpen
+            count={appPinnedRooms.length}
+          >
+            {appPinnedRooms.map((room) => (
+              <RoomSidebarItem
+                key={room.code}
+                room={room}
+                active={isRoomActive(location.pathname, room.code)}
+                focusGroup={roomsCollapseValue}
+              />
+            ))}
+          </AppSidebarDisclosure>
+
+          <AppSidebarDisclosure
+            title="Servers"
+            icon={<Sparkles />}
+            value={serversCollapseValue}
+            count={appServers.length}
+          >
+            {appServers.map((server) => (
+              <ServerSidebarItem
+                key={server.id}
+                server={server}
+                focusGroup={serversCollapseValue}
+              />
+            ))}
+          </AppSidebarDisclosure>
+        </div>
+      </div>
+
+      <AppSidebarFooter status={status} onLogout={logout} />
+    </Sidebar>
+  )
+}
+
+function AppSidebarIdentity({
+  initials,
+  status,
+  user,
+  subtitle,
+}: {
+  initials: string
+  status: AuthStatus
+  subtitle?: string
+  user: AuthUser | null
+}) {
+  const checkingSession = status === 'idle' || status === 'bootstrapping'
+
+  if (checkingSession) {
+    return (
       <SidebarBrand
         visual={
-          <Avatar className="size-13 border border-white/60 shadow-sm">
-            <AvatarImage alt={user?.name ?? 'User avatar'} />
-            <AvatarFallback>{initials}</AvatarFallback>
+          <div className="grid size-14 place-items-center rounded-full border border-white/65 bg-white/45 shadow-sm backdrop-blur-xl">
+            <SpinIcon size="md" speed="normal" label="Checking session" />
+          </div>
+        }
+        title="Checking session"
+        subtitle="Restoring your workspace"
+        meta={<span className="h-8 w-16 animate-pulse rounded-full bg-white/45" aria-hidden />}
+      />
+    )
+  }
+
+  if (!user) {
+    return (
+      <SidebarBrand
+        visual={
+          <Avatar className="size-14 border border-white/65 bg-white/45 shadow-sm">
+            <AvatarFallback>VW</AvatarFallback>
           </Avatar>
         }
-        title={user?.name ?? 'Vewave'}
-        subtitle={user?.email ?? 'Watch workspace'}
+        title="Guest workspace"
+        subtitle="Sign in to sync rooms"
         meta={
-          <span className="inline-flex items-center gap-1 rounded-full bg-white/65 px-2 py-0.5 text-[0.68rem] font-medium text-zinc-600 shadow-sm">
-            <Sparkles className="size-3" />
-            Projects
-          </span>
+          <Button asChild size="sm" variant="outline" className="rounded-full bg-white/70">
+            <Link to="/sign-in">
+              <LogIn className="size-3.5" />
+              Sign in
+            </Link>
+          </Button>
+        }
+      />
+    )
+  }
+
+  return (
+    <Dialog>
+      <SidebarBrand
+        visual={
+          <Link
+            to="/profile"
+            aria-label="Open profile"
+            className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-teal-600/45"
+          >
+            <Avatar className="size-14 border border-white/65 shadow-sm">
+              <AvatarImage src={user.avatarUrl ?? undefined} alt={user.name ?? 'User avatar'} />
+              <AvatarFallback>{initials}</AvatarFallback>
+            </Avatar>
+          </Link>
+        }
+        title={
+          <Link to="/profile" className="outline-none hover:text-teal-800 focus-visible:underline">
+            {user.name ?? 'Profile'}
+          </Link>
+        }
+        subtitle={subtitle ?? user.email}
+        meta={
+          <DialogTrigger asChild>
+            <button
+              type="button"
+              aria-label="Open app settings"
+              className="grid size-10 place-items-center rounded-full border border-white/60 bg-white/55 text-zinc-700 shadow-[0_10px_26px_rgba(15,23,42,0.12),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-xl transition-[background-color,color,box-shadow] hover:bg-white/75 hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600/40"
+            >
+              <SpinIcon size="sm" hoverDuration={1000} behavior="hover">
+                <Settings className="size-full" />
+              </SpinIcon>
+            </button>
+          </DialogTrigger>
         }
       />
 
-      <div className="min-h-0 flex-1 overflow-y-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <SidebarSection title="Workspace">
-          {appNavItems.map((item) => {
-            const Icon = item.icon
-
-            return (
-              <SidebarItem
-                key={`${item.to}-${item.params?.code ?? 'root'}`}
-                asChild
-                active={isActiveRoute(location.pathname, item)}
-              >
-                <Link to={item.to} params={item.params}>
-                  <SidebarItemIcon>
-                    <Icon />
-                  </SidebarItemIcon>
-                  <SidebarItemLabel>{item.label}</SidebarItemLabel>
-                  {item.badge ? (
-                    <span className="relative z-10 ml-auto rounded-full bg-zinc-950/85 px-2 py-0.5 text-[0.68rem] font-semibold leading-none text-white shadow-sm">
-                      {item.badge}
-                    </span>
-                  ) : null}
-                </Link>
-              </SidebarItem>
-            )
-          })}
-        </SidebarSection>
-      </div>
-
-      <SidebarFooter>
-        <Dialog>
-          <DialogTrigger asChild>
-            <SidebarItem type="button" icon={<Settings />}>
-              Settings
-            </SidebarItem>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-lg">
-            <DialogHeader>
-              <DialogTitle>Workspace settings</DialogTitle>
-              <DialogDescription>
-                Mock settings for the authenticated app shell. Real account and workspace settings
-                can attach to this surface later.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-3">
-              {[
-                ['Notifications', 'Room invites and playback alerts are enabled.'],
-                ['Profile', 'Avatar, display name, and email are managed by auth.'],
-                ['Playback sync', 'Host commands stay server-authoritative.'],
-              ].map(([title, description]) => (
-                <div key={title} className="rounded-2xl border bg-muted/35 p-4">
-                  <div className="font-medium text-foreground">{title}</div>
-                  <div className="mt-1 text-sm leading-6 text-muted-foreground">{description}</div>
-                </div>
-              ))}
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>App settings</DialogTitle>
+          <DialogDescription>
+            Mock workspace settings for rooms, servers, and playback defaults.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-3">
+          {[
+            ['History retention', 'Keep recent room visits visible in the app sidebar.'],
+            ['Room defaults', 'New rooms start private until you share the invite code.'],
+            ['Server preference', 'Use the closest sync relay unless a room requires another hub.'],
+          ].map(([title, description]) => (
+            <div key={title} className="rounded-2xl border bg-muted/35 p-4">
+              <div className="font-medium text-foreground">{title}</div>
+              <div className="mt-1 text-sm leading-6 text-muted-foreground">{description}</div>
             </div>
-          </DialogContent>
-        </Dialog>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
 
-        <SidebarItem type="button" icon={<LifeBuoy />}>
-          Support
+function AppSidebarFooter({
+  onLogout,
+  status,
+}: {
+  onLogout: () => Promise<void>
+  status: AuthStatus
+}) {
+  const checkingSession = status === 'idle' || status === 'bootstrapping'
+  const authenticated = status === 'authenticated'
+
+  return (
+    <SidebarFooter>
+      <SidebarItem type="button" icon={<LifeBuoy />} value="support">
+        Support
+      </SidebarItem>
+
+      <Separator className="my-1 bg-white/30" />
+
+      {checkingSession ? (
+        <SidebarItem type="button" icon={<SpinIcon size="sm" />} value="session-check" disabled>
+          Checking session
         </SidebarItem>
-
-        <Separator className="my-1 bg-white/30" />
-
-        <SidebarItem type="button" icon={<LogOut />} onClick={() => void logout()}>
+      ) : authenticated ? (
+        <SidebarItem
+          type="button"
+          icon={<LogOut />}
+          value="sign-out"
+          onClick={() => void onLogout()}
+        >
           Sign out
         </SidebarItem>
-      </SidebarFooter>
-    </Sidebar>
+      ) : (
+        <SidebarItem asChild value="sign-in">
+          <Link to="/sign-in">
+            <SidebarItemIcon>
+              <LogIn />
+            </SidebarItemIcon>
+            <SidebarItemLabel>Sign in</SidebarItemLabel>
+          </Link>
+        </SidebarItem>
+      )}
+    </SidebarFooter>
+  )
+}
+
+function AppSidebarDisclosure({
+  children,
+  count,
+  defaultOpen = false,
+  icon,
+  title,
+  value,
+}: {
+  children: ReactNode
+  count: number
+  defaultOpen?: boolean
+  icon: ReactNode
+  title: string
+  value: string
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+
+  return (
+    <SidebarSection title={title}>
+      <SidebarItem
+        type="button"
+        value={value}
+        focusGroup={value}
+        icon={icon}
+        badge={
+          <span className="inline-flex items-center gap-1">
+            {count}
+            <ChevronDown
+              className={cn('size-3.5 transition-transform duration-200', open && 'rotate-180')}
+            />
+          </span>
+        }
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+      >
+        {title}
+      </SidebarItem>
+
+      <AnimatePresence initial={false}>
+        {open ? (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 38, mass: 0.7 }}
+            className="overflow-hidden"
+          >
+            <div className="space-y-1 pt-1">{children}</div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </SidebarSection>
+  )
+}
+
+function RoomSidebarItem({
+  active,
+  focusGroup,
+  room,
+}: {
+  active: boolean
+  focusGroup?: string
+  room: AppSidebarRoomItem
+}) {
+  const Icon = getRoomIcon(room)
+
+  return (
+    <SidebarItem
+      asChild
+      active={active}
+      value={`room-${room.code}`}
+      focusGroup={focusGroup}
+      hoverSize={4}
+    >
+      <Link to="/room/$code" params={{ code: room.code }}>
+        <SidebarItemIcon>
+          <span className={cn('size-2.5 rounded-full shadow-sm', room.accent)} />
+        </SidebarItemIcon>
+        <SidebarItemLabel>
+          <span className="block truncate">{room.label}</span>
+          <span className="block truncate text-[0.68rem] font-normal text-zinc-500">
+            {room.description}
+          </span>
+        </SidebarItemLabel>
+        {room.badge ? (
+          <span className="relative z-10 ml-auto rounded-full bg-zinc-950/85 px-2 py-0.5 text-[0.62rem] font-semibold leading-none text-white shadow-sm">
+            {room.badge}
+          </span>
+        ) : (
+          <Icon className="relative z-10 ml-auto size-3.5 text-zinc-400" />
+        )}
+      </Link>
+    </SidebarItem>
+  )
+}
+
+function ServerSidebarItem({
+  focusGroup,
+  server,
+}: {
+  focusGroup?: string
+  server: AppSidebarServerItem
+}) {
+  return (
+    <SidebarItem
+      type="button"
+      value={`server-${server.id}`}
+      focusGroup={focusGroup}
+      hoverSize={4}
+      icon={<span className={cn('size-2.5 rounded-full shadow-sm', server.accent)} />}
+      badge={server.status}
+    >
+      <>
+        <span className="block truncate">{server.label}</span>
+        <span className="block truncate text-[0.68rem] font-normal text-zinc-500">
+          {server.description}
+        </span>
+      </>
+    </SidebarItem>
   )
 }

@@ -4,6 +4,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { loginSchema, type LoginFields } from '../schema'
 import { useAuthStore } from '../model'
+import { AuthFormDivider, OAuthButtons, PasskeyButton } from './oauth-buttons'
 import { usePostApiAuthLogin } from '@/core/api/generated/auth/auth'
 import { getApiErrorMessage } from '@/core/api/http/errors'
 import {
@@ -44,46 +45,53 @@ export const LoginForm = () => {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="you@example.com" type="email" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <div className="relative">
+    <div className="w-full max-w-sm space-y-6">
+      <div className="grid gap-3">
+        <OAuthButtons />
+        <PasskeyButton mode="sign-in" />
+      </div>
+      <AuthFormDivider />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <div className="relative">
-                    <SecureInput {...field} placeholder="Enter your password" />
-                  </div>
+                  <Input {...field} placeholder="you@example.com" type="email" />
                 </FormControl>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {form.formState.errors.root ? (
-          <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>
-        ) : null}
-        <Button type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? 'Signing in...' : 'Sign in'}
-        </Button>
-      </form>
-    </Form>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <div className="relative">
+                  <FormControl>
+                    <div className="relative">
+                      <SecureInput {...field} placeholder="Enter your password" />
+                    </div>
+                  </FormControl>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {form.formState.errors.root ? (
+            <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>
+          ) : null}
+          <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? 'Signing in...' : 'Sign in'}
+          </Button>
+        </form>
+      </Form>
+    </div>
   )
 }

@@ -1,4 +1,6 @@
 export * from './auth-bootstrap'
 export * from './login-form'
+export * from './oauth-buttons'
+export * from './oauth-callback-page'
 export * from './require-auth'
 export * from './registration-form'

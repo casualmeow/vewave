@@ -25,6 +25,7 @@ import { cn } from '@/shared/lib/utils'
 type MobileDockStyle = MotionStyle & Record<`--${string}`, string | number>
 
 export type MobileSidebarDockItem = {
+  id?: string
   label: string
   shortLabel?: string
   to: NonNullable<LinkProps['to']>
@@ -45,8 +46,24 @@ export interface MobileSidebarDockProps extends SidebarFluidInteractionProps {
   placement?: SidebarMobileDockPlacement
 }
 
-function isActivePath(pathname: string, to: LinkProps['to']) {
-  return pathname === to || pathname.startsWith(`${to}/`)
+function getMobileDockItemKey(item: MobileSidebarDockItem) {
+  return item.id ?? `${String(item.to)}:${JSON.stringify(item.params ?? {})}`
+}
+
+function getMobileDockItemPath(item: MobileSidebarDockItem) {
+  if (item.to === '/room/$code') {
+    const params = item.params as { code?: string } | undefined
+
+    return params?.code ? `/room/${params.code}` : String(item.to)
+  }
+
+  return String(item.to)
+}
+
+function isActivePath(pathname: string, item: MobileSidebarDockItem) {
+  const itemPath = getMobileDockItemPath(item)
+
+  return pathname === itemPath || pathname.startsWith(`${itemPath}/`)
 }
 
 export function MobileSidebarDock({
@@ -78,8 +95,7 @@ export function MobileSidebarDock({
   const scopeId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const [focusedItemKey, setFocusedItemKey] = useState<string | null>(null)
   const visibleItems = items.slice(0, maxItems)
-  const activeItemKey = visibleItems.find((item) => isActivePath(pathname, item.to))?.to ?? null
-  const effectiveFocusedItemKey = focusedItemKey ?? activeItemKey
+  const effectiveFocusedItemKey = focusedItemKey
   const config = useResolvedFluidConfig({
     fluidPreset,
     minHoverSize: 12,
@@ -221,21 +237,26 @@ export function MobileSidebarDock({
           className="relative z-10 grid grid-cols-[repeat(var(--mobile-dock-count),minmax(0,1fr))] gap-1.5"
           style={{ '--mobile-dock-count': visibleItems.length } as CSSProperties}
         >
-          {visibleItems.map((item) => (
-            <MobileSidebarDockButton
-              key={item.to}
-              item={item}
-              active={isActivePath(pathname, item.to)}
-              scopeId={scopeId}
-              filterId={`${scopeId}-mobile-dock-goo`}
-              refractionId={`${scopeId}-mobile-dock-refraction`}
-              config={config}
-              canAnimate={canAnimate}
-              canTrackPointer={canTrackPointer}
-              effectiveFocusedItemKey={effectiveFocusedItemKey}
-              setFocusedItemKey={setFocusedItemKey}
-            />
-          ))}
+          {visibleItems.map((item) => {
+            const itemKey = getMobileDockItemKey(item)
+
+            return (
+              <MobileSidebarDockButton
+                key={itemKey}
+                item={item}
+                itemKey={itemKey}
+                active={isActivePath(pathname, item)}
+                scopeId={scopeId}
+                filterId={`${scopeId}-mobile-dock-goo`}
+                refractionId={`${scopeId}-mobile-dock-refraction`}
+                config={config}
+                canAnimate={canAnimate}
+                canTrackPointer={canTrackPointer}
+                effectiveFocusedItemKey={effectiveFocusedItemKey}
+                setFocusedItemKey={setFocusedItemKey}
+              />
+            )
+          })}
         </div>
       </motion.div>
     </motion.div>
@@ -244,6 +265,7 @@ export function MobileSidebarDock({
 
 interface MobileSidebarDockButtonProps {
   item: MobileSidebarDockItem
+  itemKey: string
   active: boolean
   scopeId: string
   filterId: string
@@ -257,6 +279,7 @@ interface MobileSidebarDockButtonProps {
 
 function MobileSidebarDockButton({
   item,
+  itemKey,
   active,
   scopeId,
   filterId,
@@ -272,7 +295,7 @@ function MobileSidebarDockButton({
   const hasFocusedSibling = Boolean(
     config.focusBlur &&
       effectiveFocusedItemKey &&
-      effectiveFocusedItemKey !== item.to &&
+      effectiveFocusedItemKey !== itemKey &&
       canAnimate,
   )
   const setCssVariables = useRafCssVariables()
@@ -332,7 +355,7 @@ function MobileSidebarDockButton({
   return (
     <motion.div
       data-slot="liquid-mobile-sidebar-dock-item-shell"
-      data-focused={effectiveFocusedItemKey === item.to ? 'true' : 'false'}
+      data-focused={effectiveFocusedItemKey === itemKey ? 'true' : 'false'}
       data-deemphasized={hasFocusedSibling ? 'true' : 'false'}
       className="group/mobile-dock-item relative isolate min-w-0 [--dock-item-glow-opacity:0] [--dock-item-pointer-x:50%] [--dock-item-pointer-y:50%]"
       style={itemStyle}
@@ -368,10 +391,10 @@ function MobileSidebarDockButton({
       onPointerEnter={() => {
         if (item.disabled) return
         setIsHovered(true)
-        setFocusedItemKey(item.to)
+        setFocusedItemKey(itemKey)
       }}
       onPointerLeave={handlePointerLeave}
-      onFocusCapture={() => setFocusedItemKey(item.to)}
+      onFocusCapture={() => setFocusedItemKey(itemKey)}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) {
           setFocusedItemKey(null)
@@ -379,7 +402,7 @@ function MobileSidebarDockButton({
       }}
       onDragStart={() => {
         setIsDragging(true)
-        setFocusedItemKey(item.to)
+        setFocusedItemKey(itemKey)
       }}
       onDragEnd={() => {
         setIsDragging(false)

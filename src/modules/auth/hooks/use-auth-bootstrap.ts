@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useAuthStore } from '../model'
 import { getApiAuthMe } from '@/core/api/generated/auth/auth'
+import { describeApiError } from '@/core/api/http/errors'
 import { refreshSessionOnce } from '@/core/api/http/refresh-session'
 
 export function useAuthBootstrap() {
@@ -16,7 +17,6 @@ export function useAuthBootstrap() {
     }
 
     startedRef.current = true
-    let cancelled = false
 
     async function bootstrap() {
       setBootstrapping()
@@ -24,27 +24,17 @@ export function useAuthBootstrap() {
       try {
         const accessToken = await refreshSessionOnce()
 
-        if (cancelled) {
-          return
-        }
-
         setAccessToken(accessToken)
         const { user } = await getApiAuthMe()
+        setAuthenticated(user, accessToken)
+      } catch (error) {
+        const description = describeApiError(error, 'Unable to restore session.')
 
-        if (!cancelled) {
-          setAuthenticated(user, accessToken)
-        }
-      } catch {
-        if (!cancelled) {
-          setAnonymous()
-        }
+        console.warn('[auth] Session bootstrap failed:', description)
+        setAnonymous()
       }
     }
 
     void bootstrap()
-
-    return () => {
-      cancelled = true
-    }
   }, [setAccessToken, setAnonymous, setAuthenticated, setBootstrapping])
 }

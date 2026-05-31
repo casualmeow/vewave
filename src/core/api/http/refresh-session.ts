@@ -5,6 +5,7 @@ import { apiUrl } from '@/shared/config'
 const refreshClient = axios.create({
   baseURL: apiUrl,
   withCredentials: true,
+  timeout: 8000,
 })
 
 let refreshPromise: Promise<string> | null = null

@@ -14,12 +14,18 @@ import { cn } from '@/shared/lib/utils'
 
 const SPIN_ICON_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const SPIN_ICON_SPEEDS = ['slow', 'normal', 'fast'] as const
+const SPIN_ICON_SPEED_DURATIONS = {
+  slow: '1400ms',
+  normal: '900ms',
+  fast: '550ms',
+} as const
 
 type SpinIconPresetSize = (typeof SPIN_ICON_SIZES)[number]
 type SpinIconPresetSpeed = (typeof SPIN_ICON_SPEEDS)[number]
 
 type SpinIconSize = SpinIconPresetSize | number | string
 type SpinIconSpeed = SpinIconPresetSpeed | number | string
+type SpinIconDuration = SpinIconPresetSpeed | number | string
 
 type SpinIconBehavior = 'always' | 'hover' | 'drag' | 'dynamic' | 'none'
 type SpinIconDirection = 'normal' | 'reverse'
@@ -27,6 +33,7 @@ type SpinIconDirection = 'normal' | 'reverse'
 type SpinIconVars = CSSProperties & {
   '--spin-icon-size'?: string
   '--spin-icon-duration'?: string
+  '--spin-icon-hover-duration'?: string
   '--spin-icon-x'?: string
   '--spin-icon-y'?: string
   '--spin-icon-drag-rotate'?: string
@@ -36,6 +43,7 @@ const spinIconRootVariants = cva(
   [
     'group/spin-icon inline-flex items-center justify-center gap-2',
     'text-current align-[-0.125em]',
+    '[--spin-icon-hover-duration:var(--spin-icon-duration)]',
   ],
   {
     variants: {
@@ -86,11 +94,9 @@ const spinIconMotionVariants = cva(
           '[animation-timing-function:linear]',
         ],
         hover: [
-          'animate-spin',
-          '[animation-duration:var(--spin-icon-duration)]',
-          '[animation-timing-function:linear]',
-          '[animation-play-state:paused]',
-          'group-hover/spin-icon:[animation-play-state:running]',
+          '[animation:none]',
+          'group-hover/spin-icon:[animation:spin_var(--spin-icon-hover-duration)_linear_1]',
+          'group-data-[motion=off]/spin-icon:group-hover/spin-icon:[animation:none]',
         ],
         drag: [
           'animate-spin',
@@ -147,11 +153,21 @@ function resolveSize(size?: SpinIconSize): SpinIconVars | undefined {
   return { '--spin-icon-size': size }
 }
 
-function resolveSpeed(speed?: SpinIconSpeed): SpinIconVars | undefined {
-  if (!speed || isPresetSpeed(speed)) return undefined
-  if (typeof speed === 'number') return { '--spin-icon-duration': `${speed}ms` }
+function resolveDurationValue(duration?: SpinIconDuration) {
+  if (!duration) return undefined
+  if (isPresetSpeed(duration)) return SPIN_ICON_SPEED_DURATIONS[duration]
+  if (typeof duration === 'number') return `${duration}ms`
 
-  return { '--spin-icon-duration': speed }
+  return duration
+}
+
+function resolveDurationVar(
+  variableName: '--spin-icon-duration' | '--spin-icon-hover-duration',
+  duration?: SpinIconDuration,
+): SpinIconVars | undefined {
+  const value = resolveDurationValue(duration)
+
+  return value ? { [variableName]: value } : undefined
 }
 
 function useSpinDrag(options: { enabled: boolean; factor?: number; resetOnDoubleClick?: boolean }) {
@@ -234,14 +250,20 @@ export interface SpinIconRootProps
   extends Omit<ComponentPropsWithoutRef<'span'>, 'color'>,
     Omit<VariantProps<typeof spinIconRootVariants>, 'size' | 'speed'> {
   size?: SpinIconSize
+  duration?: SpinIconDuration
   speed?: SpinIconSpeed
+  hoverDuration?: SpinIconDuration
+  hoverSpeed?: SpinIconSpeed
   color?: CSSProperties['color']
   disableMotion?: boolean
 }
 
 export function SpinIconRoot({
   size = 'md',
+  duration,
   speed = 'normal',
+  hoverDuration,
+  hoverSpeed,
   color,
   disableMotion = false,
   className,
@@ -250,7 +272,8 @@ export function SpinIconRoot({
 }: SpinIconRootProps) {
   const inlineVars: SpinIconVars = {
     ...resolveSize(size),
-    ...resolveSpeed(speed),
+    ...resolveDurationVar('--spin-icon-duration', duration ?? speed),
+    ...resolveDurationVar('--spin-icon-hover-duration', hoverDuration ?? hoverSpeed),
     color,
     ...style,
   }

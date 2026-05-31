@@ -6,4 +6,9 @@ export const registrationSchema = z.object({
   password: z.string().min(8),
 })
 
+export const passkeyRegistrationSchema = registrationSchema.pick({
+  name: true,
+  email: true,
+})
+
 export type RegistrationFields = z.infer<typeof registrationSchema>

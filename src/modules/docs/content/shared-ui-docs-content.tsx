@@ -442,7 +442,7 @@ function SpinningIconDemo() {
     <DemoFrame>
       <div className="flex flex-wrap items-center gap-5 rounded-xl bg-zinc-950 p-5 text-white">
         <SpinIcon label="Syncing" showLabel behavior="always" glyph="arc" />
-        <SpinIcon label="Hover" showLabel behavior="hover" glyph="ring" />
+        <SpinIcon label="Hover" showLabel behavior="hover" glyph="ring" hoverDuration={1000} />
         <SpinIcon label="Drag" showLabel behavior="drag" glyph="dots" draggable />
       </div>
     </DemoFrame>
@@ -994,7 +994,13 @@ import { toast } from 'sonner'`,
     description:
       'Composable animated status icon with size, speed, behavior, direction, and drag support.',
     importSnippet: `import { SpinIcon } from '@/shared/ui'`,
-    usageSnippet: `<SpinIcon label="Syncing" showLabel behavior="always" glyph="arc" />`,
+    usageSnippet: `<SpinIcon
+  label="Settings"
+  behavior="hover"
+  hoverDuration={1000}
+>
+  <Settings className="size-full" />
+</SpinIcon>`,
     apiRows: [
       {
         name: 'size',
@@ -1004,7 +1010,32 @@ import { toast } from 'sonner'`,
       {
         name: 'behavior',
         type: "'always' | 'hover' | 'drag' | 'dynamic' | 'none'",
-        description: 'Animation trigger.',
+        description:
+          'Animation trigger. hover runs one finite spin per hover; always and drag keep continuous motion while active.',
+      },
+      {
+        name: 'duration',
+        type: "'slow' | 'normal' | 'fast' | number | string",
+        description:
+          'Explicit base animation duration. Takes precedence over speed; numbers are treated as milliseconds.',
+      },
+      {
+        name: 'speed',
+        type: "'slow' | 'normal' | 'fast' | number | string",
+        description:
+          'Base animation speed preset or duration value. Kept for existing usage and used when duration is not provided.',
+      },
+      {
+        name: 'hoverDuration',
+        type: "'slow' | 'normal' | 'fast' | number | string",
+        description:
+          'Duration for behavior="hover" only. Takes precedence over hoverSpeed and falls back to duration/speed.',
+      },
+      {
+        name: 'hoverSpeed',
+        type: "'slow' | 'normal' | 'fast' | number | string",
+        description:
+          'Hover-only speed preset or duration value. Useful when the steady animation and one-shot hover spin need different timing.',
       },
       { name: 'glyph', type: "'arc' | 'ring' | 'dots'", description: 'Built-in glyph shape.' },
     ],
