@@ -141,14 +141,14 @@ export function HealthcheckPage() {
       <div className="mx-auto grid w-full max-w-6xl gap-6">
         <section className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
+            <p className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
               <Activity className="size-4" />
               Healthcheck
             </p>
-            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-zinc-950">
+            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-foreground">
               Frontend auth diagnostics
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
               Checks backend reachability, CORS/credentials behavior, refresh-cookie recovery, and
               the current user endpoint.
             </p>
@@ -161,7 +161,7 @@ export function HealthcheckPage() {
         </section>
 
         <div className="grid gap-4 lg:grid-cols-[0.75fr_1.25fr]">
-          <Card className="rounded-[2rem] border-white/70 bg-white/85 shadow-sm backdrop-blur">
+          <Card className="rounded-[2rem] border-border/70 bg-card/85 shadow-sm backdrop-blur">
             <CardHeader>
               <CardTitle>Runtime state</CardTitle>
               <CardDescription>Values used by the current browser session.</CardDescription>
@@ -178,7 +178,7 @@ export function HealthcheckPage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[2rem] border-white/70 bg-white/85 shadow-sm backdrop-blur">
+          <Card className="rounded-[2rem] border-border/70 bg-card/85 shadow-sm backdrop-blur">
             <CardHeader>
               <CardTitle>Checks</CardTitle>
               <CardDescription>
@@ -200,9 +200,11 @@ export function HealthcheckPage() {
 
 function RuntimeRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid gap-1 rounded-2xl border border-zinc-200 bg-white/70 p-4">
-      <div className="text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</div>
-      <div className="break-all font-medium text-zinc-950">{value}</div>
+    <div className="grid gap-1 rounded-2xl border border-border bg-card/70 p-4">
+      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </div>
+      <div className="break-all font-medium text-foreground">{value}</div>
     </div>
   )
 }
@@ -218,31 +220,31 @@ function CheckCard({ check }: { check: CheckResult }) {
           : Clock3
 
   return (
-    <div className="grid gap-2 rounded-2xl border border-zinc-200 bg-white/70 p-4">
+    <div className="grid gap-2 rounded-2xl border border-border bg-card/70 p-4">
       <div className="flex items-start gap-3">
         <span
           className={
             check.status === 'passed'
-              ? 'text-emerald-600'
+              ? 'text-primary'
               : check.status === 'failed'
-                ? 'text-red-600'
+                ? 'text-destructive'
                 : check.status === 'running'
-                  ? 'text-teal-700'
-                  : 'text-zinc-500'
+                  ? 'text-primary'
+                  : 'text-muted-foreground'
           }
         >
           <Icon className={check.status === 'running' ? 'size-5 animate-spin' : 'size-5'} />
         </span>
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <div className="font-medium text-zinc-950">{check.title}</div>
-            <span className="rounded-full bg-zinc-950/5 px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-wide text-zinc-600">
+            <div className="font-medium text-foreground">{check.title}</div>
+            <span className="rounded-full bg-foreground/5 px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-wide text-muted-foreground">
               {check.status}
             </span>
           </div>
-          <div className="mt-1 text-sm leading-6 text-zinc-600">{check.description}</div>
+          <div className="mt-1 text-sm leading-6 text-muted-foreground">{check.description}</div>
           {check.detail ? (
-            <pre className="mt-3 max-h-32 overflow-auto whitespace-pre-wrap rounded-xl bg-zinc-950 p-3 text-xs leading-5 text-zinc-100">
+            <pre className="mt-3 max-h-32 overflow-auto whitespace-pre-wrap rounded-xl bg-foreground p-3 text-xs leading-5 text-background">
               {check.detail}
             </pre>
           ) : null}

@@ -143,7 +143,7 @@ export function TabsTrigger({
       {icon ? <span className="shrink-0">{icon}</span> : null}
       <span className="truncate">{children}</span>
       {badge ? (
-        <span className="ml-0.5 rounded-full bg-zinc-950/80 px-1.5 py-0.5 text-[0.65rem] font-semibold leading-none text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] dark:bg-white/18">
+        <span className="ml-0.5 rounded-full bg-primary px-1.5 py-0.5 text-[0.65rem] font-semibold leading-none text-primary-foreground shadow-[inset_0_1px_0_var(--glass-highlight)]">
           {badge}
         </span>
       ) : null}
@@ -210,7 +210,7 @@ export function TabsTrigger({
       {design !== 'solid' ? (
         <motion.span
           aria-hidden="true"
-          className="pointer-events-none absolute rounded-full border border-white/0 bg-[radial-gradient(circle_at_var(--tab-pointer-x)_var(--tab-pointer-y),rgba(255,255,255,0.64),rgba(255,255,255,0.14)_35%,transparent_64%),linear-gradient(135deg,rgba(255,255,255,0.22),rgba(255,255,255,0.05))] opacity-[var(--tab-glow-opacity)] shadow-[inset_0_1px_0_rgba(255,255,255,0.50)] backdrop-blur-sm transition-[opacity,border-color] duration-150 group-hover/tabs-trigger:border-white/32"
+          className="pointer-events-none absolute rounded-full border border-transparent bg-[radial-gradient(circle_at_var(--tab-pointer-x)_var(--tab-pointer-y),var(--glass-highlight),color-mix(in_srgb,var(--glass-highlight)_34%,transparent)_35%,transparent_64%),linear-gradient(135deg,color-mix(in_srgb,var(--glass-highlight)_28%,transparent),transparent)] opacity-[var(--tab-glow-opacity)] shadow-[inset_0_1px_0_var(--glass-highlight)] backdrop-blur-sm transition-[opacity,border-color] duration-150 group-hover/tabs-trigger:border-[color:var(--glass-border)]"
           style={{ filter: canFluid ? `url(#${filterIds.refraction})` : undefined }}
           animate={{ top: liquidInset, right: liquidInset, bottom: liquidInset, left: liquidInset }}
           transition={GLASS_FLUID_TRANSITION}
@@ -239,9 +239,9 @@ export function TabsTrigger({
               className="pointer-events-none absolute inset-0 [filter:var(--tabs-goo-filter)]"
               style={{ '--tabs-goo-filter': `url(#${filterIds.goo})` } as CSSProperties}
             >
-              <span className="absolute -left-5 top-1/2 size-14 -translate-y-1/2 rounded-full bg-teal-100/32" />
-              <span className="absolute left-[var(--tab-pointer-x)] top-[var(--tab-pointer-y)] size-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/42" />
-              <span className="absolute -right-5 bottom-0 size-14 rounded-full bg-sky-100/30" />
+              <span className="absolute -left-5 top-1/2 size-14 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--accent)_30%,transparent)]" />
+              <span className="absolute left-[var(--tab-pointer-x)] top-[var(--tab-pointer-y)] size-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--glass-highlight)_42%,transparent)]" />
+              <span className="absolute -right-5 bottom-0 size-14 rounded-full bg-[color-mix(in_srgb,var(--primary)_28%,transparent)]" />
             </span>
           ) : null}
         </motion.span>

@@ -36,7 +36,7 @@ export function YouTubePlayer({ media, playback }: YouTubePlayerProps) {
       ref={iframeRef}
       title={media.title ?? 'YouTube player'}
       src={embedUrl}
-      className="aspect-video w-full rounded-xl border bg-black"
+      className="aspect-video w-full rounded-xl border bg-media-background"
       allow="autoplay; encrypted-media; picture-in-picture"
       allowFullScreen
     />

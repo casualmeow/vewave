@@ -135,7 +135,7 @@ export function HeaderShowcaseSection() {
   )
 
   return (
-    <section id="header" className="grid gap-6 rounded-lg border border-zinc-200 bg-zinc-50 p-5">
+    <section id="header" className="grid gap-6 rounded-lg border border-border bg-muted/40 p-5">
       <SectionHeader
         eyebrow="Component playground"
         title="Header"
@@ -156,7 +156,7 @@ export function HeaderShowcaseSection() {
                 >
                   <span>
                     <span className="block font-medium">{preset.name}</span>
-                    <span className="mt-1 block text-xs font-normal text-zinc-500">
+                    <span className="mt-1 block text-xs font-normal text-muted-foreground">
                       {preset.description}
                     </span>
                   </span>
@@ -194,7 +194,7 @@ export function HeaderShowcaseSection() {
               <input
                 type="color"
                 value={state.glowColor}
-                className="h-9 w-full rounded-md border border-zinc-200 bg-white p-1"
+                className="h-9 w-full rounded-md border border-border bg-background p-1"
                 onChange={(event) => updateState('glowColor', event.target.value)}
               />
             </label>
@@ -344,12 +344,12 @@ export function HeaderShowcaseSection() {
         </aside>
 
         <div className="min-w-0 space-y-5">
-          <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+          <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
             <div className="flex items-start gap-3">
-              <BadgeCheck className="mt-1 size-5 shrink-0 text-teal-700" />
+              <BadgeCheck className="mt-1 size-5 shrink-0 text-primary" />
               <div>
                 <h3 className="font-medium">Same-document preview host</h3>
-                <p className="mt-1 text-sm leading-6 text-zinc-600">
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
                   Open the card below. The Header is positioned over a local scroll container, so
                   collapse and hide-on-scroll behavior are measured in the same document. Drag the
                   lower-right handle after opening to resize the preview.
@@ -373,18 +373,18 @@ export function HeaderShowcaseSection() {
                   viewportPadding: 18,
                 }}
                 renderMedia={() => (
-                  <div className="grid size-16 place-items-center rounded-lg bg-zinc-950 text-white">
+                  <div className="grid size-16 place-items-center rounded-lg bg-primary text-primary-foreground">
                     <Sparkles className="size-6" />
                   </div>
                 )}
                 renderAction={() => (
-                  <span className="rounded-full bg-zinc-950 px-4 py-2 text-sm font-medium text-white">
+                  <span className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
                     Open preview
                   </span>
                 )}
                 renderContent={() => (
                   <div className="flex h-full min-h-[28rem] flex-col gap-3">
-                    <div className="shrink-0 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-600">
+                    <div className="shrink-0 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
                       Drag the lower-right handle to resize this live preview, then scroll inside
                       the panel to test collapse and hide-on-scroll behavior.
                     </div>
@@ -397,9 +397,9 @@ export function HeaderShowcaseSection() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-zinc-200 bg-zinc-950 p-5 text-white shadow-sm">
+          <div className="rounded-lg border border-border bg-foreground p-5 text-background shadow-sm">
             <div className="font-semibold">Current Header props</div>
-            <pre className="mt-4 max-h-72 overflow-auto rounded-md bg-black/35 p-4 text-xs leading-5 text-teal-50">
+            <pre className="mt-4 max-h-72 overflow-auto rounded-md bg-background/10 p-4 text-xs leading-5 text-background/80">
               {currentProps}
             </pre>
           </div>
@@ -419,15 +419,15 @@ function HeaderPreviewSurface({
   const previewScrollRef = useRef<HTMLDivElement>(null)
   const lightSurface = state.variant === 'glassLight' || state.variant === 'solid'
   const logoIconClassName = lightSurface
-    ? 'grid size-8 place-items-center rounded-full bg-zinc-950 text-xs font-black text-white'
-    : 'grid size-8 place-items-center rounded-full bg-white text-xs font-black text-zinc-950'
+    ? 'grid size-8 place-items-center rounded-full bg-foreground text-xs font-black text-background'
+    : 'grid size-8 place-items-center rounded-full bg-background text-xs font-black text-foreground'
 
   useEffect(() => {
     previewScrollRef.current?.scrollTo({ top: 0, behavior: 'auto' })
   }, [resetSignal])
 
   return (
-    <div className="relative h-full min-h-[28rem] overflow-hidden rounded-lg bg-zinc-950">
+    <div className="relative h-full min-h-[28rem] overflow-hidden rounded-lg bg-foreground">
       <Header
         position="absolute"
         variant={state.variant}
@@ -502,7 +502,7 @@ function HeaderPreviewSurface({
 
       <div
         ref={previewScrollRef}
-        className="h-full overflow-y-auto overscroll-contain bg-[radial-gradient(circle_at_18%_10%,rgba(45,212,191,0.38),transparent_28%),linear-gradient(135deg,#0f172a_0%,#134e4a_46%,#312e81_100%)]"
+        className="h-full overflow-y-auto overscroll-contain bg-[radial-gradient(circle_at_18%_10%,color-mix(in_oklab,var(--primary)_38%,transparent),transparent_28%),linear-gradient(135deg,color-mix(in_oklab,var(--foreground)_94%,var(--primary))_0%,color-mix(in_oklab,var(--foreground)_74%,var(--primary))_46%,color-mix(in_oklab,var(--foreground)_76%,var(--accent))_100%)]"
       >
         <div className="min-h-[82rem]">
           <HeaderSpacer size={state.size} topOffset={state.topOffset} extraOffset={12} />
@@ -515,25 +515,25 @@ function HeaderPreviewSurface({
 
 function PreviewContent() {
   return (
-    <div className="px-5 pb-12 text-white sm:px-8">
+    <div className="px-5 pb-12 text-background sm:px-8">
       <section className="grid gap-6 lg:grid-cols-[1fr_22rem] lg:items-start">
-        <div className="rounded-lg border border-white/10 bg-white/[0.08] p-6 shadow-2xl shadow-black/20 backdrop-blur-md">
+        <div className="rounded-lg border border-background/10 bg-background/[0.08] p-6 shadow-2xl shadow-foreground/20 backdrop-blur-md">
           <h3 className="max-w-2xl text-4xl font-semibold tracking-tight">
             Isolated live Header viewport
           </h3>
-          <p className="mt-4 max-w-2xl leading-7 text-zinc-200">
+          <p className="mt-4 max-w-2xl leading-7 text-background/80">
             The Header receives this preview panel as its scroll source, so collapse, thresholds,
             smoothing, and hide-on-scroll behavior update from the same document tree.
           </p>
-          <div className="mt-8 aspect-video rounded-lg bg-[linear-gradient(135deg,#f8fafc_0%,#a7f3d0_38%,#38bdf8_74%,#4338ca_100%)] p-4">
-            <div className="flex h-full flex-col justify-between rounded-md border border-white/40 bg-white/25 p-4 backdrop-blur-sm">
+          <div className="mt-8 aspect-video rounded-lg bg-[linear-gradient(135deg,var(--background)_0%,color-mix(in_oklab,var(--success)_36%,var(--background))_38%,color-mix(in_oklab,var(--accent)_38%,var(--background))_74%,color-mix(in_oklab,var(--primary)_42%,var(--foreground))_100%)] p-4">
+            <div className="flex h-full flex-col justify-between rounded-md border border-background/40 bg-background/25 p-4 backdrop-blur-sm">
               <div className="flex items-center justify-between">
-                <div className="h-3 w-32 rounded-full bg-zinc-950/40" />
-                <div className="size-8 rounded-full bg-white/75" />
+                <div className="h-3 w-32 rounded-full bg-foreground/40" />
+                <div className="size-8 rounded-full bg-background/75" />
               </div>
               <div className="space-y-3">
-                <div className="h-4 w-52 rounded-full bg-zinc-950/50" />
-                <div className="h-3 w-72 max-w-full rounded-full bg-zinc-950/35" />
+                <div className="h-4 w-52 rounded-full bg-foreground/50" />
+                <div className="h-3 w-72 max-w-full rounded-full bg-foreground/35" />
               </div>
             </div>
           </div>
@@ -543,17 +543,17 @@ function PreviewContent() {
           {['Queued video', 'Room presence', 'Publish checks'].map((item, index) => (
             <div
               key={item}
-              className="rounded-lg border border-white/10 bg-black/20 p-5 backdrop-blur-md"
+              className="rounded-lg border border-background/10 bg-foreground/20 p-5 backdrop-blur-md"
             >
               <div className="flex items-center justify-between">
                 <span className="font-medium">{item}</span>
-                <span className="rounded-full bg-white/12 px-2.5 py-1 text-xs text-teal-100">
+                <span className="rounded-full bg-background/12 px-2.5 py-1 text-xs text-background/80">
                   0{index + 1}
                 </span>
               </div>
               <div className="mt-5 space-y-2">
-                <div className="h-2 rounded-full bg-white/25" />
-                <div className="h-2 w-3/4 rounded-full bg-white/15" />
+                <div className="h-2 rounded-full bg-background/25" />
+                <div className="h-2 w-3/4 rounded-full bg-background/15" />
               </div>
             </div>
           ))}
@@ -564,26 +564,29 @@ function PreviewContent() {
         {['Configure', 'Preview', 'Launch'].map((item) => (
           <div
             key={item}
-            className="min-h-44 rounded-lg border border-white/10 bg-white/[0.07] p-5"
+            className="min-h-44 rounded-lg border border-background/10 bg-background/[0.07] p-5"
           >
-            <div className="text-sm font-medium text-teal-100">{item}</div>
+            <div className="text-sm font-medium text-background/80">{item}</div>
             <div className="mt-10 space-y-2">
-              <div className="h-2 rounded-full bg-white/35" />
-              <div className="h-2 w-2/3 rounded-full bg-white/20" />
+              <div className="h-2 rounded-full bg-background/35" />
+              <div className="h-2 w-2/3 rounded-full bg-background/20" />
             </div>
           </div>
         ))}
       </section>
 
-      <section className="mt-8 rounded-lg border border-white/10 bg-black/20 p-6 backdrop-blur-md">
+      <section className="mt-8 rounded-lg border border-background/10 bg-foreground/20 p-6 backdrop-blur-md">
         <h3 className="text-2xl font-semibold tracking-tight">Scroll depth for behavior testing</h3>
-        <p className="mt-3 max-w-2xl leading-7 text-zinc-300">
+        <p className="mt-3 max-w-2xl leading-7 text-background/70">
           This extra content gives the preview a real scrolling page for collapse, threshold,
           smoothing, and hide-on-scroll settings.
         </p>
         <div className="mt-8 grid gap-3">
           {Array.from({ length: 8 }, (_, index) => (
-            <div key={index} className="h-12 rounded-md border border-white/10 bg-white/[0.06]" />
+            <div
+              key={index}
+              className="h-12 rounded-md border border-background/10 bg-background/[0.06]"
+            />
           ))}
         </div>
       </section>
@@ -602,9 +605,9 @@ function SectionHeader({
 }) {
   return (
     <div className="max-w-3xl">
-      <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-700">{eyebrow}</p>
+      <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">{eyebrow}</p>
       <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h2>
-      <p className="mt-3 text-base leading-7 text-zinc-600">{description}</p>
+      <p className="mt-3 text-base leading-7 text-muted-foreground">{description}</p>
     </div>
   )
 }

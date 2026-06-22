@@ -9,11 +9,9 @@ import { Button } from '@/shared/ui'
 
 export function DocsUiPage() {
   return (
-    <DocsPage className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8">
-      <DocsTitle className="text-4xl font-semibold tracking-tight text-zinc-950 sm:text-6xl">
-        UI Documentation
-      </DocsTitle>
-      <DocsDescription className="max-w-3xl text-lg leading-8 text-zinc-600">
+    <DocsPage>
+      <DocsTitle>UI Documentation</DocsTitle>
+      <DocsDescription>
         Component ownership, styling rules, and live playground conventions for Vewave UI work.
       </DocsDescription>
 
@@ -23,18 +21,18 @@ export function DocsUiPage() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="rounded-lg border border-zinc-200 bg-[#f8fbfb] p-6"
+            className="rounded-lg border border-border bg-muted p-6"
           >
             <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
               <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-white px-3 py-1 text-sm font-medium text-teal-800">
+                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-sm font-medium text-primary">
                   <Code2 className="size-4" />
                   UI system
                 </div>
-                <h2 className="mt-5 text-2xl font-semibold tracking-tight text-zinc-950">
+                <h2 className="mt-5 text-2xl font-semibold tracking-tight text-foreground">
                   Docs explain the rules. Showcase proves the behavior.
                 </h2>
-                <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-600">
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
                   Keep component API documentation close to each component package, and use the
                   component docs pages for live controls, animation presets, and responsive preview
                   states.
@@ -60,11 +58,11 @@ export function DocsUiPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-80px' }}
                   transition={{ delay: index * 0.04, duration: 0.45 }}
-                  className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
+                  className="rounded-lg border border-border bg-card p-5 shadow-sm"
                 >
-                  <Icon className="size-5 text-teal-700" />
-                  <h3 className="mt-4 text-lg font-semibold text-zinc-950">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-zinc-600">{item.description}</p>
+                  <Icon className="size-5 text-primary" />
+                  <h3 className="mt-4 text-lg font-semibold text-foreground">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
                 </motion.article>
               )
             })}
@@ -78,10 +76,10 @@ export function DocsUiPage() {
           <section>
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <h2 className="text-2xl font-semibold tracking-tight text-zinc-950">
+                <h2 className="text-2xl font-semibold tracking-tight text-foreground">
                   Component Notes
                 </h2>
-                <p className="mt-2 text-sm leading-6 text-zinc-600">
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   Current reusable UI areas that should remain separated from route-specific page
                   composition.
                 </p>
@@ -105,27 +103,29 @@ export function DocsUiPage() {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, margin: '-80px' }}
                     transition={{ delay: index * 0.04, duration: 0.45 }}
-                    className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm"
+                    className="overflow-hidden rounded-lg border border-border bg-card shadow-sm"
                   >
                     <div className="grid gap-4 p-5 lg:grid-cols-[12rem_1fr]">
                       <div>
-                        <Icon className="size-5 text-teal-700" />
-                        <h3 className="mt-3 text-lg font-semibold text-zinc-950">
+                        <Icon className="size-5 text-primary" />
+                        <h3 className="mt-3 text-lg font-semibold text-foreground">
                           {component.title}
                         </h3>
-                        <p className="mt-2 text-xs font-medium uppercase tracking-[0.18em] text-zinc-400">
+                        <p className="mt-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                           {component.status}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm leading-6 text-zinc-600">{component.description}</p>
+                        <p className="text-sm leading-6 text-muted-foreground">
+                          {component.description}
+                        </p>
                         <div className="mt-4 flex flex-wrap gap-2">
                           {component.notes.map((note) => (
                             <span
                               key={note}
-                              className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700"
+                              className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground"
                             >
-                              <Check className="size-3 text-emerald-600" />
+                              <Check className="size-3 text-primary" />
                               {note}
                             </span>
                           ))}
@@ -146,7 +146,7 @@ export function DocsUiPage() {
             </div>
           </section>
 
-          <section className="rounded-lg border border-zinc-200 bg-zinc-950 p-5 text-white">
+          <section className="rounded-lg border border-border bg-foreground p-5 text-background">
             <h2 className="text-2xl font-semibold tracking-tight">Styling and Motion Rules</h2>
             <div className="mt-5 grid gap-3 md:grid-cols-3">
               {[
@@ -156,7 +156,7 @@ export function DocsUiPage() {
               ].map((rule) => (
                 <div
                   key={rule}
-                  className="rounded-lg border border-white/10 bg-white/5 p-4 text-sm leading-6 text-zinc-300"
+                  className="rounded-lg border border-background/10 bg-background/5 p-4 text-sm leading-6 text-background/80"
                 >
                   {rule}
                 </div>

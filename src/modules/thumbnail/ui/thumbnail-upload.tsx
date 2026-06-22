@@ -27,9 +27,7 @@ export const ThumbnailUpload = ({
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       data-dragging={isDragging || undefined}
-      className="w-48 h-27 flex flex-col items-center justify-center
-        border-2 border-dashed border-gray-300 rounded-md
-        cursor-pointer hover:border-gray-400"
+      className="flex h-27 w-48 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-primary hover:text-foreground data-dragging:border-primary data-dragging:bg-primary/10"
     >
       <Image />
       <div>Upload photo</div>

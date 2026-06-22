@@ -1,3 +1,4 @@
+export * from './appearance-docs-page'
 export * from './component-doc-page'
 export * from './component-doc-primitives'
 export * from './components-catalog-page'

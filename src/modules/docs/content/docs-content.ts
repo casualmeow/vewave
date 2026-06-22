@@ -8,6 +8,7 @@ import {
   GitBranch,
   GalleryHorizontalEnd,
   Layers3,
+  Palette,
   Paintbrush,
   PanelLeft,
   Route,
@@ -23,7 +24,12 @@ import type { SharedUiDocRoute } from './shared-ui-docs-nav'
 export type DocsNavItem = {
   title: string
   description: string
-  to: '/admin/docs' | '/admin/docs/ui' | ComponentDocRoute | SharedUiDocRoute
+  to:
+    | '/admin/docs'
+    | '/admin/docs/ui'
+    | '/admin/docs/ui/appearance'
+    | ComponentDocRoute
+    | SharedUiDocRoute
   icon: LucideIcon
   exact?: boolean
 }
@@ -42,6 +48,13 @@ export const docsNavItems = [
     to: '/admin/docs/ui',
     icon: Component,
     exact: false,
+  },
+  {
+    title: 'Appearance',
+    description: 'Mode, preset, token resolver, and constrained custom theme rules.',
+    to: '/admin/docs/ui/appearance',
+    icon: Palette,
+    exact: true,
   },
   {
     title: 'Components',
@@ -148,6 +161,12 @@ export const architectureRows = [
 
 export const uiPrinciples = [
   {
+    title: 'Semantic Tokens',
+    description:
+      'Reusable components consume semantic CSS variables; presets and overrides decide the resolved colors.',
+    icon: Palette,
+  },
+  {
     title: 'Reusable Components',
     description:
       'Put stateful, animated, reusable components in src/components with local types, hooks, constants, and public docs under /admin/docs/ui/components.',
@@ -174,6 +193,15 @@ export const uiPrinciples = [
 ] as const
 
 export const uiComponentDocs = [
+  {
+    title: 'Appearance',
+    status: 'Theme contract and runtime resolver',
+    description:
+      'Mode, preset, logo strategy, glass intensity, token resolution, and contrast-aware user overrides.',
+    notes: ['light/dark/system mode', 'semantic tokens', 'local persistence', 'contrast checks'],
+    to: '/admin/docs/ui/appearance',
+    icon: Palette,
+  },
   {
     title: 'Glass',
     status: 'Shared liquid interaction layer',

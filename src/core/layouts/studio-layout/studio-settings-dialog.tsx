@@ -33,12 +33,12 @@ export function StudioSettingsDialog() {
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="relative justify-start overflow-hidden rounded-2xl border border-transparent px-3 py-2 data-[state=active]:border-white/55 data-[state=active]:bg-white/45 data-[state=active]:shadow-none"
+              className="relative justify-start overflow-hidden rounded-2xl border border-transparent px-3 py-2 data-[state=active]:border-border/55 data-[state=active]:bg-card/45 data-[state=active]:shadow-none"
             >
               {active ? (
                 <motion.span
                   layoutId="studio-settings-active-tab"
-                  className="absolute inset-0 -z-10 rounded-2xl bg-white/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]"
+                  className="absolute inset-0 -z-10 rounded-2xl bg-card/60 shadow-[inset_0_1px_0_color-mix(in_srgb,var(--background)_75%,transparent)]"
                   transition={
                     shouldReduceMotion
                       ? { duration: 0 }

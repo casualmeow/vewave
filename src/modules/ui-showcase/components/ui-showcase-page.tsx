@@ -33,22 +33,22 @@ const componentPlaygrounds = [
 
 export function UiShowcasePage() {
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_18%_8%,rgba(20,184,166,0.16),transparent_26rem),radial-gradient(circle_at_82%_0%,rgba(14,165,233,0.14),transparent_24rem),linear-gradient(135deg,#f8fafc,#f1f5f9)] text-zinc-950">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_18%_8%,color-mix(in_oklab,var(--primary)_18%,transparent),transparent_26rem),radial-gradient(circle_at_82%_0%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_24rem),linear-gradient(135deg,var(--background),var(--secondary))] text-foreground">
       <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center gap-8 px-4 py-10 sm:px-6 lg:px-8">
         <motion.section
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.44 }}
-          className="rounded-[2rem] border border-white/70 bg-white/82 p-6 shadow-[0_28px_90px_rgba(15,23,42,0.12)] backdrop-blur-xl sm:p-8"
+          className="rounded-[2rem] border border-border/70 bg-card/82 p-6 shadow-[0_28px_90px_color-mix(in_oklab,var(--foreground)_12%,transparent)] backdrop-blur-xl sm:p-8"
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/10 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
             <Code2 className="size-4" />
             Showcase moved
           </div>
-          <h1 className="mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-zinc-950 sm:text-6xl">
+          <h1 className="mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
             Component playgrounds now live inside the docs.
           </h1>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-600">
+          <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground">
             The standalone showcase route now points into the admin docs catalog. Open a component
             docs page to see its API, examples, and live controls in one place.
           </p>
@@ -64,13 +64,15 @@ export function UiShowcasePage() {
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05, duration: 0.42 }}
-                className="rounded-[1.5rem] border border-zinc-200 bg-white p-5 shadow-sm"
+                className="rounded-[1.5rem] border border-border bg-card p-5 shadow-sm"
               >
-                <div className="grid size-11 place-items-center rounded-2xl bg-zinc-950 text-white shadow-sm">
+                <div className="grid size-11 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
                   <Icon className="size-5" />
                 </div>
                 <h2 className="mt-4 text-2xl font-semibold tracking-tight">{item.label}</h2>
-                <p className="mt-2 min-h-12 text-sm leading-6 text-zinc-600">{item.description}</p>
+                <p className="mt-2 min-h-12 text-sm leading-6 text-muted-foreground">
+                  {item.description}
+                </p>
                 <Button asChild className="mt-5 rounded-full">
                   <Link to={item.to}>
                     Open docs playground

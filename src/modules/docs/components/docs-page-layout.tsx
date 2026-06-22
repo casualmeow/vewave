@@ -11,7 +11,7 @@ export function DocsPage({ children, className, ...props }: DocsPageProps) {
   return (
     <article
       className={cn(
-        'w-full rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8',
+        'w-full rounded-lg border border-border bg-card px-5 py-6 text-card-foreground shadow-[0_18px_60px_color-mix(in_srgb,var(--foreground)_8%,transparent)] sm:px-8',
         className,
       )}
       {...props}
@@ -24,7 +24,7 @@ export function DocsPage({ children, className, ...props }: DocsPageProps) {
 export function DocsTitle({ children, className, ...props }: DocsTitleProps) {
   return (
     <h1
-      className={cn('text-4xl font-semibold tracking-tight text-zinc-950 sm:text-6xl', className)}
+      className={cn('text-4xl font-semibold tracking-tight text-foreground sm:text-6xl', className)}
       {...props}
     >
       {children}
@@ -34,7 +34,10 @@ export function DocsTitle({ children, className, ...props }: DocsTitleProps) {
 
 export function DocsDescription({ children, className, ...props }: DocsDescriptionProps) {
   return (
-    <p className={cn('mt-3 max-w-3xl text-lg leading-8 text-zinc-600', className)} {...props}>
+    <p
+      className={cn('mt-3 max-w-3xl text-lg leading-8 text-muted-foreground', className)}
+      {...props}
+    >
       {children}
     </p>
   )

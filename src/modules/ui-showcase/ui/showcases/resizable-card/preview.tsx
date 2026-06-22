@@ -52,7 +52,7 @@ export function ResizableCardPreview({ state, expandedSize }: ResizableCardPrevi
 
   return (
     <>
-      <div className="min-w-0 rounded-lg border border-zinc-200 bg-zinc-50 p-5">
+      <div className="min-w-0 rounded-lg border border-border bg-muted/40 p-5">
         <ResizableCards
           items={cardItems}
           presentation={state.presentation}

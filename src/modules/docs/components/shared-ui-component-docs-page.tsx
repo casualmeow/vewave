@@ -11,11 +11,9 @@ export function SharedUiComponentDocsPage({ slug }: { slug: string }) {
 
   if (!doc) {
     return (
-      <DocsPage className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8">
-        <DocsTitle className="text-4xl font-semibold tracking-tight text-zinc-950">
-          Shared primitive not found
-        </DocsTitle>
-        <DocsDescription className="max-w-2xl text-lg leading-8 text-zinc-600">
+      <DocsPage>
+        <DocsTitle>Shared primitive not found</DocsTitle>
+        <DocsDescription className="max-w-2xl">
           No shared UI documentation exists for this slug.
         </DocsDescription>
         <DocsBody>
@@ -33,7 +31,7 @@ export function SharedUiComponentDocsPage({ slug }: { slug: string }) {
   const Icon = doc.icon
 
   return (
-    <DocsPage className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8">
+    <DocsPage>
       <Button asChild variant="ghost" size="sm" className="mb-5 -ml-2">
         <Link to="/admin/docs/ui/components/shared">
           <ArrowLeft className="size-4" />
@@ -41,23 +39,19 @@ export function SharedUiComponentDocsPage({ slug }: { slug: string }) {
         </Link>
       </Button>
 
-      <div className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
+      <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
         <Icon className="size-4" />
         {doc.file}
       </div>
-      <DocsTitle className="mt-5 text-4xl font-semibold tracking-tight text-zinc-950 sm:text-6xl">
-        {doc.title}
-      </DocsTitle>
-      <DocsDescription className="max-w-3xl text-lg leading-8 text-zinc-600">
-        {doc.description}
-      </DocsDescription>
+      <DocsTitle className="mt-5">{doc.title}</DocsTitle>
+      <DocsDescription>{doc.description}</DocsDescription>
 
       <DocsBody className="max-w-none">
         <div className="not-prose space-y-10">
-          <section className="grid gap-4 lg:grid-cols-[0.86fr_1.14fr]">
-            <div className="rounded-xl border border-zinc-200 bg-[#f8fbfb] p-5">
-              <div className="flex items-center gap-2 text-sm font-semibold text-zinc-950">
-                <FileCode2 className="size-4 text-teal-700" />
+          <section className="grid gap-4 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)]">
+            <div className="min-w-0 rounded-xl border border-border bg-muted/35 p-5">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <FileCode2 className="size-4 text-primary" />
                 Import
               </div>
               <div className="mt-4">
@@ -65,9 +59,9 @@ export function SharedUiComponentDocsPage({ slug }: { slug: string }) {
               </div>
             </div>
 
-            <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-              <h2 className="text-xl font-semibold tracking-tight text-zinc-950">Live example</h2>
-              <p className="mt-2 text-sm leading-6 text-zinc-600">
+            <div className="min-w-0 rounded-xl border border-border bg-card p-5 shadow-sm">
+              <h2 className="text-xl font-semibold tracking-tight text-foreground">Live example</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 Rendered from the actual shared/ui export where the component is safe to preview in
                 docs.
               </p>
@@ -88,7 +82,7 @@ export function SharedUiComponentDocsPage({ slug }: { slug: string }) {
               {doc.notes.map((note) => (
                 <div
                   key={note}
-                  className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm leading-6 text-zinc-600"
+                  className="rounded-lg border border-border bg-muted/45 px-4 py-3 text-sm leading-6 text-muted-foreground"
                 >
                   {note}
                 </div>

@@ -1,7 +1,7 @@
 import { Link, Outlet, useLocation } from '@tanstack/react-router'
 import { SearchProvider } from 'fumadocs-ui/contexts/search'
 import gsap from 'gsap'
-import { Code2, Layers3, Waves } from 'lucide-react'
+import { Code2, Layers3 } from 'lucide-react'
 import { useLayoutEffect, useRef } from 'react'
 
 import { docsNavItems } from '../content/docs-content'
@@ -9,6 +9,7 @@ import { sharedUiCategories, sharedUiDocNavItems } from '../content/shared-ui-do
 import { DocsSearchButton, DocsSearchDialog } from './docs-search'
 import type { ComponentType, ReactNode } from 'react'
 import { cn } from '@/shared/lib/utils'
+import { VewaveLogoMark } from '@/shared/theme'
 
 const primaryDocsNav = docsNavItems.slice(0, 3)
 const componentDocsNav = docsNavItems.slice(3)
@@ -46,18 +47,16 @@ export function DocsShell() {
     <SearchProvider SearchDialog={DocsSearchDialog} preload>
       <div
         ref={rootRef}
-        className="grid w-full gap-6 text-zinc-950 lg:grid-cols-[18rem_minmax(0,1fr)]"
+        className="grid w-full gap-6 text-foreground lg:grid-cols-[18rem_minmax(0,1fr)]"
       >
-        <aside className="docs-gsap-reveal lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)]">
-          <div className="flex h-full flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
-            <div className="space-y-3 border-b border-zinc-200 p-4">
+        <aside className="docs-gsap-reveal max-h-[20rem] overflow-y-auto lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] lg:max-h-none lg:overflow-visible">
+          <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm">
+            <div className="space-y-3 border-b border-border p-4">
               <Link to="/admin/docs" className="flex items-center gap-3">
-                <span className="grid size-10 place-items-center rounded-lg bg-zinc-950 text-white shadow-sm">
-                  <Waves className="size-5" />
-                </span>
+                <VewaveLogoMark className="size-10 rounded-lg" surfaceToken="card" />
                 <span>
                   <span className="block text-sm font-semibold">Vewave Docs</span>
-                  <span className="block text-xs text-zinc-500">Admin knowledge base</span>
+                  <span className="block text-xs text-muted-foreground">Admin knowledge base</span>
                 </span>
               </Link>
               <DocsSearchButton />
@@ -102,9 +101,9 @@ export function DocsShell() {
                 <Link
                   to="/admin/docs/ui/components/shared"
                   className={cn(
-                    'mb-3 flex items-center gap-2 rounded-md px-2.5 py-2 text-xs font-medium text-zinc-500 transition-colors hover:bg-zinc-50 hover:text-zinc-900',
+                    'mb-3 flex items-center gap-2 rounded-md px-2.5 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground',
                     isTocLinkActive(activePathname, '/admin/docs/ui/components/shared', true) &&
-                      'bg-teal-50 text-teal-900',
+                      'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
                   )}
                 >
                   <Layers3 className="size-3.5" />
@@ -117,7 +116,7 @@ export function DocsShell() {
 
                     return (
                       <div key={category.id} className="space-y-1.5">
-                        <div className="px-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-zinc-400">
+                        <div className="px-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
                           {category.title}
                         </div>
                         <div className="space-y-0.5">
@@ -129,16 +128,16 @@ export function DocsShell() {
                                 key={doc.to}
                                 to={doc.to}
                                 className={cn(
-                                  'group relative flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-500 transition-[background-color,color] hover:bg-zinc-50 hover:text-zinc-950',
+                                  'group relative flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-[background-color,color] hover:bg-accent hover:text-accent-foreground',
                                   isActive &&
-                                    'bg-zinc-950 text-white hover:bg-zinc-950 hover:text-white',
+                                    'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
                                 )}
                                 aria-current={isActive ? 'page' : undefined}
                               >
                                 <span
                                   className={cn(
-                                    'size-1.5 rounded-full bg-zinc-300 transition-colors group-hover:bg-teal-600',
-                                    isActive && 'bg-teal-300',
+                                    'size-1.5 rounded-full bg-border transition-colors group-hover:bg-primary',
+                                    isActive && 'bg-primary-foreground',
                                   )}
                                 />
                                 <span className="truncate">{doc.title}</span>
@@ -153,13 +152,13 @@ export function DocsShell() {
               </DocsTocSection>
             </nav>
 
-            <div className="border-t border-zinc-200 p-4">
-              <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
-                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
-                  <Code2 className="size-3.5 text-teal-700" />
+            <div className="hidden border-t border-border p-4 lg:block">
+              <div className="rounded-lg border border-border bg-muted p-3">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  <Code2 className="size-3.5 text-primary" />
                   API-first docs
                 </div>
-                <p className="mt-2 text-xs leading-5 text-zinc-500">
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
                   Each primitive now has a dedicated route, live example, usage snippet, and prop
                   table.
                 </p>
@@ -169,7 +168,7 @@ export function DocsShell() {
         </aside>
 
         <main className="docs-gsap-reveal min-w-0">
-          <div className="docs-gsap-rule mb-5 h-px w-full bg-zinc-950/15" />
+          <div className="docs-gsap-rule mb-5 h-px w-full bg-border" />
           <Outlet />
         </main>
       </div>
@@ -188,7 +187,7 @@ type TocLinkProps = {
 function DocsTocSection({ children, title }: { children: ReactNode; title: string }) {
   return (
     <section className="mb-5">
-      <h2 className="mb-2 px-2.5 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-zinc-400">
+      <h2 className="mb-2 px-2.5 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
         {title}
       </h2>
       <div className="space-y-1">{children}</div>
@@ -201,26 +200,32 @@ function DocsTocLink({ active, description, icon: Icon, title, to }: TocLinkProp
     <Link
       to={to}
       className={cn(
-        'group relative flex gap-2.5 rounded-md px-2.5 py-2 text-sm text-zinc-600 transition-[background-color,color] hover:bg-zinc-50 hover:text-zinc-950',
-        active && 'bg-teal-50 text-teal-950',
+        'group relative flex gap-2.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground transition-[background-color,color] hover:bg-accent hover:text-accent-foreground',
+        active &&
+          'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
       )}
       aria-current={active ? 'page' : undefined}
     >
       <span
         className={cn(
           'absolute inset-y-2 left-0 w-0.5 rounded-full bg-transparent transition-colors',
-          active && 'bg-teal-700',
+          active && 'bg-primary-foreground',
         )}
       />
       <Icon
         className={cn(
-          'mt-0.5 size-4 shrink-0 text-zinc-400 transition-colors group-hover:text-teal-700',
-          active && 'text-teal-700',
+          'mt-0.5 size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary',
+          active && 'text-primary-foreground',
         )}
       />
       <span className="min-w-0">
         <span className="block truncate font-medium">{title}</span>
-        <span className="mt-0.5 line-clamp-2 block text-xs leading-5 text-zinc-500">
+        <span
+          className={cn(
+            'mt-0.5 line-clamp-2 block text-xs leading-5 text-muted-foreground',
+            active && 'text-primary-foreground/80',
+          )}
+        >
           {description}
         </span>
       </span>

@@ -12,6 +12,8 @@ import {
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
+
+import { AppearancePanel } from './appearance-panel'
 import {
   getGetApiProfileByUsernameQueryKey,
   getGetApiProfileMeQueryKey,
@@ -278,7 +280,7 @@ export function ProfilePage({ username }: ProfilePageProps) {
   if (!isPublicRoute && !user) {
     return (
       <ProfileShell>
-        <Card className="max-w-xl rounded-[2rem] border-white/70 bg-white/80 shadow-sm backdrop-blur">
+        <Card className="max-w-xl rounded-[2rem] border-border/70 bg-card/80 shadow-sm backdrop-blur">
           <CardHeader>
             <CardTitle>Profile is available after sign in</CardTitle>
             <CardDescription>
@@ -291,7 +293,7 @@ export function ProfilePage({ username }: ProfilePageProps) {
                 Sign in
               </Link>
             </Button>
-            <Button asChild variant="outline" className="rounded-full bg-white/70">
+            <Button asChild variant="outline" className="rounded-full bg-card/70">
               <Link to="/sign-up">Create account</Link>
             </Button>
           </CardContent>
@@ -326,15 +328,15 @@ export function ProfilePage({ username }: ProfilePageProps) {
   return (
     <ProfileShell>
       <div className="grid w-full max-w-5xl gap-6">
-        <Card className="overflow-hidden rounded-[2rem] border-white/70 bg-white/85 shadow-sm backdrop-blur">
+        <Card className="overflow-hidden rounded-[2rem] border-border/70 bg-card/85 shadow-sm backdrop-blur">
           <CardHeader className="gap-5 md:flex-row md:items-center md:justify-between md:space-y-0">
             <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-center">
-              <Avatar className="size-24 border border-white/70 shadow-sm">
+              <Avatar className="size-24 border border-border/70 shadow-sm">
                 <AvatarImage src={profile.avatarUrl ?? undefined} alt={`${profile.name} avatar`} />
                 <AvatarFallback className="text-xl">{initials}</AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className="text-xs font-medium uppercase tracking-[0.22em] text-teal-700">
+                <p className="text-xs font-medium uppercase tracking-[0.22em] text-primary">
                   {canEdit ? 'Your profile' : 'Public profile'}
                 </p>
                 <CardTitle className="mt-2 truncate text-3xl">{profile.name}</CardTitle>
@@ -346,7 +348,7 @@ export function ProfilePage({ username }: ProfilePageProps) {
             </div>
 
             {canEdit && publicHandle ? (
-              <Button asChild variant="outline" className="rounded-full bg-white/70">
+              <Button asChild variant="outline" className="rounded-full bg-card/70">
                 <Link to="/profile/$username" params={{ username: publicHandle }}>
                   <ExternalLink className="size-4" />
                   Public view
@@ -356,9 +358,9 @@ export function ProfilePage({ username }: ProfilePageProps) {
           </CardHeader>
           <CardContent className="grid gap-5">
             {profile.bio ? (
-              <p className="max-w-3xl text-sm leading-6 text-zinc-700">{profile.bio}</p>
+              <p className="max-w-3xl text-sm leading-6 text-foreground">{profile.bio}</p>
             ) : (
-              <p className="max-w-3xl text-sm leading-6 text-zinc-500">
+              <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
                 {canEdit ? 'Add a short bio to your profile.' : 'This user has not added a bio.'}
               </p>
             )}
@@ -379,16 +381,17 @@ export function ProfilePage({ username }: ProfilePageProps) {
         </Card>
 
         {canEdit ? (
-          <Card className="rounded-[2rem] border-white/70 bg-white/85 shadow-sm backdrop-blur">
+          <Card className="rounded-[2rem] border-border/70 bg-card/85 shadow-sm backdrop-blur">
             <CardHeader>
               <CardTitle>Profile settings</CardTitle>
               <CardDescription>Update public details and account security.</CardDescription>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="profile" className="gap-5">
-                <TabsList className="grid w-full grid-cols-2 sm:w-fit">
+                <TabsList className="grid w-full grid-cols-3 sm:w-fit">
                   <TabsTrigger value="profile">Profile</TabsTrigger>
                   <TabsTrigger value="security">Security</TabsTrigger>
+                  <TabsTrigger value="appearance">Appearance</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="profile">
@@ -426,7 +429,7 @@ export function ProfilePage({ username }: ProfilePageProps) {
 
                     <Field id="profile-avatar" label="Avatar URL">
                       <div className="grid gap-3 sm:grid-cols-[auto_1fr] sm:items-center">
-                        <Avatar className="size-16 border border-white/70 shadow-sm">
+                        <Avatar className="size-16 border border-border/70 shadow-sm">
                           <AvatarImage
                             src={nullableField(profileForm.avatarUrl) ?? undefined}
                             alt={`${profileForm.name || profile.name} avatar preview`}
@@ -538,7 +541,7 @@ export function ProfilePage({ username }: ProfilePageProps) {
                       </Field>
                     </div>
 
-                    <Separator className="bg-white/45" />
+                    <Separator className="bg-border/70" />
 
                     <div className="flex justify-end">
                       <Button
@@ -556,6 +559,10 @@ export function ProfilePage({ username }: ProfilePageProps) {
                     </div>
                   </form>
                 </TabsContent>
+
+                <TabsContent value="appearance">
+                  <AppearancePanel />
+                </TabsContent>
               </Tabs>
             </CardContent>
           </Card>
@@ -567,10 +574,12 @@ export function ProfilePage({ username }: ProfilePageProps) {
 
 function ProfileFact({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
-    <div className="min-w-0 rounded-2xl border bg-white/70 p-4">
-      <div className="text-teal-700 [&_svg]:size-4">{icon}</div>
-      <div className="mt-3 text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</div>
-      <div className="mt-1 truncate text-sm font-medium text-zinc-950">{value}</div>
+    <div className="min-w-0 rounded-2xl border border-border bg-card/70 p-4">
+      <div className="text-primary [&_svg]:size-4">{icon}</div>
+      <div className="mt-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </div>
+      <div className="mt-1 truncate text-sm font-medium text-foreground">{value}</div>
     </div>
   )
 }
@@ -585,10 +594,10 @@ function ProfileStatusCard({
   title: string
 }) {
   return (
-    <Card className="max-w-xl rounded-[2rem] border-white/70 bg-white/80 shadow-sm backdrop-blur">
+    <Card className="max-w-xl rounded-[2rem] border-border/70 bg-card/80 shadow-sm backdrop-blur">
       <CardHeader className="items-center text-center">
-        <div className="grid size-16 place-items-center rounded-full border bg-white shadow-sm">
-          {loading ? <SpinIcon label={title} /> : <ImageIcon className="size-6 text-teal-700" />}
+        <div className="grid size-16 place-items-center rounded-full border border-border bg-card shadow-sm">
+          {loading ? <SpinIcon label={title} /> : <ImageIcon className="size-6 text-primary" />}
         </div>
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>

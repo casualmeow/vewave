@@ -200,7 +200,7 @@ export const MinifiedVideoPlayer = memo(function ({
   return (
     <div
       ref={containerRef}
-      className={cn('relative group bg-black overflow-hidden rounded-xl', className)}
+      className={cn('relative group overflow-hidden rounded-xl bg-media-background', className)}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(true)}
       tabIndex={0}
@@ -218,7 +218,7 @@ export const MinifiedVideoPlayer = memo(function ({
 
       <div
         className={cn(
-          'absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent transition-opacity duration-300',
+          'absolute inset-x-0 bottom-0 bg-gradient-to-t from-media-background/80 via-media-background/40 to-transparent transition-opacity duration-300',
           showControls ? 'opacity-100' : 'opacity-0',
         )}
       >
@@ -228,7 +228,7 @@ export const MinifiedVideoPlayer = memo(function ({
             onValueChange={handleSeek}
             max={100}
             step={0.1}
-            className="w-full [&>span:first-child]:h-1 [&>span:first-child]:bg-white/30 [&_[role=slider]]:bg-white [&_[role=slider]]:w-3 [&_[role=slider]]:h-3 [&_[role=slider]]:border-0 [&>span:first-child_span]:bg-white [&_[role=slider]:focus-visible]:ring-0 [&_[role=slider]:focus-visible]:ring-offset-0"
+            className="w-full [&>span:first-child]:h-1 [&>span:first-child]:bg-media-muted [&_[role=slider]]:h-3 [&_[role=slider]]:w-3 [&_[role=slider]]:border-0 [&_[role=slider]]:bg-media-foreground [&_[role=slider]:focus-visible]:ring-0 [&_[role=slider]:focus-visible]:ring-offset-0 [&>span:first-child_span]:bg-media-foreground"
           />
         </div>
 
@@ -238,13 +238,13 @@ export const MinifiedVideoPlayer = memo(function ({
               size="icon"
               type="button"
               variant="ghost"
-              className="w-8 h-8 text-white hover:bg-white/20"
+              className="h-8 w-8 text-media-foreground hover:bg-media-control"
               onClick={togglePlay}
             >
               {isPlaying ? (
-                <Pause className="w-4 h-4 fill-white" />
+                <Pause className="h-4 w-4 fill-media-foreground" />
               ) : (
-                <Play className="w-4 h-4 fill-white" />
+                <Play className="h-4 w-4 fill-media-foreground" />
               )}
             </Button>
 
@@ -253,7 +253,7 @@ export const MinifiedVideoPlayer = memo(function ({
                 size="icon"
                 type="button"
                 variant="ghost"
-                className="w-8 h-8 text-white hover:bg-white/20"
+                className="h-8 w-8 text-media-foreground hover:bg-media-control"
                 onClick={toggleMute}
               >
                 {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
@@ -264,12 +264,12 @@ export const MinifiedVideoPlayer = memo(function ({
                   value={[isMuted ? 0 : volume * 100]}
                   onValueChange={handleVolumeChange}
                   max={100}
-                  className="[&>span:first-child]:h-1 [&>span:first-child]:bg-white/30 [&_[role=slider]]:bg-white [&_[role=slider]]:w-2 [&_[role=slider]]:h-2 [&_[role=slider]]:border-0 [&>span:first-child_span]:bg-white"
+                  className="[&>span:first-child]:h-1 [&>span:first-child]:bg-media-muted [&_[role=slider]]:h-2 [&_[role=slider]]:w-2 [&_[role=slider]]:border-0 [&_[role=slider]]:bg-media-foreground [&>span:first-child_span]:bg-media-foreground"
                 />
               </div>
             </div>
 
-            <div className="text-white text-xs font-mono">
+            <div className="font-mono text-xs text-media-foreground">
               {formatTime(currentTime)} / {formatTime(duration)}
             </div>
           </div>
@@ -280,7 +280,7 @@ export const MinifiedVideoPlayer = memo(function ({
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="w-8 h-8 text-white hover:bg-white/20"
+                  className="h-8 w-8 text-media-foreground hover:bg-media-control"
                 >
                   <Settings className="w-4 h-4" />
                 </Button>
@@ -358,7 +358,7 @@ export const MinifiedVideoPlayer = memo(function ({
               size="icon"
               type="button"
               variant="ghost"
-              className="w-8 h-8 text-white hover:bg-white/20"
+              className="h-8 w-8 text-media-foreground hover:bg-media-control"
               onClick={toggleFullscreen}
             >
               {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}

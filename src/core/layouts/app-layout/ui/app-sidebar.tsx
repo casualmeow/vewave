@@ -54,6 +54,7 @@ import {
   SpinIcon,
 } from '@/shared/ui'
 import { cn } from '@/shared/lib/utils'
+import { VewaveLogoMark } from '@/shared/theme'
 
 function getInitials(name?: string | null, email?: string | null) {
   const source = name?.trim() || email?.trim() || 'Vewave User'
@@ -159,7 +160,7 @@ export function AppSidebar({ className }: { className?: string }) {
                     </SidebarItemIcon>
                     <SidebarItemLabel>{item.label}</SidebarItemLabel>
                     {item.badge ? (
-                      <span className="relative z-10 ml-auto rounded-full bg-zinc-950/85 px-2 py-0.5 text-[0.68rem] font-semibold leading-none text-white shadow-sm">
+                      <span className="relative z-10 ml-auto rounded-full bg-sidebar-primary px-2 py-0.5 text-[0.68rem] font-semibold leading-none text-sidebar-primary-foreground shadow-sm">
                         {item.badge}
                       </span>
                     ) : null}
@@ -235,13 +236,18 @@ function AppSidebarIdentity({
     return (
       <SidebarBrand
         visual={
-          <div className="grid size-14 place-items-center rounded-full border border-white/65 bg-white/45 shadow-sm backdrop-blur-xl">
+          <div className="grid size-14 place-items-center rounded-full border border-[color:var(--glass-border)] bg-[var(--glass-background)] shadow-sm backdrop-blur-xl">
             <SpinIcon size="md" speed="normal" label="Checking session" />
           </div>
         }
         title="Checking session"
         subtitle="Restoring your workspace"
-        meta={<span className="h-8 w-16 animate-pulse rounded-full bg-white/45" aria-hidden />}
+        meta={
+          <span
+            className="h-8 w-16 animate-pulse rounded-full bg-muted-foreground/20"
+            aria-hidden
+          />
+        }
       />
     )
   }
@@ -249,15 +255,11 @@ function AppSidebarIdentity({
   if (!user) {
     return (
       <SidebarBrand
-        visual={
-          <Avatar className="size-14 border border-white/65 bg-white/45 shadow-sm">
-            <AvatarFallback>VW</AvatarFallback>
-          </Avatar>
-        }
+        visual={<VewaveLogoMark className="size-14 text-lg" label="VW" surfaceToken="sidebar" />}
         title="Guest workspace"
         subtitle="Sign in to sync rooms"
         meta={
-          <Button asChild size="sm" variant="outline" className="rounded-full bg-white/70">
+          <Button asChild size="sm" variant="outline" className="rounded-full bg-card/70">
             <Link to="/sign-in" search={{ redirectTo: undefined }}>
               <LogIn className="size-3.5" />
               Sign in
@@ -275,16 +277,16 @@ function AppSidebarIdentity({
           <Link
             to="/profile"
             aria-label="Open profile"
-            className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-teal-600/45"
+            className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
           >
-            <Avatar className="size-14 border border-white/65 shadow-sm">
+            <Avatar className="size-14 border border-[color:var(--glass-border)] shadow-sm">
               <AvatarImage src={user.avatarUrl ?? undefined} alt={user.name ?? 'User avatar'} />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
           </Link>
         }
         title={
-          <Link to="/profile" className="outline-none hover:text-teal-800 focus-visible:underline">
+          <Link to="/profile" className="outline-none hover:text-primary focus-visible:underline">
             {user.name ?? 'Profile'}
           </Link>
         }
@@ -294,7 +296,7 @@ function AppSidebarIdentity({
             <button
               type="button"
               aria-label="Open app settings"
-              className="grid size-10 place-items-center rounded-full border border-white/60 bg-white/55 text-zinc-700 shadow-[0_10px_26px_rgba(15,23,42,0.12),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-xl transition-[background-color,color,box-shadow] hover:bg-white/75 hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600/40"
+              className="grid size-10 place-items-center rounded-full border border-[color:var(--glass-border)] bg-[var(--glass-background)] text-sidebar-foreground shadow-[0_10px_26px_color-mix(in_srgb,var(--foreground)_12%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-xl transition-[background-color,color,box-shadow] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
             >
               <SpinIcon size="sm" hoverDuration={1000} behavior="hover">
                 <Settings className="size-full" />
@@ -344,7 +346,7 @@ function AppSidebarFooter({
         Support
       </SidebarItem>
 
-      <Separator className="my-1 bg-white/30" />
+      <Separator className="my-1 bg-sidebar-border" />
 
       {checkingSession ? (
         <SidebarItem type="button" icon={<SpinIcon size="sm" />} value="session-check" disabled>
@@ -453,16 +455,16 @@ function RoomSidebarItem({
         </SidebarItemIcon>
         <SidebarItemLabel>
           <span className="block truncate">{room.label}</span>
-          <span className="block truncate text-[0.68rem] font-normal text-zinc-500">
+          <span className="block truncate text-[0.68rem] font-normal text-muted-foreground">
             {room.description}
           </span>
         </SidebarItemLabel>
         {room.badge ? (
-          <span className="relative z-10 ml-auto rounded-full bg-zinc-950/85 px-2 py-0.5 text-[0.62rem] font-semibold leading-none text-white shadow-sm">
+          <span className="relative z-10 ml-auto rounded-full bg-sidebar-primary px-2 py-0.5 text-[0.62rem] font-semibold leading-none text-sidebar-primary-foreground shadow-sm">
             {room.badge}
           </span>
         ) : (
-          <Icon className="relative z-10 ml-auto size-3.5 text-zinc-400" />
+          <Icon className="relative z-10 ml-auto size-3.5 text-muted-foreground" />
         )}
       </Link>
     </SidebarItem>
@@ -487,7 +489,7 @@ function ServerSidebarItem({
     >
       <>
         <span className="block truncate">{server.label}</span>
-        <span className="block truncate text-[0.68rem] font-normal text-zinc-500">
+        <span className="block truncate text-[0.68rem] font-normal text-muted-foreground">
           {server.description}
         </span>
       </>

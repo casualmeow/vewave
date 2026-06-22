@@ -55,20 +55,20 @@ export const appRecentRooms: ReadonlyArray<AppSidebarRoomItem> = [
     code: 'DEMO42',
     label: 'Friday watch room',
     description: 'Joined 12 min ago',
-    accent: 'bg-teal-400',
+    accent: 'bg-primary',
     badge: 'Live',
   },
   {
     code: 'SYNC7',
     label: 'Design review',
     description: 'Last opened yesterday',
-    accent: 'bg-sky-400',
+    accent: 'bg-accent',
   },
   {
     code: 'LOFI9',
     label: 'Lofi cinema',
     description: 'Shared playlist',
-    accent: 'bg-emerald-400',
+    accent: 'bg-secondary-foreground',
   },
 ]
 
@@ -77,20 +77,20 @@ export const appPinnedRooms: ReadonlyArray<AppSidebarRoomItem> = [
     code: 'TEAM1',
     label: 'Team premiere',
     description: 'Pinned room',
-    accent: 'bg-cyan-400',
+    accent: 'bg-primary',
     badge: 'Host',
   },
   {
     code: 'QA234',
     label: 'QA screening',
     description: 'Private test room',
-    accent: 'bg-indigo-400',
+    accent: 'bg-accent',
   },
   {
     code: 'OPEN8',
     label: 'Open lounge',
     description: 'Public room',
-    accent: 'bg-lime-400',
+    accent: 'bg-muted-foreground',
   },
 ]
 
@@ -99,21 +99,21 @@ export const appServers: ReadonlyArray<AppSidebarServerItem> = [
     id: 'edge-sync',
     label: 'Edge sync',
     description: 'Nearest playback relay',
-    accent: 'bg-teal-400',
+    accent: 'bg-primary',
     status: 'Live',
   },
   {
     id: 'media-parser',
     label: 'Media parser',
     description: 'URL metadata service',
-    accent: 'bg-sky-400',
+    accent: 'bg-accent',
     status: 'Idle',
   },
   {
     id: 'presence-hub',
     label: 'Presence hub',
     description: 'Room member events',
-    accent: 'bg-amber-400',
+    accent: 'bg-muted-foreground',
     status: 'Beta',
   },
 ]

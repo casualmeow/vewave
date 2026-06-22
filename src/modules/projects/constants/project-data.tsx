@@ -13,7 +13,7 @@ export const initialProjects: Array<ProjectItem> = [
     lastOpened: 'Today, 18:40',
     ctaText: 'Open room',
     ctaLink: '/room/CINEMA7',
-    accent: 'from-teal-300 via-cyan-200 to-sky-300',
+    accent: 'from-primary/55 via-accent/35 to-secondary',
     summary:
       'Host controls are enabled, viewer chat is moderated, and the next shared playback session starts in the evening window.',
   },
@@ -29,7 +29,7 @@ export const initialProjects: Array<ProjectItem> = [
     lastOpened: 'Yesterday',
     ctaText: 'Review',
     ctaLink: '/room/LAUNCH9',
-    accent: 'from-emerald-200 via-lime-100 to-cyan-200',
+    accent: 'from-accent/50 via-muted to-primary/25',
     summary:
       'Draft project with three unresolved edit notes, two scheduled watch rooms, and creator-only playback permissions.',
   },
@@ -45,7 +45,7 @@ export const initialProjects: Array<ProjectItem> = [
     lastOpened: 'May 22',
     ctaText: 'Watch',
     ctaLink: '/room/REPLAY4',
-    accent: 'from-sky-200 via-indigo-100 to-teal-200',
+    accent: 'from-secondary via-muted to-accent/45',
     summary:
       'Archived session with preserved playback state, featured moments, and audience presence history for future edits.',
   },

@@ -101,8 +101,8 @@ function FluidSettingsTab({
       data-deemphasized={deemphasized ? 'true' : 'false'}
       className={cn(
         'group relative isolate flex w-full items-center gap-2 overflow-hidden rounded-2xl px-3 py-2 text-left text-sm font-medium outline-none [--tab-pointer-x:50%] [--tab-pointer-y:50%]',
-        'focus-visible:ring-2 focus-visible:ring-teal-300/60',
-        active ? 'text-zinc-950' : 'text-zinc-600 hover:text-zinc-950',
+        'focus-visible:ring-2 focus-visible:ring-ring/50',
+        active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
       )}
       style={!canUsePointerMotion ? undefined : fluidTransformStyle}
       animate={
@@ -138,7 +138,7 @@ function FluidSettingsTab({
     >
       <motion.span
         aria-hidden="true"
-        className="pointer-events-none absolute rounded-[1.6rem] border border-white/0 bg-[radial-gradient(circle_at_var(--tab-pointer-x)_var(--tab-pointer-y),rgba(255,255,255,0.76),rgba(255,255,255,0.14)_42%,transparent_64%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.58)] backdrop-blur-sm"
+        className="pointer-events-none absolute rounded-[1.6rem] border border-transparent bg-[radial-gradient(circle_at_var(--tab-pointer-x)_var(--tab-pointer-y),var(--glass-highlight),color-mix(in_srgb,var(--glass-highlight)_34%,transparent)_42%,transparent_64%)] shadow-[inset_0_1px_0_var(--glass-highlight)] backdrop-blur-sm"
         initial={false}
         animate={{
           opacity: focused ? 0.76 : 0,
@@ -152,7 +152,7 @@ function FluidSettingsTab({
       {active ? (
         <motion.span
           layoutId={layoutId}
-          className="pointer-events-none absolute overflow-hidden rounded-2xl border border-white/65 bg-[linear-gradient(135deg,rgba(255,255,255,0.88),rgba(255,255,255,0.30),rgba(153,246,228,0.40))] shadow-[0_16px_36px_rgba(15,118,110,0.18),inset_0_1px_0_rgba(255,255,255,0.95)] backdrop-blur-xl"
+          className="pointer-events-none absolute overflow-hidden rounded-2xl border border-[color:var(--glass-border)] bg-[linear-gradient(135deg,var(--tabs-active),var(--glass-background),color-mix(in_srgb,var(--accent)_28%,transparent))] shadow-[0_16px_36px_color-mix(in_srgb,var(--accent)_18%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-xl"
           animate={{
             top: focused ? -10 : 0,
             right: focused ? -10 : 0,
@@ -163,7 +163,7 @@ function FluidSettingsTab({
         >
           <span className="absolute inset-0" style={{ filter: `url(#${gooFilterId})` }}>
             <motion.span
-              className="absolute -left-5 top-1/2 size-16 -translate-y-1/2 rounded-full bg-teal-100/40"
+              className="absolute -left-5 top-1/2 size-16 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--accent)_32%,transparent)]"
               animate={
                 prefersReducedMotion ? undefined : { x: [0, 10, -3, 0], scale: [1, 1.22, 0.94, 1] }
               }
@@ -174,7 +174,7 @@ function FluidSettingsTab({
               }
             />
             <motion.span
-              className="absolute left-[var(--tab-pointer-x)] top-[var(--tab-pointer-y)] size-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/48"
+              className="absolute left-[var(--tab-pointer-x)] top-[var(--tab-pointer-y)] size-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--glass-highlight)_48%,transparent)]"
               animate={prefersReducedMotion ? undefined : { scale: [0.72, 1.34, 0.9] }}
               transition={
                 prefersReducedMotion
@@ -183,7 +183,7 @@ function FluidSettingsTab({
               }
             />
             <motion.span
-              className="absolute -right-5 bottom-0 size-16 rounded-full bg-sky-100/34"
+              className="absolute -right-5 bottom-0 size-16 rounded-full bg-[color-mix(in_srgb,var(--primary)_30%,transparent)]"
               animate={
                 prefersReducedMotion ? undefined : { x: [0, -8, 3, 0], scale: [1, 0.88, 1.16, 1] }
               }
@@ -232,7 +232,7 @@ export function SidebarSettingsDialog() {
       <div
         role="tablist"
         aria-label="Studio settings sections"
-        className="grid h-auto shrink-0 grid-cols-1 gap-1 rounded-3xl border border-white/45 bg-white/30 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-2xl md:min-w-44"
+        className="grid h-auto shrink-0 grid-cols-1 gap-1 rounded-3xl border border-[color:var(--glass-border)] bg-[var(--glass-background)] p-1.5 shadow-[inset_0_1px_0_var(--glass-highlight)] backdrop-blur-2xl md:min-w-44"
         onPointerLeave={() => setFocusedTab(null)}
       >
         {tabs.map((tab) => (
@@ -254,18 +254,18 @@ export function SidebarSettingsDialog() {
       <motion.div
         key={selectedTab.value}
         role="tabpanel"
-        className="min-h-64 w-full overflow-hidden rounded-3xl border border-white/45 bg-white/62 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.12),inset_0_1px_0_rgba(255,255,255,0.86)] backdrop-blur-2xl"
+        className="min-h-64 w-full overflow-hidden rounded-3xl border border-[color:var(--glass-border)] bg-card p-5 shadow-[0_20px_60px_color-mix(in_srgb,var(--foreground)_12%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-2xl"
         initial={{ opacity: 0, y: 8, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={SIDEBAR_FLUID_TRANSITION}
       >
         <div className="flex items-center gap-3">
-          <div className="grid size-11 place-items-center rounded-2xl bg-zinc-950 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
+          <div className="grid size-11 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-[inset_0_1px_0_var(--glass-highlight)]">
             <Icon className="size-5" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-zinc-950">{selectedTab.name}</h3>
-            <p className="text-sm text-zinc-600">{selectedTab.description}</p>
+            <h3 className="text-lg font-semibold text-foreground">{selectedTab.name}</h3>
+            <p className="text-sm text-muted-foreground">{selectedTab.description}</p>
           </div>
         </div>
       </motion.div>

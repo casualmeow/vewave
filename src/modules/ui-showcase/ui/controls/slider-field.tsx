@@ -21,7 +21,7 @@ export function SliderField({
     <div className="grid gap-2">
       <div className="flex items-center justify-between gap-3">
         <Label>{label}</Label>
-        <span className="text-xs tabular-nums text-zinc-500">
+        <span className="text-xs tabular-nums text-muted-foreground">
           {Number.isInteger(value) ? value : value.toFixed(2)}
           {unit}
         </span>

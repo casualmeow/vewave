@@ -387,17 +387,17 @@ export function SidebarShowcaseSection() {
   }
 
   return (
-    <section id="sidebar" className="grid gap-6 rounded-lg border border-zinc-200 bg-white p-5">
+    <section id="sidebar" className="grid gap-6 rounded-lg border border-border bg-card p-5">
       <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/10 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
             <PanelLeft className="size-4" />
             Sidebar component
           </div>
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-zinc-950">
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-foreground">
             Decomposable sidebar variants
           </h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-600">
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
             A real Sidebar instance driven by controls, plus compact comparisons for liquid glass,
             glass, fluent, and solid surfaces. The liquid variant keeps item content sharp while a
             single selector moves through the nav group and the shell catches a subtle desktop
@@ -413,7 +413,7 @@ export function SidebarShowcaseSection() {
               variant="outline"
               size="sm"
               onClick={() => setState(preset.state)}
-              className="bg-white"
+              className="bg-background"
             >
               {preset.label}
             </Button>
@@ -696,19 +696,19 @@ export function SidebarShowcaseSection() {
             />
           </ControlCard>
 
-          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm leading-6 text-zinc-600">
-            <div className="font-medium text-zinc-950">Current design intent</div>
+          <div className="rounded-lg border border-border bg-muted/40 p-4 text-sm leading-6 text-muted-foreground">
+            <div className="font-medium text-foreground">Current design intent</div>
             <p className="mt-1">{designDescriptions[state.design]}</p>
           </div>
 
-          <div className="rounded-lg border border-zinc-200 bg-zinc-950 p-4 text-sm text-zinc-100 shadow-sm">
+          <div className="rounded-lg border border-border bg-foreground p-4 text-sm text-background shadow-sm">
             <div className="flex items-center justify-between gap-3">
               <div className="font-medium">Current compound API</div>
-              <span className="rounded-full bg-white/10 px-2 py-0.5 text-[0.68rem] text-zinc-300">
+              <span className="rounded-full bg-background/10 px-2 py-0.5 text-[0.68rem] text-background/70">
                 src/components/sidebar
               </span>
             </div>
-            <pre className="mt-3 overflow-x-auto whitespace-pre-wrap text-xs leading-5 text-zinc-300">
+            <pre className="mt-3 overflow-x-auto whitespace-pre-wrap text-xs leading-5 text-background/70">
               {`<Sidebar
   design="${state.design}"
   size="${state.size}"
@@ -777,7 +777,7 @@ function SidebarPreviewCanvas({
   onActiveChange: (value: SidebarDemoItemId) => void
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-zinc-200 bg-[radial-gradient(circle_at_20%_10%,rgba(45,212,191,0.18),transparent_24rem),radial-gradient(circle_at_80%_80%,rgba(14,165,233,0.16),transparent_20rem),linear-gradient(135deg,#f8fafc,#eef4f1)] p-4 shadow-sm">
+    <div className="overflow-hidden rounded-lg border border-border bg-[radial-gradient(circle_at_20%_10%,color-mix(in_oklab,var(--primary)_18%,transparent),transparent_24rem),radial-gradient(circle_at_80%_80%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_20rem),linear-gradient(135deg,var(--background),var(--secondary))] p-4 shadow-sm">
       <div className="overflow-x-auto [scrollbar-width:thin]">
         <div className="grid min-w-[46rem] gap-4 lg:grid-cols-[auto_minmax(0,1fr)]">
           <DemoSidebar
@@ -808,29 +808,29 @@ function SidebarPreviewCanvas({
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.24 }}
-            className="min-w-0 rounded-xl border border-white/70 bg-white/78 p-5 shadow-[0_24px_60px_rgba(15,23,42,0.12)] backdrop-blur"
+            className="min-w-0 rounded-xl border border-border/70 bg-card/78 p-5 shadow-[0_24px_60px_color-mix(in_oklab,var(--foreground)_12%,transparent)] backdrop-blur"
           >
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
                   Preview surface
                 </p>
-                <h3 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-950">
+                <h3 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
                   {state.activeItem === 'content'
                     ? 'Content manager'
                     : sidebarDemoItems.find((item) => item.id === state.activeItem)?.label}
                 </h3>
               </div>
-              <div className="rounded-full bg-zinc-950 px-3 py-1 text-xs font-medium text-white">
+              <div className="rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
                 {state.design}
               </div>
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
               {['Uploads', 'Drafts', 'Scheduled'].map((label, index) => (
-                <div key={label} className="rounded-lg border border-zinc-200 bg-white p-4">
-                  <div className="text-2xl font-semibold text-zinc-950">{18 + index * 7}</div>
-                  <div className="mt-1 text-sm text-zinc-500">{label}</div>
+                <div key={label} className="rounded-lg border border-border bg-card p-4">
+                  <div className="text-2xl font-semibold text-foreground">{18 + index * 7}</div>
+                  <div className="mt-1 text-sm text-muted-foreground">{label}</div>
                 </div>
               ))}
             </div>
@@ -843,9 +843,9 @@ function SidebarPreviewCanvas({
               ].map((item) => (
                 <div
                   key={item}
-                  className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-600"
+                  className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 text-sm text-muted-foreground"
                 >
-                  <Sparkles className="size-4 text-teal-600" />
+                  <Sparkles className="size-4 text-primary" />
                   {item}
                 </div>
               ))}
@@ -861,10 +861,10 @@ function SidebarVariantComparison({ activeItem }: { activeItem: SidebarDemoItemI
   return (
     <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
       {sidebarDesigns.map((design) => (
-        <div key={design} className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
+        <div key={design} className="rounded-lg border border-border bg-muted/40 p-3">
           <div className="mb-3 flex items-center justify-between">
-            <div className="text-sm font-semibold capitalize text-zinc-950">{design}</div>
-            <div className="rounded-full bg-white px-2 py-0.5 text-[0.68rem] text-zinc-500 shadow-sm">
+            <div className="text-sm font-semibold capitalize text-foreground">{design}</div>
+            <div className="rounded-full bg-background px-2 py-0.5 text-[0.68rem] text-muted-foreground shadow-sm">
               variant
             </div>
           </div>
@@ -967,8 +967,8 @@ function DemoSidebar({
       <div className="flex min-h-0 flex-1 flex-col">
         <SidebarBrand
           visual={
-            <Avatar className="size-11 border border-white/60 bg-teal-950 text-white shadow-sm">
-              <AvatarFallback className="bg-teal-950 text-white">VW</AvatarFallback>
+            <Avatar className="size-11 border border-background/60 bg-primary text-primary-foreground shadow-sm">
+              <AvatarFallback className="bg-primary text-primary-foreground">VW</AvatarFallback>
             </Avatar>
           }
           title="Vewave Studio"
@@ -1019,26 +1019,26 @@ function DemoSidebar({
 
 function SidebarPropsMatrix({ state }: { state: SidebarShowcaseState }) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
+    <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-zinc-950">Props passed to Sidebar</h3>
-          <p className="mt-1 text-xs leading-5 text-zinc-500">
+          <h3 className="text-sm font-semibold text-foreground">Props passed to Sidebar</h3>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
             Desktop interaction props drive the live preview; mobile dock props are exposed in the
             generated responsive usage snippet.
           </p>
         </div>
-        <div className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs text-zinc-500">
+        <div className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
           {sidebarPropRows.length} props
         </div>
       </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
         {sidebarPropRows.map((key) => (
-          <div key={key} className="rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2">
-            <div className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-zinc-400">
+          <div key={key} className="rounded-md border border-border bg-muted/40 px-3 py-2">
+            <div className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               {key}
             </div>
-            <div className="mt-1 truncate text-sm font-medium text-zinc-900">
+            <div className="mt-1 truncate text-sm font-medium text-foreground">
               {String(state[key])}
             </div>
           </div>

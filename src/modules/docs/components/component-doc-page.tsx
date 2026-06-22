@@ -13,17 +13,13 @@ export function ComponentDocPage({ doc, showcase }: { doc: ComponentDoc; showcas
   const Icon = doc.icon
 
   return (
-    <DocsPage className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8">
-      <div className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
+    <DocsPage>
+      <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
         <Icon className="size-4" />
         {doc.eyebrow}
       </div>
-      <DocsTitle className="mt-5 text-4xl font-semibold tracking-tight text-zinc-950 sm:text-6xl">
-        {doc.title}
-      </DocsTitle>
-      <DocsDescription className="max-w-3xl text-lg leading-8 text-zinc-600">
-        {doc.description}
-      </DocsDescription>
+      <DocsTitle className="mt-5">{doc.title}</DocsTitle>
+      <DocsDescription>{doc.description}</DocsDescription>
 
       <DocsBody className="max-w-none">
         <div className="not-prose space-y-10">
@@ -31,19 +27,19 @@ export function ComponentDocPage({ doc, showcase }: { doc: ComponentDoc; showcas
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: 'easeOut' }}
-            className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]"
+            className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]"
           >
-            <div className="space-y-4 rounded-lg border border-zinc-200 bg-[#f8fbfb] p-5">
-              <h2 className="text-xl font-semibold tracking-tight text-zinc-950">Install</h2>
-              <p className="text-sm leading-6 text-zinc-600">
+            <div className="min-w-0 space-y-4 rounded-lg border border-border bg-muted/35 p-5">
+              <h2 className="text-xl font-semibold tracking-tight text-foreground">Install</h2>
+              <p className="text-sm leading-6 text-muted-foreground">
                 Import from the component package barrel. Do not import from private internal
                 subfolders in feature code.
               </p>
               <DocsCodeBlock>{doc.importSnippet}</DocsCodeBlock>
             </div>
-            <div className="space-y-4 rounded-lg border border-zinc-200 bg-[#fbfaf7] p-5">
-              <h2 className="text-xl font-semibold tracking-tight text-zinc-950">Usage</h2>
-              <p className="text-sm leading-6 text-zinc-600">
+            <div className="min-w-0 space-y-4 rounded-lg border border-border bg-muted/25 p-5">
+              <h2 className="text-xl font-semibold tracking-tight text-foreground">Usage</h2>
+              <p className="text-sm leading-6 text-muted-foreground">
                 Start with the documented public API and move interactive variants to the showcase
                 when the state space gets large.
               </p>
@@ -59,7 +55,7 @@ export function ComponentDocPage({ doc, showcase }: { doc: ComponentDoc; showcas
 
           {showcase ? (
             <DocsSection title="Playground">
-              <div className="overflow-hidden rounded-xl border border-zinc-200 bg-[#f8faf9] p-2 shadow-sm">
+              <div className="overflow-hidden rounded-xl border border-border bg-muted/25 p-2 shadow-sm">
                 {showcase}
               </div>
             </DocsSection>
@@ -78,10 +74,10 @@ export function ComponentDocPage({ doc, showcase }: { doc: ComponentDoc; showcas
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-80px' }}
                   transition={{ delay: index * 0.04, duration: 0.4 }}
-                  className="space-y-4 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
+                  className="min-w-0 space-y-4 rounded-lg border border-border bg-card p-5 shadow-sm"
                 >
-                  <h3 className="text-lg font-semibold text-zinc-950">{section.title}</h3>
-                  <p className="text-sm leading-6 text-zinc-600">{section.body}</p>
+                  <h3 className="text-lg font-semibold text-foreground">{section.title}</h3>
+                  <p className="text-sm leading-6 text-muted-foreground">{section.body}</p>
                   {section.code ? <DocsCodeBlock>{section.code}</DocsCodeBlock> : null}
                 </motion.article>
               ))}
@@ -93,19 +89,19 @@ export function ComponentDocPage({ doc, showcase }: { doc: ComponentDoc; showcas
               {doc.accessibility.map((item) => (
                 <div
                   key={item}
-                  className="flex gap-3 rounded-lg border border-zinc-200 bg-white p-4 text-sm leading-6 text-zinc-600"
+                  className="flex gap-3 rounded-lg border border-border bg-card p-4 text-sm leading-6 text-muted-foreground"
                 >
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
                   {item}
                 </div>
               ))}
             </div>
           </DocsSection>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-zinc-950 p-5 text-white">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-foreground p-5 text-background">
             <div>
               <h2 className="text-xl font-semibold tracking-tight">Test it live</h2>
-              <p className="mt-1 text-sm text-zinc-300">
+              <p className="mt-1 text-sm text-background/70">
                 Use the showcase for controls, presets, and responsive preview states.
               </p>
             </div>
@@ -116,7 +112,11 @@ export function ComponentDocPage({ doc, showcase }: { doc: ComponentDoc; showcas
                   <ExternalLink className="size-4" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="border-white/20 bg-white/5 text-white">
+              <Button
+                asChild
+                variant="outline"
+                className="border-background/20 bg-background/5 text-background hover:bg-background/10 hover:text-background"
+              >
                 <Link to="/admin/docs/ui/components">
                   All components
                   <ArrowRight className="size-4" />

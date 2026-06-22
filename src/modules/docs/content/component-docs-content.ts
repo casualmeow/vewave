@@ -109,7 +109,7 @@ const glassUsageSnippet = `function LiquidItem(props: GlassFluidInteractionProps
       whileHover={{ scale: props.active ? config.activeHoverScale : config.hoverScale }}
       whileDrag={{ scale: config.dragScale }}
       transition={GLASS_FLUID_TRANSITION}
-      className="rounded-full border bg-white/40 px-4 py-2 backdrop-blur-xl"
+      className="rounded-full border bg-background/40 px-4 py-2 backdrop-blur-xl"
     >
       Liquid control
     </motion.button>

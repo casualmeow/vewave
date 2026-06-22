@@ -63,7 +63,7 @@ export function StudioSidebar({ className }: { className?: string }) {
           title="Your channel"
           subtitle="Channel name"
           meta={
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/65 px-2 py-0.5 text-[0.68rem] font-medium text-zinc-600 shadow-sm">
+            <span className="inline-flex items-center gap-1 rounded-full bg-card/65 px-2 py-0.5 text-[0.68rem] font-medium text-muted-foreground shadow-sm">
               <Clapperboard className="size-3" />
               Creator studio
             </span>
@@ -83,7 +83,7 @@ export function StudioSidebar({ className }: { className?: string }) {
                   </SidebarItemIcon>
                   <SidebarItemLabel>{item.label}</SidebarItemLabel>
                   {item.badge ? (
-                    <span className="ml-auto rounded-full bg-background px-2 py-0.5 text-[0.68rem] font-semibold leading-none text-white shadow-sm">
+                    <span className="ml-auto rounded-full bg-primary px-2 py-0.5 text-[0.68rem] font-semibold leading-none text-primary-foreground shadow-sm">
                       {item.badge}
                     </span>
                   ) : null}

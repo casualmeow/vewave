@@ -10,11 +10,9 @@ import { Button } from '@/shared/ui'
 
 export function DocsHomePage() {
   return (
-    <DocsPage className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8">
-      <DocsTitle className="text-4xl font-semibold tracking-tight text-zinc-950 sm:text-6xl">
-        Vewave Project Docs
-      </DocsTitle>
-      <DocsDescription className="max-w-3xl text-lg leading-8 text-zinc-600">
+    <DocsPage>
+      <DocsTitle>Vewave Project Docs</DocsTitle>
+      <DocsDescription>
         README content is now represented as an in-app Fumadocs-style documentation surface with
         architecture notes, setup commands, and UI guidance.
       </DocsDescription>
@@ -27,15 +25,15 @@ export function DocsHomePage() {
             transition={{ duration: 0.55, ease: 'easeOut' }}
             className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]"
           >
-            <div className="rounded-lg border border-zinc-200 bg-[#f9fbfa] p-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
+            <div className="rounded-lg border border-border bg-muted/35 p-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
                 <TerminalSquare className="size-4" />
                 Local workflow
               </div>
-              <h2 className="mt-5 text-2xl font-semibold tracking-tight text-zinc-950">
+              <h2 className="mt-5 text-2xl font-semibold tracking-tight text-foreground">
                 Run the app with generated backend clients.
               </h2>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600">
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
                 The frontend reads API URLs from Vite env, generates REST clients with Orval, and
                 keeps route files thin by importing module-level page compositions.
               </p>
@@ -56,20 +54,20 @@ export function DocsHomePage() {
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.08, duration: 0.45 }}
-              className="overflow-hidden rounded-lg border border-zinc-900 bg-zinc-950 shadow-2xl"
+              className="overflow-hidden rounded-lg border border-border bg-foreground text-background shadow-2xl"
             >
-              <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                <span className="text-sm text-zinc-300">README quick start</span>
-                <Copy className="size-4 text-zinc-500" />
+              <div className="flex items-center justify-between border-b border-background/10 px-4 py-3">
+                <span className="text-sm text-background/75">README quick start</span>
+                <Copy className="size-4 text-background/40" />
               </div>
               <div className="space-y-1 p-4 font-mono text-sm">
                 {quickStartCommands.map((item, index) => (
                   <div key={item.command} className="grid grid-cols-[1.5rem_1fr] gap-2">
-                    <span className="text-zinc-500">{index + 1}</span>
+                    <span className="text-background/40">{index + 1}</span>
                     <span>
-                      <span className="text-emerald-300">$</span>{' '}
-                      <span className="text-zinc-100">{item.command}</span>
-                      <span className="ml-3 hidden text-xs text-zinc-500 sm:inline">
+                      <span className="text-primary">$</span>{' '}
+                      <span className="text-background">{item.command}</span>
+                      <span className="ml-3 hidden text-xs text-background/45 sm:inline">
                         {item.label}
                       </span>
                     </span>
@@ -96,44 +94,44 @@ export function DocsHomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-80px' }}
                   transition={{ delay: index * 0.04, duration: 0.45 }}
-                  className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
+                  className="rounded-lg border border-border bg-card p-5 shadow-sm"
                 >
-                  <Icon className="size-5 text-teal-700" />
-                  <h3 className="mt-4 text-lg font-semibold text-zinc-950">{card.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-zinc-600">{card.description}</p>
+                  <Icon className="size-5 text-primary" />
+                  <h3 className="mt-4 text-lg font-semibold text-foreground">{card.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{card.description}</p>
                 </motion.article>
               )
             })}
           </section>
 
-          <section className="rounded-lg border border-zinc-200 bg-[#fbfaf7] p-5">
+          <section className="rounded-lg border border-border bg-muted/30 p-5">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <h2 className="text-2xl font-semibold tracking-tight text-zinc-950">
+                <h2 className="text-2xl font-semibold tracking-tight text-foreground">
                   Architecture Boundaries
                 </h2>
-                <p className="mt-2 text-sm leading-6 text-zinc-600">
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   These are the working boundaries from AGENTS.md, surfaced here for day-to-day
                   project work.
                 </p>
               </div>
-              <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-zinc-600 ring-1 ring-zinc-200">
+              <span className="rounded-full bg-card px-3 py-1 text-xs font-medium text-muted-foreground ring-1 ring-border">
                 module architecture
               </span>
             </div>
 
-            <div className="mt-5 divide-y divide-zinc-200 overflow-hidden rounded-lg border border-zinc-200 bg-white">
+            <div className="mt-5 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
               {architectureRows.map((row) => (
                 <div key={row.path} className="grid gap-3 p-4 sm:grid-cols-[13rem_1fr]">
-                  <code className="text-sm font-semibold text-zinc-950">{row.path}</code>
-                  <p className="text-sm leading-6 text-zinc-600">{row.purpose}</p>
+                  <code className="text-sm font-semibold text-foreground">{row.path}</code>
+                  <p className="text-sm leading-6 text-muted-foreground">{row.purpose}</p>
                 </div>
               ))}
             </div>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold tracking-tight text-zinc-950">
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground">
               Backend Integration Checklist
             </h2>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -145,9 +143,9 @@ export function DocsHomePage() {
               ].map((item) => (
                 <div
                   key={item}
-                  className="flex gap-3 rounded-lg border border-zinc-200 bg-white p-4 text-sm leading-6 text-zinc-600"
+                  className="flex gap-3 rounded-lg border border-border bg-card p-4 text-sm leading-6 text-muted-foreground"
                 >
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
                   {item}
                 </div>
               ))}
@@ -155,10 +153,10 @@ export function DocsHomePage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold tracking-tight text-zinc-950">
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground">
               Documentation Surfaces
             </h2>
-            <p className="mt-2 text-sm leading-6 text-zinc-600">
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
               Cards are used for quick navigation while the module owns Vewave-specific layout and
               animation behavior.
             </p>

@@ -219,7 +219,7 @@ export const RESIZABLE_CARD_ANIMATION_PRESET_DEFINITIONS = [
     container: { type: 'spring', stiffness: 220, damping: 26, mass: 0.85 },
     media: fadeStandard,
     text: fadeStandard,
-    dialogClassName: 'shadow-2xl ring-1 ring-black/5',
+    dialogClassName: 'shadow-2xl ring-1 ring-foreground/5',
   }),
   definePreset({
     id: 'elevation-lift',
@@ -230,8 +230,8 @@ export const RESIZABLE_CARD_ANIMATION_PRESET_DEFINITIONS = [
     sharedLayout: contentContinuityLayout,
     container: { type: 'spring', stiffness: 230, damping: 27, mass: 0.8 },
     backdrop: { duration: 0.22, ease: 'easeOut' },
-    backdropClassName: 'bg-black/45 backdrop-blur-sm',
-    dialogClassName: 'shadow-[0_32px_100px_rgba(15,23,42,0.32)]',
+    backdropClassName: 'bg-foreground/45 backdrop-blur-sm',
+    dialogClassName: 'shadow-[0_32px_100px_color-mix(in_srgb,var(--foreground)_32%,transparent)]',
   }),
   definePreset({
     id: 'surface-grow',
@@ -561,8 +561,8 @@ export const RESIZABLE_CARD_ANIMATION_PRESET_DEFINITIONS = [
     container: softSpring,
     media: { type: 'spring', stiffness: 260, damping: 26, mass: 0.8 },
     backdrop: { duration: 0.24, ease: 'easeOut' },
-    backdropClassName: 'bg-black/55 backdrop-blur-md',
-    dialogClassName: 'shadow-[0_34px_120px_rgba(0,0,0,0.38)]',
+    backdropClassName: 'bg-foreground/55 backdrop-blur-md',
+    dialogClassName: 'shadow-[0_34px_120px_color-mix(in_srgb,var(--foreground)_38%,transparent)]',
   }),
   definePreset({
     id: 'blur-reveal',

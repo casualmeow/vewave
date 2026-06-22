@@ -49,7 +49,7 @@ function CropperCropArea({
     <CropperPrimitive.CropArea
       data-slot="cropper-crop-area"
       className={cn(
-        'pointer-events-none absolute border-3 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.3)] in-[[data-slot=cropper]:focus-visible]:ring-[3px] in-[[data-slot=cropper]:focus-visible]:ring-white/50',
+        'pointer-events-none absolute border-3 border-background shadow-[0_0_0_9999px_color-mix(in_srgb,var(--foreground)_30%,transparent)] in-[[data-slot=cropper]:focus-visible]:ring-[3px] in-[[data-slot=cropper]:focus-visible]:ring-background/50',
         className,
       )}
       {...props}

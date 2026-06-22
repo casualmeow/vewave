@@ -2,6 +2,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
 import { headerItems } from '../config'
 import { Header, HeaderButton, HeaderLogo, HeaderNav, HeaderNavItem } from '@/components/header'
+import { VewaveLogoMark } from '@/shared/theme'
 
 export function LandingHeader() {
   const navigate = useNavigate()
@@ -23,15 +24,7 @@ export function LandingHeader() {
       revealAtTop={32}
       navigationLabel="Landing"
       logo={
-        <HeaderLogo
-          href="/"
-          icon={
-            <span className="grid size-8 place-items-center rounded-full bg-white text-sm font-black text-zinc-950">
-              V
-            </span>
-          }
-          text="Vewave"
-        />
+        <HeaderLogo href="/" icon={<VewaveLogoMark surfaceToken="foreground" />} text="Vewave" />
       }
       navigation={
         <HeaderNav>

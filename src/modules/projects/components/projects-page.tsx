@@ -25,20 +25,20 @@ export function ProjectsPage() {
       <div className="mx-auto grid w-full max-w-7xl gap-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
+            <p className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
               <FolderKanban className="size-4" />
               Projects
             </p>
-            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-zinc-950">
+            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-foreground">
               Your watch workspace
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
               Create room-ready projects, reopen old watch sessions, and keep synchronized playback
               contexts in one place.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 rounded-3xl border border-zinc-200 bg-white/75 p-2 shadow-sm backdrop-blur">
+          <div className="grid grid-cols-3 gap-2 rounded-3xl border border-border bg-card/75 p-2 shadow-sm backdrop-blur">
             {[
               { label: 'Projects', value: projects.length, icon: FolderKanban },
               { label: 'Active', value: activeProjects, icon: UsersRound },
@@ -51,10 +51,10 @@ export function ProjectsPage() {
               const Icon = item.icon
 
               return (
-                <div key={item.label} className="min-w-24 rounded-2xl bg-white px-4 py-3 shadow-sm">
-                  <Icon className="size-4 text-teal-700" />
-                  <div className="mt-2 text-xl font-semibold text-zinc-950">{item.value}</div>
-                  <div className="text-xs text-zinc-500">{item.label}</div>
+                <div key={item.label} className="min-w-24 rounded-2xl bg-card px-4 py-3 shadow-sm">
+                  <Icon className="size-4 text-primary" />
+                  <div className="mt-2 text-xl font-semibold text-foreground">{item.value}</div>
+                  <div className="text-xs text-muted-foreground">{item.label}</div>
                 </div>
               )
             })}
@@ -66,14 +66,14 @@ export function ProjectsPage() {
         <section className="grid gap-4">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight text-zinc-950">
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
                 Existing projects
               </h2>
-              <p className="mt-1 text-sm text-zinc-600">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Open a saved project to inspect its room state and continue watching.
               </p>
             </div>
-            <Button asChild variant="outline" className="rounded-full bg-white">
+            <Button asChild variant="outline" className="rounded-full bg-card">
               <Link to="/create">
                 Create room
                 <ArrowRight className="size-4" />
@@ -88,7 +88,7 @@ export function ProjectsPage() {
             variant="ghost"
             size="default"
             actionVariant="default"
-            className="rounded-[2rem] border border-zinc-200 bg-white/70 p-4 shadow-sm"
+            className="rounded-[2rem] border border-border bg-card/70 p-4 shadow-sm"
             listClassName="mx-0 max-w-none gap-4 md:grid-cols-2 xl:grid-cols-3"
             compactSize={{
               width: '100%',
@@ -116,8 +116,8 @@ export function ProjectsPage() {
             renderContent={(item) => <ProjectExpandedContent item={item} />}
           />
 
-          <div className="flex items-center gap-2 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600">
-            <Clock3 className="size-4 text-teal-700" />
+          <div className="flex items-center gap-2 rounded-2xl border border-border bg-muted/45 px-4 py-3 text-sm text-muted-foreground">
+            <Clock3 className="size-4 text-primary" />
             Recently created mock projects stay in this session only. Backend persistence can be
             wired into the same module later.
           </div>

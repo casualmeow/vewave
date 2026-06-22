@@ -20,12 +20,12 @@ const shadixTransition = {
 
 export function ShadixReferencePreview() {
   return (
-    <div className="mt-5 rounded-lg border border-zinc-200 bg-white p-5">
+    <div className="mt-5 rounded-lg border border-border bg-card p-5">
       <div className="mb-5 max-w-2xl">
-        <h4 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+        <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Shadix-style compound API
         </h4>
-        <p className="mt-2 text-sm leading-6 text-zinc-600">
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
           These cards use the new compound exports from `@/components/resizable-card`. The compact
           body and expanded container share the same surface identity, while image, title, and
           description preserve continuity.
@@ -37,7 +37,7 @@ export function ShadixReferencePreview() {
           <li key={item.id}>
             <ResizableCard transition={shadixTransition}>
               <ResizableCardBody className="h-full w-full rounded-2xl pb-4">
-                <div className="h-56 overflow-hidden rounded-t-2xl bg-zinc-100">
+                <div className="h-56 overflow-hidden rounded-t-2xl bg-muted">
                   <ResizableCardImage src={item.src} alt={item.imageAlt ?? ''} />
                 </div>
                 <ResizableCardTitle>{item.title}</ResizableCardTitle>
@@ -45,7 +45,7 @@ export function ShadixReferencePreview() {
               </ResizableCardBody>
 
               <ResizableCardExpandContainer className="w-[min(92vw,34rem)] rounded-3xl pb-0">
-                <div className="h-72 overflow-hidden bg-zinc-100">
+                <div className="h-72 overflow-hidden bg-muted">
                   <ResizableCardImage src={item.src} alt={item.imageAlt ?? ''} />
                 </div>
                 <div className="flex items-start justify-between gap-4 pr-12">
@@ -58,7 +58,7 @@ export function ShadixReferencePreview() {
                       href={item.ctaLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="mt-4 shrink-0 rounded-full bg-emerald-500 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-emerald-600"
+                      className="mt-4 shrink-0 rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
                     >
                       {item.ctaText}
                     </a>

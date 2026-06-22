@@ -12,7 +12,7 @@ export function CheckboxField({
   onChange: (checked: boolean) => void
 }) {
   return (
-    <label className="flex items-center justify-between gap-3 rounded-md border border-zinc-200 px-3 py-2 text-sm has-disabled:opacity-50">
+    <label className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2 text-sm has-disabled:opacity-50">
       <span>{label}</span>
       <Checkbox
         checked={checked}

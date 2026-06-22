@@ -20,39 +20,38 @@ export const headerVariants = cva(
       },
       variant: {
         glass: [
-          'border-white/[0.24] bg-white/[0.14] text-white',
-          'shadow-[0_18px_54px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.24),inset_0_-1px_0_rgba(255,255,255,0.08)]',
+          'border-[color:var(--glass-border)] bg-[var(--glass-background)] text-header-foreground',
+          'shadow-[0_18px_54px_color-mix(in_srgb,var(--foreground)_16%,transparent),inset_0_1px_0_var(--glass-highlight)]',
         ],
         glassDark: [
-          'border-white/[0.12] bg-black/[0.45] text-white',
-          'shadow-[0_16px_48px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.10)]',
+          'border-[color:var(--glass-border)] bg-[color-mix(in_srgb,var(--background)_72%,transparent)] text-header-foreground',
+          'shadow-[0_16px_48px_color-mix(in_srgb,var(--foreground)_24%,transparent),inset_0_1px_0_var(--glass-highlight)]',
         ],
         glassLight: [
-          'border-white/[0.60] bg-white/[0.75] text-zinc-950',
-          'shadow-[0_16px_48px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.80)]',
-          'dark:border-white/[0.10] dark:bg-zinc-950/[0.60] dark:text-zinc-50',
+          'border-header-border bg-header text-header-foreground',
+          'shadow-[0_16px_48px_color-mix(in_srgb,var(--foreground)_10%,transparent),inset_0_1px_0_var(--glass-highlight)]',
         ],
         liquidGlass: [
-          'border-white/[0.52] bg-[linear-gradient(135deg,rgba(255,255,255,0.68),rgba(255,255,255,0.26)_44%,rgba(226,252,247,0.36)_100%)] text-zinc-950',
-          'shadow-[0_26px_84px_rgba(15,23,42,0.20),0_10px_28px_rgba(20,184,166,0.10),inset_0_1px_0_rgba(255,255,255,0.92),inset_0_-1px_0_rgba(255,255,255,0.26)]',
-          'supports-[backdrop-filter]:bg-white/[0.26] dark:border-white/[0.14] dark:bg-white/[0.08] dark:text-zinc-50',
+          'border-[color:var(--glass-border)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--glass-highlight)_76%,transparent),var(--glass-background)_44%,color-mix(in_srgb,var(--accent)_24%,transparent)_100%)] text-header-foreground',
+          'shadow-[0_26px_84px_color-mix(in_srgb,var(--foreground)_20%,transparent),0_10px_28px_color-mix(in_srgb,var(--accent)_14%,transparent),inset_0_1px_0_var(--glass-highlight)]',
+          'supports-[backdrop-filter]:bg-[var(--glass-background)]',
         ],
         telegramGlass: [
-          'border-white/[0.36] bg-[linear-gradient(180deg,rgba(255,255,255,0.42),rgba(255,255,255,0.18))] text-zinc-950',
-          'shadow-[0_18px_64px_rgba(15,23,42,0.16),inset_0_1px_0_rgba(255,255,255,0.74),inset_0_-1px_0_rgba(255,255,255,0.18)]',
-          'supports-[backdrop-filter]:bg-white/[0.20] dark:border-white/[0.12] dark:bg-black/[0.32] dark:text-white',
+          'border-[color:var(--glass-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--glass-highlight)_58%,transparent),var(--glass-background))] text-header-foreground',
+          'shadow-[0_18px_64px_color-mix(in_srgb,var(--foreground)_16%,transparent),inset_0_1px_0_var(--glass-highlight)]',
+          'supports-[backdrop-filter]:bg-[var(--glass-background)]',
         ],
         solid: [
-          'border-border/[0.80] bg-background/[0.95] text-foreground',
-          'shadow-[0_16px_48px_rgba(0,0,0,0.18)]',
+          'border-border bg-background text-foreground',
+          'shadow-[0_16px_48px_color-mix(in_srgb,var(--foreground)_18%,transparent)]',
         ],
         gradient: [
-          'border-white/[0.15] bg-[linear-gradient(135deg,rgba(30,30,40,0.92)_0%,rgba(16,16,24,0.96)_100%)] text-white',
-          'shadow-[0_16px_48px_rgba(0,0,0,0.28)]',
+          'border-header-border bg-[linear-gradient(135deg,var(--surface-elevated)_0%,var(--background)_100%)] text-header-foreground',
+          'shadow-[0_16px_48px_color-mix(in_srgb,var(--foreground)_24%,transparent)]',
         ],
         glow: [
-          'border-white/[0.15] bg-black/[0.50] text-white',
-          'shadow-[0_16px_48px_rgba(0,0,0,0.32),0_0_56px_color-mix(in_srgb,var(--header-glow)_40%,transparent)]',
+          'border-header-border bg-header text-header-foreground',
+          'shadow-[0_16px_48px_color-mix(in_srgb,var(--foreground)_28%,transparent),0_0_56px_color-mix(in_srgb,var(--header-glow)_40%,transparent)]',
         ],
       },
     },
@@ -68,7 +67,7 @@ export const headerNavItemVariants = cva(
   [
     'relative inline-flex select-none items-center justify-center whitespace-nowrap rounded-full',
     'text-sm font-medium outline-none transition-[background-color,color,opacity,box-shadow,filter]',
-    'focus-visible:ring-2 focus-visible:ring-white/[0.42] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
+    'focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
   ],
   {
     variants: {
@@ -79,11 +78,11 @@ export const headerNavItemVariants = cva(
       },
       active: {
         true: [
-          'bg-white/[0.64] text-zinc-950 opacity-100 shadow-[0_10px_28px_rgba(15,23,42,0.12),inset_0_1px_0_rgba(255,255,255,0.88)]',
-          'backdrop-blur-xl dark:bg-white/[0.16] dark:text-white',
+          'bg-[var(--tabs-active)] text-foreground opacity-100 shadow-[0_10px_28px_color-mix(in_srgb,var(--foreground)_12%,transparent),inset_0_1px_0_var(--glass-highlight)]',
+          'backdrop-blur-xl',
         ],
         false:
-          'text-current opacity-76 hover:bg-white/[0.22] hover:opacity-100 hover:[filter:saturate(1.14)] dark:hover:bg-white/[0.10]',
+          'text-current opacity-76 hover:bg-accent/45 hover:opacity-100 hover:[filter:saturate(1.14)]',
       },
       disabled: {
         true: 'pointer-events-none cursor-not-allowed opacity-45',
@@ -102,7 +101,7 @@ export const headerButtonVariants = cva(
   [
     'inline-flex select-none items-center justify-center gap-2 rounded-full font-medium',
     'outline-none transition-[background-color,border-color,color,box-shadow,transform,opacity,filter]',
-    'focus-visible:ring-2 focus-visible:ring-white/[0.42] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
+    'focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
     'disabled:pointer-events-none disabled:opacity-55',
     'active:scale-[0.98]',
   ],
@@ -110,11 +109,11 @@ export const headerButtonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-white/[0.78] text-zinc-950 shadow-[0_10px_28px_rgba(15,23,42,0.12),inset_0_1px_0_rgba(255,255,255,0.86)] backdrop-blur-xl hover:bg-white/[0.90]',
+          'bg-primary text-primary-foreground shadow-[0_10px_28px_color-mix(in_srgb,var(--primary)_18%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-xl hover:bg-primary/90',
         outline:
-          'border border-current/45 bg-transparent text-current hover:bg-white/[0.14] hover:[filter:saturate(1.12)]',
-        ghost: 'bg-transparent text-current opacity-80 hover:bg-white/[0.14] hover:opacity-100',
-        soft: 'bg-white/[0.18] text-current shadow-[inset_0_1px_0_rgba(255,255,255,0.24)] hover:bg-white/[0.26]',
+          'border border-current/45 bg-transparent text-current hover:bg-accent/45 hover:[filter:saturate(1.12)]',
+        ghost: 'bg-transparent text-current opacity-80 hover:bg-accent/45 hover:opacity-100',
+        soft: 'bg-accent/45 text-accent-foreground shadow-[inset_0_1px_0_var(--glass-highlight)] hover:bg-accent/60',
       },
       size: {
         sm: 'h-8 px-3 text-xs',

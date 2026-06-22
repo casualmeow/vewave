@@ -50,7 +50,7 @@ export function ResizableCardShowcaseControls({
           options={RESIZABLE_CARD_PRESENTATIONS}
           onChange={onPresentationChange}
         />
-        <p className="text-sm leading-6 text-zinc-600">
+        <p className="text-sm leading-6 text-muted-foreground">
           Inline keeps the utility layout. Media uses the polished resizable-card structure with a
           media surface, stable text motion, and independently revealed details.
         </p>
@@ -69,11 +69,11 @@ export function ResizableCardShowcaseControls({
           options={presetOptions}
           onChange={(value) => onStateChange('animationPreset', value)}
         />
-        <p className="text-sm leading-6 text-zinc-600">
+        <p className="text-sm leading-6 text-muted-foreground">
           {selectedPreset?.description ??
             'Shared-layout morphs are richest when compact and expanded geometry match.'}
         </p>
-        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Family: {selectedPreset?.family ?? 'n/a'} · Recommended:{' '}
           {selectedPreset?.recommendedPresentation ?? 'both'}
         </p>

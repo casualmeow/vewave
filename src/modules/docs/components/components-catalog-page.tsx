@@ -8,15 +8,13 @@ import { Button } from '@/shared/ui'
 
 export function ComponentsCatalogPage() {
   return (
-    <DocsPage className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8">
-      <div className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
+    <DocsPage>
+      <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
         <BookOpen className="size-4" />
         UI kit documentation
       </div>
-      <DocsTitle className="mt-5 text-4xl font-semibold tracking-tight text-zinc-950 sm:text-6xl">
-        Components
-      </DocsTitle>
-      <DocsDescription className="max-w-3xl text-lg leading-8 text-zinc-600">
+      <DocsTitle className="mt-5">Components</DocsTitle>
+      <DocsDescription>
         Public component documentation has moved out of component folders and into docs routes, like
         a UI kit reference.
       </DocsDescription>
@@ -33,13 +31,15 @@ export function ComponentsCatalogPage() {
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05, duration: 0.45 }}
-                  className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
+                  className="rounded-lg border border-border bg-card p-5 shadow-sm"
                 >
-                  <Icon className="size-5 text-teal-700" />
-                  <h2 className="mt-4 text-2xl font-semibold tracking-tight text-zinc-950">
+                  <Icon className="size-5 text-primary" />
+                  <h2 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">
                     {component.title}
                   </h2>
-                  <p className="mt-2 text-sm leading-6 text-zinc-600">{component.description}</p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {component.description}
+                  </p>
                   <Button asChild className="mt-5" variant="outline">
                     <Link to={component.to}>
                       Read docs
@@ -56,13 +56,10 @@ export function ComponentsCatalogPage() {
               const Icon = item.icon
 
               return (
-                <div
-                  key={item.title}
-                  className="rounded-lg border border-zinc-200 bg-[#f8fbfb] p-5"
-                >
-                  <Icon className="size-5 text-teal-700" />
-                  <h3 className="mt-4 text-lg font-semibold text-zinc-950">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-zinc-600">{item.description}</p>
+                <div key={item.title} className="rounded-lg border border-border bg-muted/35 p-5">
+                  <Icon className="size-5 text-primary" />
+                  <h3 className="mt-4 text-lg font-semibold text-foreground">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
                 </div>
               )
             })}

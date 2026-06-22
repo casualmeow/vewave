@@ -9,6 +9,7 @@ import { routeTree } from './routeTree.gen'
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
 import { AuthBootstrap } from '@/modules/auth'
+import { AppThemeProvider } from '@/shared/theme'
 
 // Create a new router instance
 const router = createRouter({
@@ -43,11 +44,13 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <AuthBootstrap>
-          <RouterProvider router={router} />
-        </AuthBootstrap>
-      </QueryClientProvider>
+      <AppThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthBootstrap>
+            <RouterProvider router={router} />
+          </AuthBootstrap>
+        </QueryClientProvider>
+      </AppThemeProvider>
     </StrictMode>,
   )
 }

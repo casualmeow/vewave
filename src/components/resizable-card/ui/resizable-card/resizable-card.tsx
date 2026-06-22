@@ -230,7 +230,10 @@ export function ResizableCardExpandContainer({
           <motion.div
             data-slot="resizable-card-overlay"
             key={`resizable-card-overlay-${uniqueId}`}
-            className={cn('fixed inset-0 z-40 bg-white/40 dark:bg-black/40', overlayClassName)}
+            className={cn(
+              'fixed inset-0 z-40 bg-background/40 dark:bg-foreground/40',
+              overlayClassName,
+            )}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

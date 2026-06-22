@@ -243,7 +243,7 @@ export function SidebarItem({
       {design === 'liquidGlass' ? (
         <motion.span
           aria-hidden="true"
-          className="pointer-events-none absolute rounded-[1.6rem] border border-white/0 bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),rgba(255,255,255,0.64),rgba(255,255,255,0.14)_35%,transparent_64%),linear-gradient(135deg,rgba(255,255,255,0.22),rgba(255,255,255,0.05))] opacity-[calc(var(--item-pointer-glow)*0.95)] shadow-[inset_0_1px_0_rgba(255,255,255,0.50)] backdrop-blur-sm transition-[opacity,border-color] duration-150 group-hover/sidebar-item-shell:border-white/32"
+          className="pointer-events-none absolute rounded-[1.6rem] border border-transparent bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),var(--glass-highlight),color-mix(in_srgb,var(--glass-highlight)_34%,transparent)_35%,transparent_64%),linear-gradient(135deg,color-mix(in_srgb,var(--glass-highlight)_28%,transparent),transparent)] opacity-[calc(var(--item-pointer-glow)*0.95)] shadow-[inset_0_1px_0_var(--glass-highlight)] backdrop-blur-sm transition-[opacity,border-color] duration-150 group-hover/sidebar-item-shell:border-[color:var(--glass-border)]"
           style={{ filter: canFluid ? `url(#${filterIds.refraction})` : undefined }}
           animate={{
             top: liquidInset,
@@ -260,7 +260,7 @@ export function SidebarItem({
           <motion.span
             key="fluid-field"
             aria-hidden="true"
-            className="pointer-events-none absolute overflow-hidden rounded-[1.7rem] border border-white/40 bg-[linear-gradient(135deg,rgba(255,255,255,0.40),rgba(255,255,255,0.10)_45%,rgba(153,246,228,0.24))] shadow-[0_20px_52px_rgba(15,23,42,0.16),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl"
+            className="pointer-events-none absolute overflow-hidden rounded-[1.7rem] border border-[color:var(--glass-border)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--glass-highlight)_48%,transparent),var(--glass-background)_45%,color-mix(in_srgb,var(--accent)_24%,transparent))] shadow-[0_20px_52px_color-mix(in_srgb,var(--foreground)_16%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-2xl"
             style={{ filter: `url(#${filterIds.refraction})` }}
             initial={{ opacity: 0, scale: 0.82, top: 0, right: 0, bottom: 0, left: 0 }}
             animate={{
@@ -274,24 +274,24 @@ export function SidebarItem({
             exit={{ opacity: 0, scale: 0.9, top: 0, right: 0, bottom: 0, left: 0 }}
             transition={transition}
           >
-            <span className="absolute inset-0 bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),rgba(255,255,255,0.92),transparent_42%)]" />
+            <span className="absolute inset-0 bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),var(--glass-highlight),transparent_42%)]" />
             <span className="absolute inset-0" style={{ filter: `url(#${filterIds.gooStrong})` }}>
               <motion.span
-                className="absolute -left-6 top-1/2 size-20 -translate-y-1/2 rounded-full bg-teal-100/35"
+                className="absolute -left-6 top-1/2 size-20 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--accent)_30%,transparent)]"
                 animate={canAnimate ? { x: [0, 11, -4, 0], scale: [1, 1.28, 0.96, 1] } : undefined}
                 transition={
                   canAnimate ? { duration: 2.6, repeat: Infinity, ease: 'easeInOut' } : undefined
                 }
               />
               <motion.span
-                className="absolute left-[var(--item-pointer-x)] top-[var(--item-pointer-y)] size-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/45"
+                className="absolute left-[var(--item-pointer-x)] top-[var(--item-pointer-y)] size-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--glass-highlight)_45%,transparent)]"
                 animate={canAnimate ? { scale: [0.72, 1.34, 0.9] } : undefined}
                 transition={
                   canAnimate ? { duration: 0.95, repeat: Infinity, ease: 'easeInOut' } : undefined
                 }
               />
               <motion.span
-                className="absolute -right-7 bottom-0 size-20 rounded-full bg-sky-100/32"
+                className="absolute -right-7 bottom-0 size-20 rounded-full bg-[color-mix(in_srgb,var(--primary)_28%,transparent)]"
                 animate={canAnimate ? { x: [0, -9, 4, 0], scale: [1, 0.88, 1.2, 1] } : undefined}
                 transition={
                   canAnimate ? { duration: 2.9, repeat: Infinity, ease: 'easeInOut' } : undefined
@@ -318,28 +318,28 @@ export function SidebarItem({
             className="pointer-events-none absolute inset-0"
             style={{ filter: `url(#${filterIds.refraction})` }}
           />
-          <span className="pointer-events-none absolute inset-x-2 top-0 h-px bg-gradient-to-r from-transparent via-white/95 to-transparent" />
-          <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),rgba(255,255,255,0.90),transparent_38%)] opacity-[calc(0.35+var(--item-pointer-glow)*0.55)]" />
+          <span className="pointer-events-none absolute inset-x-2 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--glass-highlight),transparent)]" />
+          <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),var(--glass-highlight),transparent_38%)] opacity-[calc(0.35+var(--item-pointer-glow)*0.55)]" />
           <span
             className="pointer-events-none absolute inset-0"
             style={{ filter: `url(#${filterIds.gooStrong})` }}
           >
             <motion.span
-              className="absolute -left-4 top-1/2 size-16 -translate-y-1/2 rounded-full bg-teal-100/36"
+              className="absolute -left-4 top-1/2 size-16 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--accent)_30%,transparent)]"
               animate={canAnimate ? { x: [0, 8, -3, 0], scale: [1, 1.18, 0.94, 1] } : undefined}
               transition={
                 canAnimate ? { duration: 3.2, repeat: Infinity, ease: 'easeInOut' } : undefined
               }
             />
             <motion.span
-              className="absolute left-[var(--item-pointer-x)] top-[var(--item-pointer-y)] size-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/46"
+              className="absolute left-[var(--item-pointer-x)] top-[var(--item-pointer-y)] size-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--glass-highlight)_46%,transparent)]"
               animate={canAnimate ? { scale: [0.76, 1.24, 0.88] } : undefined}
               transition={
                 canAnimate ? { duration: 1.05, repeat: Infinity, ease: 'easeInOut' } : undefined
               }
             />
             <motion.span
-              className="absolute -right-5 bottom-0 size-16 rounded-full bg-sky-100/34"
+              className="absolute -right-5 bottom-0 size-16 rounded-full bg-[color-mix(in_srgb,var(--primary)_30%,transparent)]"
               animate={canAnimate ? { x: [0, -7, 3, 0], scale: [1, 0.88, 1.12, 1] } : undefined}
               transition={
                 canAnimate ? { duration: 2.9, repeat: Infinity, ease: 'easeInOut' } : undefined

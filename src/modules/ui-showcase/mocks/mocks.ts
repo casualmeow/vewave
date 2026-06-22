@@ -7,28 +7,28 @@ export const catalogItems = [
     label: 'Header',
     description: 'Live header playground with scroll-linked behavior.',
     icon: PanelTop,
-    tone: 'from-teal-300 to-sky-400',
+    tone: 'from-[color-mix(in_oklab,var(--primary)_36%,var(--background))] to-[color-mix(in_oklab,var(--accent)_34%,var(--background))]',
   },
   {
     href: '#sidebar',
     label: 'Sidebar',
     description: 'Solid, glass, and fluent app-shell navigation variants.',
     icon: PanelLeft,
-    tone: 'from-cyan-300 to-teal-400',
+    tone: 'from-[color-mix(in_oklab,var(--accent)_38%,var(--background))] to-[color-mix(in_oklab,var(--primary)_32%,var(--background))]',
   },
   {
     href: '#resizable-card',
     label: 'ResizableCard',
     description: 'Item-list cards plus Shadix-style compound expandable cards.',
     icon: Box,
-    tone: 'from-violet-300 to-fuchsia-400',
+    tone: 'from-[color-mix(in_oklab,var(--accent)_42%,var(--background))] to-[color-mix(in_oklab,var(--primary)_26%,var(--secondary))]',
   },
   {
     href: '#resizable-card',
     label: 'Media rail',
     description: 'Aceternity-style card data using image, CTA, and content props.',
     icon: Sparkles,
-    tone: 'from-lime-300 to-emerald-400',
+    tone: 'from-[color-mix(in_oklab,var(--success)_36%,var(--background))] to-[color-mix(in_oklab,var(--primary)_30%,var(--background))]',
   },
 ]
 

@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 export const demoMediaVariants = cva(
-  'grid place-items-center rounded-xl bg-gradient-to-br text-zinc-950',
+  'grid place-items-center rounded-xl bg-gradient-to-br text-foreground',
   {
     variants: {
       size: {
@@ -9,9 +9,12 @@ export const demoMediaVariants = cva(
         expanded: 'h-28 w-full',
       },
       tone: {
-        preview: 'from-teal-300 to-sky-400',
-        content: 'from-violet-300 to-fuchsia-400',
-        interaction: 'from-lime-300 to-emerald-400',
+        preview:
+          'from-[color-mix(in_oklab,var(--primary)_36%,var(--background))] to-[color-mix(in_oklab,var(--accent)_34%,var(--background))]',
+        content:
+          'from-[color-mix(in_oklab,var(--accent)_42%,var(--background))] to-[color-mix(in_oklab,var(--primary)_26%,var(--secondary))]',
+        interaction:
+          'from-[color-mix(in_oklab,var(--success)_36%,var(--background))] to-[color-mix(in_oklab,var(--primary)_30%,var(--background))]',
       },
     },
     defaultVariants: {

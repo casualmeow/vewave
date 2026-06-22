@@ -109,7 +109,7 @@ type FormDemoValues = {
 
 function DemoFrame({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-[radial-gradient(circle_at_12%_0%,rgba(45,212,191,0.12),transparent_16rem),linear-gradient(135deg,#ffffff,#f8fafc)] p-5 shadow-sm">
+    <div className="rounded-xl border border-border bg-[radial-gradient(circle_at_12%_0%,color-mix(in_srgb,var(--primary)_12%,transparent),transparent_16rem),linear-gradient(135deg,var(--card),var(--muted))] p-5 shadow-sm">
       {children}
     </div>
   )
@@ -135,15 +135,15 @@ function ButtonDemo() {
 function CardDemo() {
   return (
     <DemoFrame>
-      <Card className="max-w-md border-zinc-200 bg-white/90">
+      <Card className="max-w-md border-border bg-card/90">
         <CardHeader>
           <CardTitle>Room snapshot</CardTitle>
           <CardDescription>Card primitives create generic layout surfaces.</CardDescription>
           <CardAction>
-            <BadgeCheck className="size-5 text-teal-700" />
+            <BadgeCheck className="size-5 text-primary" />
           </CardAction>
         </CardHeader>
-        <CardContent className="text-sm leading-6 text-zinc-600">
+        <CardContent className="text-sm leading-6 text-muted-foreground">
           Product-specific content stays in modules. Card only owns spacing and visual structure.
         </CardContent>
         <CardFooter>
@@ -158,11 +158,11 @@ function AvatarDemo() {
   return (
     <DemoFrame>
       <div className="flex items-center gap-4">
-        <Avatar className="size-14 border border-white shadow-sm">
+        <Avatar className="size-14 border border-background shadow-sm">
           <AvatarImage src="https://github.com/shadcn.png" alt="Example avatar" />
           <AvatarFallback>SC</AvatarFallback>
         </Avatar>
-        <Avatar className="size-14 border border-white shadow-sm">
+        <Avatar className="size-14 border border-background shadow-sm">
           <AvatarFallback>VW</AvatarFallback>
         </Avatar>
       </div>
@@ -191,7 +191,7 @@ function CropperDemo() {
   return (
     <DemoFrame>
       <Cropper
-        className="h-56 rounded-xl bg-zinc-950"
+        className="h-56 rounded-xl bg-foreground"
         image="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80"
         aspectRatio={1}
       >
@@ -317,7 +317,7 @@ function ProgressDemo() {
       <div className="grid max-w-md gap-4">
         <div className="flex items-center justify-between text-sm">
           <Label>Upload progress</Label>
-          <span className="font-medium text-zinc-700">{value[0]}%</span>
+          <span className="font-medium text-foreground">{value[0]}%</span>
         </div>
         <Progress value={value[0]} />
         <Slider value={value} onValueChange={setValue} max={100} step={1} />
@@ -372,10 +372,12 @@ function SelectDemo() {
 function SeparatorDemo() {
   return (
     <DemoFrame>
-      <div className="max-w-md rounded-xl border border-zinc-200 bg-white p-4">
-        <div className="font-medium text-zinc-950">Room controls</div>
+      <div className="max-w-md rounded-xl border border-border bg-card p-4">
+        <div className="font-medium text-foreground">Room controls</div>
         <Separator className="my-4" />
-        <div className="text-sm text-zinc-600">Separator divides related interface regions.</div>
+        <div className="text-sm text-muted-foreground">
+          Separator divides related interface regions.
+        </div>
       </div>
     </DemoFrame>
   )
@@ -410,7 +412,7 @@ function SliderDemo() {
       <div className="grid max-w-md gap-3">
         <div className="flex items-center justify-between text-sm">
           <Label>Volume</Label>
-          <span className="font-medium text-zinc-700">{volume[0]}%</span>
+          <span className="font-medium text-foreground">{volume[0]}%</span>
         </div>
         <Slider value={volume} onValueChange={setVolume} max={100} step={1} />
       </div>
@@ -440,7 +442,7 @@ function SonnerDemo() {
 function SpinningIconDemo() {
   return (
     <DemoFrame>
-      <div className="flex flex-wrap items-center gap-5 rounded-xl bg-zinc-950 p-5 text-white">
+      <div className="flex flex-wrap items-center gap-5 rounded-xl bg-foreground p-5 text-background">
         <SpinIcon label="Syncing" showLabel behavior="always" glyph="arc" />
         <SpinIcon label="Hover" showLabel behavior="hover" glyph="ring" hoverDuration={1000} />
         <SpinIcon label="Drag" showLabel behavior="drag" glyph="dots" draggable />
@@ -477,18 +479,15 @@ function TableDemo() {
 function TabsDemo() {
   return (
     <DemoFrame>
-      <Tabs
-        defaultValue="usage"
-        className="max-w-md rounded-xl border border-zinc-200 bg-white p-3"
-      >
+      <Tabs defaultValue="usage" className="max-w-md rounded-xl border border-border bg-card p-3">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="usage">Usage</TabsTrigger>
           <TabsTrigger value="rules">Rules</TabsTrigger>
         </TabsList>
-        <TabsContent value="usage" className="pt-4 text-sm leading-6 text-zinc-600">
+        <TabsContent value="usage" className="pt-4 text-sm leading-6 text-muted-foreground">
           Tabs organize related panels while preserving keyboard behavior.
         </TabsContent>
-        <TabsContent value="rules" className="pt-4 text-sm leading-6 text-zinc-600">
+        <TabsContent value="rules" className="pt-4 text-sm leading-6 text-muted-foreground">
           Keep tab state local to the module unless a reusable component owns it.
         </TabsContent>
       </Tabs>

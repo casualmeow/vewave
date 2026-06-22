@@ -10,7 +10,7 @@ export function TabsDocsPage() {
 
 function TabsDocsShowcase() {
   return (
-    <div className="grid gap-5 rounded-lg bg-[radial-gradient(circle_at_20%_8%,rgba(45,212,191,0.20),transparent_28%),linear-gradient(135deg,#f8fbf9,#eef2ff)] p-5 lg:grid-cols-[0.9fr_1.1fr]">
+    <div className="grid gap-5 rounded-lg bg-[radial-gradient(circle_at_20%_8%,color-mix(in_srgb,var(--primary)_20%,transparent),transparent_28%),linear-gradient(135deg,var(--card),var(--muted))] p-5 lg:grid-cols-[0.9fr_1.1fr]">
       <Tabs defaultValue="activity" design="liquidGlass" motion="fluid" fluidPreset="balanced">
         <TabsList>
           <TabsTrigger value="activity" icon={<Activity className="size-4" />}>
@@ -85,8 +85,8 @@ function TabsDocsShowcase() {
 
 function Panel({ body, title }: { body: string; title: string }) {
   return (
-    <div className="rounded-xl border border-white/50 bg-white/58 p-4 text-sm leading-6 text-zinc-600 shadow-sm backdrop-blur">
-      <h3 className="font-semibold text-zinc-950">{title}</h3>
+    <div className="rounded-xl border border-border/60 bg-card/60 p-4 text-sm leading-6 text-muted-foreground shadow-sm backdrop-blur">
+      <h3 className="font-semibold text-foreground">{title}</h3>
       <p className="mt-1">{body}</p>
     </div>
   )

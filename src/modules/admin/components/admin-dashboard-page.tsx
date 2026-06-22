@@ -63,14 +63,14 @@ export function AdminDashboardPage() {
     <div className="mx-auto grid w-full max-w-7xl gap-6">
       <section className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
+          <p className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
             <ShieldCheck className="size-4" />
             Admin dashboard
           </p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-zinc-950">
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-foreground">
             Operational overview
           </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             The admin layout owns its own navigation and stays behind the admin route guard.
             Privileged areas are scaffolded so backend controls can be attached deliberately.
           </p>
@@ -78,7 +78,7 @@ export function AdminDashboardPage() {
       </section>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="rounded-lg border-zinc-200 bg-white">
+        <Card className="rounded-lg border-border bg-card">
           <CardHeader>
             <CardTitle>Route guard</CardTitle>
             <CardDescription>
@@ -86,14 +86,14 @@ export function AdminDashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-800">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
               <ShieldCheck className="size-4" />
               Client verified
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-lg border-zinc-200 bg-white lg:col-span-2">
+        <Card className="rounded-lg border-border bg-card lg:col-span-2">
           <CardHeader>
             <CardTitle>Backend authorization</CardTitle>
             <CardDescription>
@@ -101,7 +101,7 @@ export function AdminDashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm leading-6 text-zinc-600">
+            <p className="text-sm leading-6 text-muted-foreground">
               {summaryQuery.isLoading
                 ? 'Checking backend admin permissions...'
                 : (summaryQuery.data?.summary.message ?? 'Admin summary is unavailable.')}
@@ -118,8 +118,8 @@ export function AdminDashboardPage() {
 
       <section>
         <div className="mb-3">
-          <h3 className="text-lg font-semibold text-zinc-950">Privileged operation areas</h3>
-          <p className="mt-1 text-sm leading-6 text-zinc-600">
+          <h3 className="text-lg font-semibold text-foreground">Privileged operation areas</h3>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
             These pages are admin-only placeholders for user, database, and system manipulation
             flows.
           </p>
@@ -153,9 +153,9 @@ function AdminRouteCard({
   const Icon = item.icon
 
   return (
-    <Card className="rounded-lg border-zinc-200 bg-white">
+    <Card className="rounded-lg border-border bg-card">
       <CardHeader>
-        <div className="grid size-10 place-items-center rounded-lg bg-zinc-100 text-zinc-800">
+        <div className="grid size-10 place-items-center rounded-lg bg-muted text-foreground">
           <Icon className="size-5" />
         </div>
         <CardTitle>{item.title}</CardTitle>

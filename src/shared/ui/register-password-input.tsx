@@ -35,10 +35,10 @@ export default function RegisterPasswordInput() {
 
   const getStrengthColor = (score: number) => {
     if (score === 0) return 'bg-border'
-    if (score <= 1) return 'bg-red-500'
-    if (score <= 2) return 'bg-orange-500'
-    if (score === 3) return 'bg-amber-500'
-    return 'bg-emerald-500'
+    if (score <= 1) return 'bg-destructive'
+    if (score <= 2) return 'bg-warning/70'
+    if (score === 3) return 'bg-warning'
+    return 'bg-success'
   }
 
   const getStrengthText = (score: number) => {
@@ -105,11 +105,11 @@ export default function RegisterPasswordInput() {
         {strength.map((req, index) => (
           <li key={index} className="flex items-center gap-2">
             {req.met ? (
-              <CheckIcon size={16} className="text-emerald-500" aria-hidden="true" />
+              <CheckIcon size={16} className="text-success" aria-hidden="true" />
             ) : (
               <XIcon size={16} className="text-muted-foreground/80" aria-hidden="true" />
             )}
-            <span className={`text-xs ${req.met ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+            <span className={`text-xs ${req.met ? 'text-success' : 'text-muted-foreground'}`}>
               {req.text}
               <span className="sr-only">
                 {req.met ? ' - Requirement met' : ' - Requirement not met'}

@@ -75,9 +75,9 @@ export function DocsSearchDialog({ open, onOpenChange }: DocsSearchDialogProps) 
       onSearchChange={setSearch}
       isLoading={query.isLoading}
     >
-      <SearchDialogOverlay className="bg-zinc-950/28 backdrop-blur-sm" />
-      <SearchDialogContent className="border-zinc-200 bg-white text-zinc-950 shadow-[0_28px_90px_rgba(15,23,42,0.32)]">
-        <SearchDialogHeader className="border-b border-zinc-200 bg-[#fbfcfa]">
+      <SearchDialogOverlay className="bg-foreground/28 backdrop-blur-sm" />
+      <SearchDialogContent className="border-border bg-card text-card-foreground shadow-[0_28px_90px_color-mix(in_srgb,var(--foreground)_32%,transparent)]">
+        <SearchDialogHeader className="border-b border-border bg-muted">
           <SearchDialogIcon />
           <SearchDialogInput placeholder="Search docs, components, props..." />
           <SearchDialogClose />
@@ -85,7 +85,7 @@ export function DocsSearchDialog({ open, onOpenChange }: DocsSearchDialogProps) 
         <SearchDialogList
           items={query.data === 'empty' ? [] : query.data}
           Empty={() => (
-            <div className="px-6 py-12 text-center text-sm text-zinc-500">
+            <div className="px-6 py-12 text-center text-sm text-muted-foreground">
               Nothing matched. Try a component name, prop, or route.
             </div>
           )}
@@ -105,9 +105,9 @@ export function DocsSearchButton({ className }: { className?: string }) {
       data-search-trigger=""
       aria-label="Open docs search"
       className={cn(
-        'inline-flex h-10 items-center gap-2 rounded-full border border-zinc-200 bg-white/86 px-3 text-sm font-medium text-zinc-600 shadow-sm backdrop-blur transition-[background-color,border-color,color,box-shadow]',
-        'hover:border-teal-900/20 hover:bg-white hover:text-zinc-950 hover:shadow-[0_12px_32px_rgba(15,23,42,0.10)]',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f6f8f5]',
+        'inline-flex h-10 items-center gap-2 rounded-full border border-border bg-card/86 px-3 text-sm font-medium text-muted-foreground shadow-sm backdrop-blur transition-[background-color,border-color,color,box-shadow]',
+        'hover:border-primary/30 hover:bg-card hover:text-foreground hover:shadow-[0_12px_32px_color-mix(in_srgb,var(--foreground)_10%,transparent)]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         className,
       )}
       onClick={() => setOpenSearch(true)}
@@ -118,7 +118,7 @@ export function DocsSearchButton({ className }: { className?: string }) {
         {hotKeyLabels.map((label, index) => (
           <kbd
             key={index}
-            className="rounded-md border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[0.68rem] font-semibold leading-none text-zinc-500"
+            className="rounded-md border border-border bg-muted px-1.5 py-0.5 text-[0.68rem] font-semibold leading-none text-muted-foreground"
           >
             {label}
           </kbd>

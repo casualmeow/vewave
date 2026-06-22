@@ -10,10 +10,7 @@ export function ResizableCardShowcaseSection() {
     useResizableCardShowcase()
 
   return (
-    <section
-      id="resizable-card"
-      className="grid gap-6 rounded-lg border border-zinc-200 bg-white p-5"
-    >
+    <section id="resizable-card" className="grid gap-6 rounded-lg border border-border bg-card p-5">
       <ResizableCardShowcaseHeader />
 
       <div className="grid gap-6 xl:grid-cols-[24rem_minmax(0,1fr)]">

@@ -58,7 +58,7 @@ export function ResizableCardDialog<T extends ResizableCardItem>({
             exit={animation.presence.backdrop.exit}
             transition={animation.backdrop}
             className={cx(
-              'fixed inset-0 z-[90] bg-black/40 backdrop-blur-[2px]',
+              'fixed inset-0 z-[90] bg-foreground/40 backdrop-blur-[2px]',
               animation.backdropClassName,
               backdropClassName,
             )}

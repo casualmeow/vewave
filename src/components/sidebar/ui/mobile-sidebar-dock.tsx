@@ -172,7 +172,7 @@ export function MobileSidebarDock({
       transition={SIDEBAR_FLUID_TRANSITION}
     >
       <motion.div
-        className="pointer-events-auto relative mx-auto max-w-[27rem] overflow-visible rounded-[2.05rem] border border-white/55 bg-[linear-gradient(135deg,rgba(255,255,255,0.64),rgba(255,255,255,0.22)_42%,rgba(226,252,247,0.38))] p-2 shadow-[0_24px_80px_rgba(15,23,42,0.30),0_10px_34px_rgba(20,184,166,0.16),inset_0_1px_0_rgba(255,255,255,0.92),inset_0_-1px_0_rgba(255,255,255,0.34)] backdrop-blur-3xl backdrop-saturate-200 [--mobile-dock-glow-opacity:0.28] [--mobile-dock-pointer-x:50%] [--mobile-dock-pointer-y:50%] [--mobile-dock-sheen-x:22%] [--mobile-dock-sheen-y:12%] supports-[backdrop-filter]:bg-white/24"
+        className="pointer-events-auto relative mx-auto max-w-[27rem] overflow-visible rounded-[2.05rem] border border-[color:var(--glass-border)] bg-[linear-gradient(135deg,var(--glass-highlight),color-mix(in_srgb,var(--glass-background)_64%,transparent)_42%,color-mix(in_srgb,var(--accent)_24%,transparent))] p-2 shadow-[0_24px_80px_color-mix(in_srgb,var(--foreground)_30%,transparent),0_10px_34px_color-mix(in_srgb,var(--primary)_16%,transparent),inset_0_1px_0_var(--glass-highlight),inset_0_-1px_0_color-mix(in_srgb,var(--glass-highlight)_34%,transparent)] backdrop-blur-3xl backdrop-saturate-200 [--mobile-dock-glow-opacity:0.28] [--mobile-dock-pointer-x:50%] [--mobile-dock-pointer-y:50%] [--mobile-dock-sheen-x:22%] [--mobile-dock-sheen-y:12%] supports-[backdrop-filter]:bg-[var(--glass-background)]"
         style={{
           ...fluidTransformStyle,
         }}
@@ -223,15 +223,15 @@ export function MobileSidebarDock({
 
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(circle_at_var(--mobile-dock-pointer-x)_var(--mobile-dock-pointer-y),rgba(255,255,255,0.9),transparent_36%),linear-gradient(120deg,transparent,rgba(255,255,255,0.34)_var(--mobile-dock-sheen-x),transparent)] opacity-[var(--mobile-dock-glow-opacity)]"
+          className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(circle_at_var(--mobile-dock-pointer-x)_var(--mobile-dock-pointer-y),var(--glass-highlight),transparent_36%),linear-gradient(120deg,transparent,var(--glass-highlight)_var(--mobile-dock-sheen-x),transparent)] opacity-[var(--mobile-dock-glow-opacity)]"
         />
         <span
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]"
           style={{ filter: `url(#${scopeId}-mobile-dock-refraction)` }}
         >
-          <span className="absolute -left-8 top-1/2 size-24 -translate-y-1/2 rounded-full bg-teal-100/18 blur-xl" />
-          <span className="absolute -right-8 bottom-0 size-24 rounded-full bg-sky-100/18 blur-xl" />
+          <span className="absolute -left-8 top-1/2 size-24 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--accent)_18%,transparent)] blur-xl" />
+          <span className="absolute -right-8 bottom-0 size-24 rounded-full bg-[color-mix(in_srgb,var(--primary)_18%,transparent)] blur-xl" />
         </span>
 
         <div
@@ -412,7 +412,7 @@ function MobileSidebarDockButton({
     >
       <motion.span
         aria-hidden="true"
-        className="pointer-events-none absolute rounded-[1.55rem] border border-white/0 bg-[radial-gradient(circle_at_var(--dock-item-pointer-x)_var(--dock-item-pointer-y),rgba(255,255,255,0.82),rgba(255,255,255,0.22)_36%,transparent_65%),linear-gradient(135deg,rgba(255,255,255,0.24),rgba(255,255,255,0.06))] opacity-[var(--dock-item-glow-opacity)] shadow-[inset_0_1px_0_rgba(255,255,255,0.64)] backdrop-blur-md transition-[opacity,border-color] duration-150 group-hover/mobile-dock-item:border-white/45"
+        className="pointer-events-none absolute rounded-[1.55rem] border border-transparent bg-[radial-gradient(circle_at_var(--dock-item-pointer-x)_var(--dock-item-pointer-y),var(--glass-highlight),color-mix(in_srgb,var(--glass-highlight)_34%,transparent)_36%,transparent_65%),linear-gradient(135deg,color-mix(in_srgb,var(--glass-highlight)_28%,transparent),transparent)] opacity-[var(--dock-item-glow-opacity)] shadow-[inset_0_1px_0_var(--glass-highlight)] backdrop-blur-md transition-[opacity,border-color] duration-150 group-hover/mobile-dock-item:border-[color:var(--glass-border)]"
         style={{ filter: `url(#${refractionId})` }}
         animate={{ top: liquidInset, right: liquidInset, bottom: liquidInset, left: liquidInset }}
         transition={SIDEBAR_FLUID_TRANSITION}
@@ -422,7 +422,7 @@ function MobileSidebarDockButton({
         <motion.span
           layoutId={active && canAnimate ? `${scopeId}-mobile-active-dock-item` : undefined}
           aria-hidden="true"
-          className="pointer-events-none absolute overflow-hidden rounded-[1.55rem] border border-white/70 bg-[radial-gradient(circle_at_var(--dock-item-pointer-x)_var(--dock-item-pointer-y),rgba(255,255,255,1),transparent_36%),linear-gradient(135deg,rgba(255,255,255,0.78),rgba(255,255,255,0.22)_52%,rgba(153,246,228,0.40))] shadow-[0_18px_44px_rgba(20,184,166,0.22),0_8px_22px_rgba(15,23,42,0.15),inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-1px_0_rgba(255,255,255,0.34)] backdrop-blur-xl backdrop-saturate-200"
+          className="pointer-events-none absolute overflow-hidden rounded-[1.55rem] border border-[color:var(--glass-border)] bg-[radial-gradient(circle_at_var(--dock-item-pointer-x)_var(--dock-item-pointer-y),var(--glass-highlight),transparent_36%),linear-gradient(135deg,var(--sidebar-accent),var(--glass-background)_52%,color-mix(in_srgb,var(--accent)_28%,transparent))] shadow-[0_18px_44px_color-mix(in_srgb,var(--accent)_22%,transparent),0_8px_22px_color-mix(in_srgb,var(--foreground)_15%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-xl backdrop-saturate-200"
           style={{ filter: `url(#${refractionId})` }}
           initial={
             canAnimate ? { opacity: 0, scale: 0.76, top: 0, right: 0, bottom: 0, left: 0 } : false
@@ -438,27 +438,27 @@ function MobileSidebarDockButton({
           exit={{ opacity: 0, scale: 0.9, top: 0, right: 0, bottom: 0, left: 0 }}
           transition={SIDEBAR_FLUID_TRANSITION}
         >
-          <span className="pointer-events-none absolute inset-x-2 top-0 h-px bg-gradient-to-r from-transparent via-white/95 to-transparent" />
+          <span className="pointer-events-none absolute inset-x-2 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--glass-highlight),transparent)]" />
           <span
             className="pointer-events-none absolute inset-0 [filter:var(--mobile-dock-goo-filter)]"
             style={{ '--mobile-dock-goo-filter': `url(#${filterId})` } as CSSProperties}
           >
             <motion.span
-              className="absolute -left-5 top-1/2 size-16 -translate-y-1/2 rounded-full bg-teal-100/36"
+              className="absolute -left-5 top-1/2 size-16 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--accent)_30%,transparent)]"
               animate={canAnimate ? { x: [0, 8, -3, 0], scale: [1, 1.22, 0.94, 1] } : undefined}
               transition={
                 canAnimate ? { duration: 2.7, repeat: Infinity, ease: 'easeInOut' } : undefined
               }
             />
             <motion.span
-              className="absolute left-[var(--dock-item-pointer-x)] top-[var(--dock-item-pointer-y)] size-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/48"
+              className="absolute left-[var(--dock-item-pointer-x)] top-[var(--dock-item-pointer-y)] size-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--glass-highlight)_48%,transparent)]"
               animate={canAnimate ? { scale: [0.72, 1.34, 0.9] } : undefined}
               transition={
                 canAnimate ? { duration: 0.95, repeat: Infinity, ease: 'easeInOut' } : undefined
               }
             />
             <motion.span
-              className="absolute -right-5 bottom-0 size-16 rounded-full bg-sky-100/34"
+              className="absolute -right-5 bottom-0 size-16 rounded-full bg-[color-mix(in_srgb,var(--primary)_30%,transparent)]"
               animate={canAnimate ? { x: [0, -7, 3, 0], scale: [1, 0.9, 1.16, 1] } : undefined}
               transition={
                 canAnimate ? { duration: 2.9, repeat: Infinity, ease: 'easeInOut' } : undefined
@@ -477,8 +477,10 @@ function MobileSidebarDockButton({
         tabIndex={item.disabled ? -1 : undefined}
         className={cn(
           'relative z-10 flex min-h-[4.25rem] min-w-0 flex-col items-center justify-center gap-1 rounded-[1.55rem] px-1.5 py-2 text-[0.67rem] font-semibold leading-none outline-none transition-colors',
-          'focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
-          active ? 'text-zinc-950' : 'text-zinc-700 hover:text-zinc-950',
+          'focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
+          active
+            ? 'text-sidebar-accent-foreground'
+            : 'text-sidebar-foreground hover:text-sidebar-accent-foreground',
           item.disabled && 'pointer-events-none opacity-45',
         )}
         onClick={(event) => {
@@ -491,7 +493,7 @@ function MobileSidebarDockButton({
         <span className="relative grid size-5 place-items-center [&_svg]:size-full">
           {item.icon}
           {item.badge ? (
-            <span className="absolute -right-2 -top-2 rounded-full bg-zinc-950 px-1.5 py-0.5 text-[0.55rem] font-bold leading-none text-white shadow-sm">
+            <span className="absolute -right-2 -top-2 rounded-full bg-sidebar-primary px-1.5 py-0.5 text-[0.55rem] font-bold leading-none text-sidebar-primary-foreground shadow-sm">
               {item.badge}
             </span>
           ) : null}

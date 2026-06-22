@@ -103,14 +103,14 @@ export const sidebarRootVariants = cva(
       design: {
         solid: 'border-sidebar-border bg-sidebar shadow-sm',
         glass:
-          'border-white/45 bg-white/48 shadow-[0_24px_70px_rgba(15,23,42,0.14)] backdrop-blur-2xl supports-[backdrop-filter]:bg-white/36',
+          'border-[color:var(--glass-border)] bg-[var(--glass-background)] shadow-[0_24px_70px_color-mix(in_srgb,var(--foreground)_14%,transparent)] backdrop-blur-2xl',
         liquidGlass: [
-          'border-white/52 bg-[linear-gradient(145deg,rgba(255,255,255,0.62),rgba(255,255,255,0.26)_46%,rgba(226,252,247,0.34)_100%)]',
-          'shadow-[0_34px_96px_rgba(15,23,42,0.22),0_12px_36px_rgba(15,118,110,0.11),inset_0_1px_0_rgba(255,255,255,0.92),inset_0_-1px_0_rgba(255,255,255,0.26)]',
-          'backdrop-blur-2xl backdrop-saturate-200 supports-[backdrop-filter]:bg-white/24',
+          'border-[color:var(--glass-border)] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--glass-highlight)_72%,transparent),var(--glass-background)_46%,color-mix(in_srgb,var(--accent)_24%,transparent)_100%)]',
+          'shadow-[0_34px_96px_color-mix(in_srgb,var(--foreground)_22%,transparent),0_12px_36px_color-mix(in_srgb,var(--accent)_14%,transparent),inset_0_1px_0_var(--glass-highlight)]',
+          'backdrop-blur-2xl backdrop-saturate-200 supports-[backdrop-filter]:bg-[var(--glass-background)]',
         ],
         fluent:
-          'border-zinc-200/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(241,245,249,0.88))] shadow-[0_18px_55px_rgba(15,23,42,0.11)] backdrop-blur-xl',
+          'border-sidebar-border bg-[linear-gradient(135deg,var(--sidebar),var(--surface-elevated))] shadow-[0_18px_55px_color-mix(in_srgb,var(--foreground)_11%,transparent)] backdrop-blur-xl',
       },
       size: {
         sm: 'w-56',
@@ -134,9 +134,9 @@ export const sidebarBrandVariants = cva('relative z-10 flex items-center gap-3 b
   variants: {
     design: {
       solid: 'border-sidebar-border',
-      glass: 'border-white/35',
-      liquidGlass: 'border-white/24 bg-white/[0.08]',
-      fluent: 'border-zinc-200/70',
+      glass: 'border-[color:var(--glass-border)]',
+      liquidGlass: 'border-[color:var(--glass-border)] bg-[var(--glass-background)]',
+      fluent: 'border-sidebar-border',
     },
     size: {
       sm: 'p-3',
@@ -185,11 +185,12 @@ export const sidebarItemVariants = cva(
       design: {
         solid:
           'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[active=true]:text-sidebar-accent-foreground',
-        glass: 'text-zinc-700 hover:text-zinc-950 data-[active=true]:text-zinc-950',
+        glass:
+          'text-sidebar-foreground hover:text-sidebar-accent-foreground data-[active=true]:text-sidebar-accent-foreground',
         liquidGlass:
-          'text-zinc-700 hover:text-zinc-950 data-[active=true]:text-zinc-950 group-hover/sidebar-item-shell:[filter:saturate(1.12)]',
+          'text-sidebar-foreground hover:text-sidebar-accent-foreground data-[active=true]:text-sidebar-accent-foreground group-hover/sidebar-item-shell:[filter:saturate(1.12)]',
         fluent:
-          'text-zinc-600 hover:bg-white/80 hover:text-zinc-950 data-[active=true]:text-zinc-950',
+          'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[active=true]:text-sidebar-accent-foreground',
       },
       size: {
         sm: 'min-h-9 px-2.5 py-2 text-sm',
@@ -216,13 +217,13 @@ export const sidebarActiveIndicatorVariants = cva(
       design: {
         solid: 'border-sidebar-border bg-sidebar-accent shadow-sm',
         glass:
-          'border-white/65 bg-white/62 shadow-[0_14px_34px_rgba(15,23,42,0.11),inset_0_1px_0_rgba(255,255,255,0.90)] backdrop-blur-xl',
+          'border-[color:var(--glass-border)] bg-sidebar-accent shadow-[0_14px_34px_color-mix(in_srgb,var(--foreground)_11%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-xl',
         liquidGlass: [
-          'border-white/72 bg-[radial-gradient(circle_at_var(--item-pointer-x,18%)_var(--item-pointer-y,0%),rgba(255,255,255,1),transparent_36%),linear-gradient(135deg,rgba(255,255,255,0.76),rgba(255,255,255,0.24)_54%,rgba(153,246,228,0.42))]',
-          'shadow-[0_20px_50px_rgba(20,184,166,0.22),0_8px_20px_rgba(15,23,42,0.12),inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-1px_0_rgba(255,255,255,0.38)] backdrop-blur-xl backdrop-saturate-200',
+          'border-[color:var(--glass-border)] bg-[radial-gradient(circle_at_var(--item-pointer-x,18%)_var(--item-pointer-y,0%),var(--glass-highlight),transparent_36%),linear-gradient(135deg,var(--sidebar-accent),var(--glass-background)_54%,color-mix(in_srgb,var(--accent)_28%,transparent))]',
+          'shadow-[0_20px_50px_color-mix(in_srgb,var(--accent)_22%,transparent),0_8px_20px_color-mix(in_srgb,var(--foreground)_12%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-xl backdrop-saturate-200',
         ],
         fluent:
-          'border-sky-200/80 bg-sky-50 shadow-[inset_3px_0_0_rgba(14,165,233,0.95),0_8px_22px_rgba(14,165,233,0.10)]',
+          'border-sidebar-border bg-sidebar-accent shadow-[inset_3px_0_0_var(--sidebar-primary),0_8px_22px_color-mix(in_srgb,var(--sidebar-primary)_14%,transparent)]',
       },
     },
     defaultVariants: {
@@ -237,10 +238,10 @@ export const sidebarBadgeVariants = cva(
     variants: {
       design: {
         solid: 'bg-sidebar-primary text-sidebar-primary-foreground',
-        glass: 'bg-zinc-950/85 text-white shadow-sm',
+        glass: 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm',
         liquidGlass:
-          'bg-zinc-950/82 text-white shadow-[0_8px_20px_rgba(15,23,42,0.16),inset_0_1px_0_rgba(255,255,255,0.28)]',
-        fluent: 'bg-sky-500 text-white shadow-sm',
+          'bg-sidebar-primary text-sidebar-primary-foreground shadow-[0_8px_20px_color-mix(in_srgb,var(--sidebar-primary)_20%,transparent),inset_0_1px_0_var(--glass-highlight)]',
+        fluent: 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm',
       },
     },
     defaultVariants: {
@@ -253,9 +254,9 @@ export const sidebarFooterVariants = cva('relative z-10 mt-auto border-t', {
   variants: {
     design: {
       solid: 'border-sidebar-border',
-      glass: 'border-white/35',
-      liquidGlass: 'border-white/24 bg-white/[0.08]',
-      fluent: 'border-zinc-200/70',
+      glass: 'border-[color:var(--glass-border)]',
+      liquidGlass: 'border-[color:var(--glass-border)] bg-[var(--glass-background)]',
+      fluent: 'border-sidebar-border',
     },
     size: {
       sm: 'p-2',
