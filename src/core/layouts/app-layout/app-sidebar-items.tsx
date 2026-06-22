@@ -4,13 +4,14 @@ import {
   History,
   PlusCircle,
   Radio,
+  ShieldCheck,
   Sparkles,
   UsersRound,
   type LucideIcon,
 } from 'lucide-react'
 import type { MobileSidebarDockItem } from '@/components/sidebar'
 
-export type AppSidebarRoute = '/projects' | '/create' | '/healthcheck' | '/room/$code'
+export type AppSidebarRoute = '/projects' | '/create' | '/healthcheck' | '/admin' | '/room/$code'
 
 export type AppSidebarItem = {
   label: string
@@ -42,6 +43,12 @@ export const appPrimaryItems: ReadonlyArray<AppSidebarItem> = [
   { label: 'New project', shortLabel: 'Create', to: '/create', icon: PlusCircle, badge: 'New' },
   { label: 'Healthcheck', shortLabel: 'Health', to: '/healthcheck', icon: Activity },
 ]
+
+export const appAdminItem: AppSidebarItem = {
+  label: 'Admin',
+  to: '/admin',
+  icon: ShieldCheck,
+}
 
 export const appRecentRooms: ReadonlyArray<AppSidebarRoomItem> = [
   {

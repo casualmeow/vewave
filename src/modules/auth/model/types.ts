@@ -7,6 +7,7 @@ export type AuthUser = {
   username: string | null
   avatarUrl: string | null
   bio: string | null
+  isAdmin: boolean
 }
 
 export type AuthResponse = {

@@ -1,7 +1,7 @@
 import { VideoData } from '../constants'
 import { VideoEditHeaderActions } from './video-edit-header-actions'
 import EditPlayer from '@/shared/ui/edit-player'
-import { AccessSelector } from '@/shared/ui/edit-acess-selector'
+import { AccessSelector } from '@/shared/ui/edit-access-selector'
 
 interface VideoEditSidebarProps {
   onAccessChange: (value: 'Public' | 'Unlisted' | 'Private') => void

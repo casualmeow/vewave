@@ -14,6 +14,7 @@ import { useState } from 'react'
 
 import {
   appPinnedRooms,
+  appAdminItem,
   appPrimaryItems,
   appRecentRooms,
   appServers,
@@ -72,6 +73,7 @@ export function AppSidebar({ className }: { className?: string }) {
   const user = useAuthStore((state) => state.user)
   const initials = getInitials(user?.name, user?.email)
   const identitySubtitle = user?.username ? `@${user.username}` : user?.email
+  const primaryItems = user?.isAdmin ? [...appPrimaryItems, appAdminItem] : appPrimaryItems
   const mobileDockItems = getAppMobileDockItems()
   const sessionMobileDockItems =
     status === 'authenticated'
@@ -91,6 +93,7 @@ export function AppSidebar({ className }: { className?: string }) {
               id: 'sign-in',
               label: 'Sign in',
               to: '/sign-in' as const,
+              search: { redirectTo: undefined },
               icon: <LogIn />,
             },
           ]
@@ -139,7 +142,7 @@ export function AppSidebar({ className }: { className?: string }) {
 
         <div className="min-h-0 flex-1 overflow-y-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <SidebarSection title="Workspace">
-            {appPrimaryItems.map((item) => {
+            {primaryItems.map((item) => {
               const Icon = item.icon
 
               return (
@@ -255,7 +258,7 @@ function AppSidebarIdentity({
         subtitle="Sign in to sync rooms"
         meta={
           <Button asChild size="sm" variant="outline" className="rounded-full bg-white/70">
-            <Link to="/sign-in">
+            <Link to="/sign-in" search={{ redirectTo: undefined }}>
               <LogIn className="size-3.5" />
               Sign in
             </Link>
@@ -358,7 +361,7 @@ function AppSidebarFooter({
         </SidebarItem>
       ) : (
         <SidebarItem asChild value="sign-in">
-          <Link to="/sign-in">
+          <Link to="/sign-in" search={{ redirectTo: undefined }}>
             <SidebarItemIcon>
               <LogIn />
             </SidebarItemIcon>

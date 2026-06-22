@@ -1,9 +1,9 @@
 import { Link } from '@tanstack/react-router'
-import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/layouts/docs/page'
 import { ArrowLeft, FileCode2 } from 'lucide-react'
 
 import { getSharedUiDoc } from '../content/shared-ui-docs-content'
 import { DocsCodeBlock, DocsPropTable, DocsSection } from './component-doc-primitives'
+import { DocsBody, DocsDescription, DocsPage, DocsTitle } from './docs-page-layout'
 import { Button } from '@/shared/ui'
 
 export function SharedUiComponentDocsPage({ slug }: { slug: string }) {
@@ -11,14 +11,7 @@ export function SharedUiComponentDocsPage({ slug }: { slug: string }) {
 
   if (!doc) {
     return (
-      <DocsPage
-        full
-        breadcrumb={{ enabled: false }}
-        footer={{ enabled: false }}
-        tableOfContent={{ enabled: false }}
-        tableOfContentPopover={{ enabled: false }}
-        className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8"
-      >
+      <DocsPage className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8">
         <DocsTitle className="text-4xl font-semibold tracking-tight text-zinc-950">
           Shared primitive not found
         </DocsTitle>
@@ -27,7 +20,7 @@ export function SharedUiComponentDocsPage({ slug }: { slug: string }) {
         </DocsDescription>
         <DocsBody>
           <Button asChild variant="outline">
-            <Link to="/docs/ui/components/shared">
+            <Link to="/admin/docs/ui/components/shared">
               <ArrowLeft className="size-4" />
               Back to Shared UI
             </Link>
@@ -40,16 +33,9 @@ export function SharedUiComponentDocsPage({ slug }: { slug: string }) {
   const Icon = doc.icon
 
   return (
-    <DocsPage
-      full
-      breadcrumb={{ enabled: false }}
-      footer={{ enabled: false }}
-      tableOfContent={{ enabled: false }}
-      tableOfContentPopover={{ enabled: false }}
-      className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8"
-    >
+    <DocsPage className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8">
       <Button asChild variant="ghost" size="sm" className="mb-5 -ml-2">
-        <Link to="/docs/ui/components/shared">
+        <Link to="/admin/docs/ui/components/shared">
           <ArrowLeft className="size-4" />
           Shared UI
         </Link>

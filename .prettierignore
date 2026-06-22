@@ -1,3 +1,9 @@
 package-lock.json
+skills-lock.json
 pnpm-lock.yaml
 yarn.lock
+.agents
+node_modules
+dist
+coverage
+src/routeTree.gen.ts

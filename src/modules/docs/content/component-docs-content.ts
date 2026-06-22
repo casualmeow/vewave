@@ -13,13 +13,13 @@ import type { LucideIcon } from 'lucide-react'
 export type ComponentDocSlug = 'glass' | 'header' | 'tabs' | 'resizable-card' | 'sidebar' | 'shared'
 
 export type ComponentDocRoute =
-  | '/docs/ui/components'
-  | '/docs/ui/components/glass'
-  | '/docs/ui/components/header'
-  | '/docs/ui/components/tabs'
-  | '/docs/ui/components/resizable-card'
-  | '/docs/ui/components/sidebar'
-  | '/docs/ui/components/shared'
+  | '/admin/docs/ui/components'
+  | '/admin/docs/ui/components/glass'
+  | '/admin/docs/ui/components/header'
+  | '/admin/docs/ui/components/tabs'
+  | '/admin/docs/ui/components/resizable-card'
+  | '/admin/docs/ui/components/sidebar'
+  | '/admin/docs/ui/components/shared'
 
 export type ComponentDocLink = {
   slug: ComponentDocSlug
@@ -271,7 +271,7 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
     eyebrow: 'Motion / liquid interaction foundation',
     description:
       'Shared glass-interaction utilities used by Header, Sidebar, and Tabs for fluid presets, magnetic pointer motion, drag behavior, and reduced-motion-aware animation tuning.',
-    to: '/docs/ui/components/glass',
+    to: '/admin/docs/ui/components/glass',
     icon: Sparkles,
     importSnippet: glassImportSnippet,
     usageSnippet: glassUsageSnippet,
@@ -369,7 +369,7 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
     eyebrow: 'Navigation / layout primitive',
     description:
       'A React 19 scroll-reactive header with composition slots, animated width collapse, liquid/telegram glass variants, pointer-reactive shine, and reduced-motion handling.',
-    to: '/docs/ui/components/header',
+    to: '/admin/docs/ui/components/header',
     icon: PanelTop,
     importSnippet: headerImportSnippet,
     usageSnippet: headerUsageSnippet,
@@ -503,7 +503,7 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
     eyebrow: 'Navigation / segmented control',
     description:
       'A Radix Tabs wrapper with solid, glass, liquid-glass, and Telegram-style surfaces, moving shared-layout active indicators, icons, badges, vertical orientation, and shared glass interaction tuning.',
-    to: '/docs/ui/components/tabs',
+    to: '/admin/docs/ui/components/tabs',
     icon: GalleryHorizontalEnd,
     importSnippet: tabsImportSnippet,
     usageSnippet: tabsUsageSnippet,
@@ -655,7 +655,7 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
     eyebrow: 'Expandable card / dialog component',
     description:
       'A reusable expandable-card system with inline and media presentations, render slots, resize constraints, shared-layout animation presets, and Shadix-style compound pieces.',
-    to: '/docs/ui/components/resizable-card',
+    to: '/admin/docs/ui/components/resizable-card',
     icon: StretchHorizontal,
     importSnippet: resizableCardImportSnippet,
     usageSnippet: resizableCardUsageSnippet,
@@ -745,7 +745,7 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
     eyebrow: 'Navigation / shell component',
     description:
       'A decomposable sidebar system for app shells with compound items, CVA design variants, one moving active selector, and solid/glass/liquid-glass/fluent visual treatments.',
-    to: '/docs/ui/components/sidebar',
+    to: '/admin/docs/ui/components/sidebar',
     icon: PanelLeft,
     importSnippet: sidebarImportSnippet,
     usageSnippet: sidebarUsageSnippet,
@@ -1161,7 +1161,7 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
     eyebrow: 'Primitives / shared layer',
     description:
       'Low-level shadcn/Radix-style primitives for forms, actions, surfaces, and overlays. Each shared primitive has its own docs route.',
-    to: '/docs/ui/components/shared',
+    to: '/admin/docs/ui/components/shared',
     icon: Layers3,
     importSnippet: `import {
   Button,
@@ -1300,7 +1300,7 @@ export const componentDocsHighlights = [
   {
     title: 'UI-kit pages',
     description:
-      'Component usage now lives under /docs/ui/components instead of README files inside component packages.',
+      'Component usage now lives under /admin/docs/ui/components instead of README files inside component packages.',
     icon: Component,
   },
   {

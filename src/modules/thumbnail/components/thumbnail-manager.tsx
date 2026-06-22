@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useFileUpload } from '../hooks/useFileUplaod'
+import { useFileUpload } from '../hooks/useFileUpload'
 import { FileConstraints } from '../constants/file-constraints'
 import { initialFiles } from '../api/getPreviews.mock'
 import { ThumbnailCropDialog } from '../ui/thumbnail-crop-dialog'

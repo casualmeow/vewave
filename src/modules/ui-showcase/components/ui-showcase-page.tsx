@@ -8,25 +8,25 @@ const componentPlaygrounds = [
   {
     label: 'Sidebar',
     description: 'Liquid-glass navigation shell with every interaction prop wired into controls.',
-    to: '/docs/ui/components/sidebar',
+    to: '/admin/docs/ui/components/sidebar',
     icon: PanelLeft,
   },
   {
     label: 'Header',
     description: 'Scroll-aware header playground with slots, collapse, and motion controls.',
-    to: '/docs/ui/components/header',
+    to: '/admin/docs/ui/components/header',
     icon: PanelTop,
   },
   {
     label: 'ResizableCard',
     description: 'Expandable card presentations, resize settings, and animation presets.',
-    to: '/docs/ui/components/resizable-card',
+    to: '/admin/docs/ui/components/resizable-card',
     icon: StretchHorizontal,
   },
   {
     label: 'Shared UI',
     description: 'Button, form, surface, dialog, tabs, and other shared primitive examples.',
-    to: '/docs/ui/components/shared',
+    to: '/admin/docs/ui/components/shared',
     icon: Layers3,
   },
 ] as const
@@ -49,7 +49,7 @@ export function UiShowcasePage() {
             Component playgrounds now live inside the docs.
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-600">
-            The standalone `/ui/showcase` route is kept as a navigation bridge. Open a component
+            The standalone showcase route now points into the admin docs catalog. Open a component
             docs page to see its API, examples, and live controls in one place.
           </p>
         </motion.section>

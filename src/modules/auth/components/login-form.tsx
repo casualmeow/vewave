@@ -19,7 +19,21 @@ import {
 } from '@/shared/ui'
 import { SecureInput } from '@/shared/ui/secure-input'
 
-export const LoginForm = () => {
+type LoginFormProps = {
+  redirectTo?: string
+}
+
+const defaultRedirectPath = '/projects'
+
+const getSafeRedirectPath = (value?: string) => {
+  if (!value || !value.startsWith('/') || value.startsWith('//')) {
+    return defaultRedirectPath
+  }
+
+  return value
+}
+
+export const LoginForm = ({ redirectTo }: LoginFormProps) => {
   const navigate = useNavigate()
   const setAuthenticated = useAuthStore((state) => state.setAuthenticated)
   const loginMutation = usePostApiAuthLogin()
@@ -36,7 +50,13 @@ export const LoginForm = () => {
       const response = await loginMutation.mutateAsync({ data: values })
       setAuthenticated(response.user, response.accessToken)
       toast.success('Signed in')
-      await navigate({ to: '/projects' })
+      const nextPath = getSafeRedirectPath(redirectTo)
+
+      if (nextPath === defaultRedirectPath) {
+        await navigate({ to: defaultRedirectPath })
+      } else {
+        window.location.assign(nextPath)
+      }
     } catch (error) {
       form.setError('root', {
         message: getApiErrorMessage(error, 'Unable to sign in.'),

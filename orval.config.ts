@@ -10,7 +10,7 @@ export default defineConfig({
       target: './src/core/api/generated',
       schemas: './src/core/api/generated/model',
       client: 'react-query',
-      prettier: true,
+      httpClient: 'axios',
       clean: true,
       override: {
         mutator: {

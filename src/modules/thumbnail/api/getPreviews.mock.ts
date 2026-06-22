@@ -1,4 +1,4 @@
-import type { FileMetadata } from '../hooks/useFileUplaod'
+import type { FileMetadata } from '../hooks/useFileUpload'
 
 export const initialFiles: Array<FileMetadata> = [
   {

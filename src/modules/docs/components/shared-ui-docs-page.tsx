@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router'
-import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/layouts/docs/page'
 import { ArrowRight, Layers3 } from 'lucide-react'
 import { motion } from 'motion/react'
 
 import { sharedUiCategories, sharedUiDocNavItems } from '../content/shared-ui-docs-nav'
 import { DocsCodeBlock, DocsSection } from './component-doc-primitives'
+import { DocsBody, DocsDescription, DocsPage, DocsTitle } from './docs-page-layout'
 import { Button } from '@/shared/ui'
 
 const importSnippet = `import {
@@ -19,14 +19,7 @@ const importSnippet = `import {
 
 export function SharedUiDocsPage() {
   return (
-    <DocsPage
-      full
-      breadcrumb={{ enabled: false }}
-      footer={{ enabled: false }}
-      tableOfContent={{ enabled: false }}
-      tableOfContentPopover={{ enabled: false }}
-      className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8"
-    >
+    <DocsPage className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8">
       <div className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
         <Layers3 className="size-4" />
         src/shared/ui

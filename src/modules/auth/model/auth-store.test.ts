@@ -8,6 +8,7 @@ const user = {
   username: null,
   avatarUrl: null,
   bio: null,
+  isAdmin: false,
 }
 
 describe('auth store', () => {

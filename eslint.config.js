@@ -9,7 +9,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 /** @type {import("eslint").Linter.Config[]} */
 export default [
   {
-    ignores: ['dist/**', 'eslint.config.js', 'prettier.config.js', 'vite.config.js'],
+    ignores: [
+      'dist/**',
+      'src/core/api/generated/**',
+      'src/routeTree.gen.ts',
+      'eslint.config.js',
+      'prettier.config.js',
+      'vite.config.ts',
+    ],
   },
   ...tanstackConfig,
   {

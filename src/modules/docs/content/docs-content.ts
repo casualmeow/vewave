@@ -23,7 +23,7 @@ import type { SharedUiDocRoute } from './shared-ui-docs-nav'
 export type DocsNavItem = {
   title: string
   description: string
-  to: '/docs' | '/docs/ui' | ComponentDocRoute | SharedUiDocRoute
+  to: '/admin/docs' | '/admin/docs/ui' | ComponentDocRoute | SharedUiDocRoute
   icon: LucideIcon
   exact?: boolean
 }
@@ -32,49 +32,49 @@ export const docsNavItems = [
   {
     title: 'Overview',
     description: 'Project setup, architecture, and backend integration.',
-    to: '/docs',
+    to: '/admin/docs',
     icon: BookOpen,
     exact: true,
   },
   {
     title: 'UI',
     description: 'Reusable UI components, primitives, and showcase workflow.',
-    to: '/docs/ui',
+    to: '/admin/docs/ui',
     icon: Component,
     exact: false,
   },
   {
     title: 'Components',
     description: 'UI-kit style API docs for reusable components.',
-    to: '/docs/ui/components',
+    to: '/admin/docs/ui/components',
     icon: FileCode2,
     exact: false,
   },
   {
     title: 'Glass',
     description: 'Shared liquid-glass presets, hooks, and pointer interaction helpers.',
-    to: '/docs/ui/components/glass',
+    to: '/admin/docs/ui/components/glass',
     icon: Sparkles,
     exact: true,
   },
   {
     title: 'Header',
     description: 'Scroll-aware top navigation component with liquid glass variants.',
-    to: '/docs/ui/components/header',
+    to: '/admin/docs/ui/components/header',
     icon: Route,
     exact: true,
   },
   {
     title: 'Tabs',
     description: 'Radix tabs with solid, glass, liquid, and Telegram-style surfaces.',
-    to: '/docs/ui/components/tabs',
+    to: '/admin/docs/ui/components/tabs',
     icon: GalleryHorizontalEnd,
     exact: true,
   },
   {
     title: 'ResizableCard',
     description: 'Expandable card, resize, and motion API.',
-    to: '/docs/ui/components/resizable-card',
+    to: '/admin/docs/ui/components/resizable-card',
     icon: Paintbrush,
     exact: true,
   },
@@ -82,14 +82,14 @@ export const docsNavItems = [
     title: 'Sidebar',
     description:
       'Composable shell navigation with liquid glass, glass, fluent, and solid variants.',
-    to: '/docs/ui/components/sidebar',
+    to: '/admin/docs/ui/components/sidebar',
     icon: PanelLeft,
     exact: true,
   },
   {
     title: 'Shared UI',
     description: 'Low-level primitives with one page per shared component.',
-    to: '/docs/ui/components/shared',
+    to: '/admin/docs/ui/components/shared',
     icon: Layers3,
     exact: false,
   },
@@ -150,7 +150,7 @@ export const uiPrinciples = [
   {
     title: 'Reusable Components',
     description:
-      'Put stateful, animated, reusable components in src/components with local types, hooks, constants, and public docs under /docs/ui/components.',
+      'Put stateful, animated, reusable components in src/components with local types, hooks, constants, and public docs under /admin/docs/ui/components.',
     icon: Boxes,
   },
   {
@@ -162,7 +162,7 @@ export const uiPrinciples = [
   {
     title: 'Component Docs',
     description:
-      'When a public prop changes, update the matching /docs/ui/components page rather than burying API details in prompts.',
+      'When a public prop changes, update the matching /admin/docs/ui/components page rather than burying API details in prompts.',
     icon: FileCode2,
   },
   {
@@ -180,7 +180,7 @@ export const uiComponentDocs = [
     description:
       'Presets, hooks, and motion helpers used by liquid-glass Header, Sidebar, and Tabs implementations.',
     notes: ['fluid presets', 'pointer progress', 'RAF CSS variables', 'motion drag helpers'],
-    to: '/docs/ui/components/glass',
+    to: '/admin/docs/ui/components/glass',
     icon: Sparkles,
   },
   {
@@ -194,7 +194,7 @@ export const uiComponentDocs = [
       'manual collapse mode',
       'slot-based API',
     ],
-    to: '/docs/ui/components/header',
+    to: '/admin/docs/ui/components/header',
     icon: Route,
   },
   {
@@ -203,7 +203,7 @@ export const uiComponentDocs = [
     description:
       'Compound Tabs, TabsList, TabsTrigger, and TabsContent components with moving active indicators and fluid interaction tuning.',
     notes: ['solid/glass/liquid designs', 'icons and badges', 'vertical tabs', 'fluid presets'],
-    to: '/docs/ui/components/tabs',
+    to: '/admin/docs/ui/components/tabs',
     icon: GalleryHorizontalEnd,
   },
   {
@@ -217,7 +217,7 @@ export const uiComponentDocs = [
       'resize handle',
       'modal accessibility',
     ],
-    to: '/docs/ui/components/resizable-card',
+    to: '/admin/docs/ui/components/resizable-card',
     icon: Paintbrush,
   },
   {
@@ -231,7 +231,7 @@ export const uiComponentDocs = [
       'compound items',
       'collapsed labels',
     ],
-    to: '/docs/ui/components/sidebar',
+    to: '/admin/docs/ui/components/sidebar',
     icon: PanelLeft,
   },
   {
@@ -240,7 +240,7 @@ export const uiComponentDocs = [
     description:
       'Button, Card, Dialog, Form, Select, Slider, Tabs, Tooltip, and other building blocks used by modules, each with its own docs page.',
     notes: ['per-component docs', 'CVA variants', 'Radix primitives', 'barrel exports'],
-    to: '/docs/ui/components/shared',
+    to: '/admin/docs/ui/components/shared',
     icon: Wrench,
   },
   {

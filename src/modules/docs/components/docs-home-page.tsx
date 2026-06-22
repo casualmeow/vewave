@@ -1,23 +1,16 @@
 import { Link } from '@tanstack/react-router'
 import { Callout } from 'fumadocs-ui/components/callout'
 import { Card, Cards } from 'fumadocs-ui/components/card'
-import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/layouts/docs/page'
 import { ArrowRight, CheckCircle2, Copy, TerminalSquare } from 'lucide-react'
 import { motion } from 'motion/react'
 
 import { architectureRows, overviewCards, quickStartCommands } from '../content/docs-content'
+import { DocsBody, DocsDescription, DocsPage, DocsTitle } from './docs-page-layout'
 import { Button } from '@/shared/ui'
 
 export function DocsHomePage() {
   return (
-    <DocsPage
-      full
-      breadcrumb={{ enabled: false }}
-      footer={{ enabled: false }}
-      tableOfContent={{ enabled: false }}
-      tableOfContentPopover={{ enabled: false }}
-      className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8"
-    >
+    <DocsPage className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8">
       <DocsTitle className="text-4xl font-semibold tracking-tight text-zinc-950 sm:text-6xl">
         Vewave Project Docs
       </DocsTitle>
@@ -48,13 +41,13 @@ export function DocsHomePage() {
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Button asChild>
-                  <Link to="/docs/ui">
+                  <Link to="/admin/docs/ui">
                     Read UI docs
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link to="/ui/showcase">Open showcase</Link>
+                  <Link to="/admin/docs/ui/components">Open showcase</Link>
                 </Button>
               </div>
             </div>
@@ -86,10 +79,10 @@ export function DocsHomePage() {
             </motion.div>
           </motion.section>
 
-          <Callout type="info" title="Fumadocs integration note">
-            Vewave remains a Vite + TanStack Router app. The docs route uses Fumadocs UI page
-            primitives, Fumadocs styles, and local module content without converting the app to
-            TanStack Start.
+          <Callout type="info" title="Documentation integration note">
+            Vewave remains a Vite + TanStack Router app. The admin docs route uses the local docs
+            shell, content primitives, and module-owned content without adding the old public docs
+            layout back.
           </Callout>
 
           <section className="grid gap-4 md:grid-cols-3">
@@ -166,8 +159,8 @@ export function DocsHomePage() {
               Documentation Surfaces
             </h2>
             <p className="mt-2 text-sm leading-6 text-zinc-600">
-              Fumadocs cards are used for quick navigation while the module owns Vewave-specific
-              layout and animation behavior.
+              Cards are used for quick navigation while the module owns Vewave-specific layout and
+              animation behavior.
             </p>
             <Cards className="mt-5">
               <Card

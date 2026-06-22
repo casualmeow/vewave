@@ -1,22 +1,15 @@
 import { Link } from '@tanstack/react-router'
 import { Callout } from 'fumadocs-ui/components/callout'
-import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/layouts/docs/page'
 import { ArrowRight, Check, Code2 } from 'lucide-react'
 import { motion } from 'motion/react'
 
 import { uiComponentDocs, uiPrinciples } from '../content/docs-content'
+import { DocsBody, DocsDescription, DocsPage, DocsTitle } from './docs-page-layout'
 import { Button } from '@/shared/ui'
 
 export function DocsUiPage() {
   return (
-    <DocsPage
-      full
-      breadcrumb={{ enabled: false }}
-      footer={{ enabled: false }}
-      tableOfContent={{ enabled: false }}
-      tableOfContentPopover={{ enabled: false }}
-      className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8"
-    >
+    <DocsPage className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8">
       <DocsTitle className="text-4xl font-semibold tracking-tight text-zinc-950 sm:text-6xl">
         UI Documentation
       </DocsTitle>
@@ -48,7 +41,7 @@ export function DocsUiPage() {
                 </p>
               </div>
               <Button asChild>
-                <Link to="/docs/ui/components">
+                <Link to="/admin/docs/ui/components">
                   Open component docs
                   <ArrowRight className="size-4" />
                 </Link>
@@ -78,8 +71,8 @@ export function DocsUiPage() {
           </section>
 
           <Callout type="idea" title="UI docs workflow">
-            Use this page for standing conventions and /docs/ui/components for exact public APIs
-            plus live component playgrounds.
+            Use this page for standing conventions and /admin/docs/ui/components for exact public
+            APIs plus live component playgrounds.
           </Callout>
 
           <section>
@@ -94,7 +87,7 @@ export function DocsUiPage() {
                 </p>
               </div>
               <Button asChild variant="outline" size="sm">
-                <Link to="/docs/ui/components">
+                <Link to="/admin/docs/ui/components">
                   Component docs
                   <ArrowRight className="size-4" />
                 </Link>

@@ -1,0 +1,11 @@
+import { createFileRoute } from '@tanstack/react-router'
+
+import { SharedUiComponentDocsPage } from '@/modules/docs'
+
+export const Route = createFileRoute('/admin/docs/ui/components/shared/secure-input/')({
+  component: SecureInputSharedUiDocsRoute,
+})
+
+function SecureInputSharedUiDocsRoute() {
+  return <SharedUiComponentDocsPage slug="secure-input" />
+}

@@ -12,7 +12,7 @@ export function RequireAuth({ children }: RequireAuthProps) {
 
   useEffect(() => {
     if (status === 'anonymous') {
-      void navigate({ to: '/sign-in' })
+      void navigate({ to: '/sign-in', search: { redirectTo: undefined } })
     }
   }, [navigate, status])
 

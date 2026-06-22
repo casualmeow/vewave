@@ -30,6 +30,7 @@ export type MobileSidebarDockItem = {
   shortLabel?: string
   to: NonNullable<LinkProps['to']>
   params?: LinkProps['params']
+  search?: LinkProps['search']
   icon: ReactNode
   badge?: ReactNode
   disabled?: boolean
@@ -470,6 +471,7 @@ function MobileSidebarDockButton({
       <Link
         to={item.to}
         params={item.params}
+        search={item.search}
         aria-current={active ? 'page' : undefined}
         aria-disabled={item.disabled || undefined}
         tabIndex={item.disabled ? -1 : undefined}

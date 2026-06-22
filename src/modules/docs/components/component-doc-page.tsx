@@ -1,9 +1,9 @@
 import { Link } from '@tanstack/react-router'
 import { Callout } from 'fumadocs-ui/components/callout'
-import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/layouts/docs/page'
 import { ArrowRight, CheckCircle2, ExternalLink } from 'lucide-react'
 import { motion } from 'motion/react'
 import { DocsCodeBlock, DocsPropTable, DocsSection } from './component-doc-primitives'
+import { DocsBody, DocsDescription, DocsPage, DocsTitle } from './docs-page-layout'
 import type { ReactNode } from 'react'
 
 import type { ComponentDoc } from '../content/component-docs-content'
@@ -13,14 +13,7 @@ export function ComponentDocPage({ doc, showcase }: { doc: ComponentDoc; showcas
   const Icon = doc.icon
 
   return (
-    <DocsPage
-      full
-      breadcrumb={{ enabled: false }}
-      footer={{ enabled: false }}
-      tableOfContent={{ enabled: false }}
-      tableOfContentPopover={{ enabled: false }}
-      className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8"
-    >
+    <DocsPage className="rounded-lg border border-zinc-200 bg-white px-5 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:px-8">
       <div className="inline-flex items-center gap-2 rounded-full border border-teal-900/10 bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
         <Icon className="size-4" />
         {doc.eyebrow}
@@ -60,7 +53,8 @@ export function ComponentDocPage({ doc, showcase }: { doc: ComponentDoc; showcas
 
           <Callout type="info" title="Docs location">
             Component docs now live in this UI-kit documentation route. Component folders should
-            keep implementation, tests, and public exports, while /docs owns usage documentation.
+            keep implementation, tests, and public exports, while /admin/docs owns usage
+            documentation.
           </Callout>
 
           {showcase ? (
@@ -117,13 +111,13 @@ export function ComponentDocPage({ doc, showcase }: { doc: ComponentDoc; showcas
             </div>
             <div className="flex flex-wrap gap-2">
               <Button asChild variant="secondary">
-                <Link to="/ui/showcase">
+                <Link to="/admin/docs/ui/components">
                   Open showcase
                   <ExternalLink className="size-4" />
                 </Link>
               </Button>
               <Button asChild variant="outline" className="border-white/20 bg-white/5 text-white">
-                <Link to="/docs/ui/components">
+                <Link to="/admin/docs/ui/components">
                   All components
                   <ArrowRight className="size-4" />
                 </Link>

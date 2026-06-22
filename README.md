@@ -45,7 +45,6 @@ transport lives under `src/core/api/http/**`.
 Before shipping substantial work, run:
 
 ```bash
-npm run test
 npm run check
 npm run build
 ```

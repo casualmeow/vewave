@@ -58,6 +58,7 @@ type ProfileView = {
   avatarUrl: string | null
   bio: string | null
   email?: string
+  isAdmin?: boolean
   createdAt: string
   canEdit: boolean
 }
@@ -136,6 +137,7 @@ function toAuthUser(profile: ProfileView, fallback: AuthUser): AuthUser {
     username: profile.username,
     avatarUrl: profile.avatarUrl,
     bio: profile.bio,
+    isAdmin: profile.isAdmin ?? fallback.isAdmin,
   }
 }
 
@@ -285,7 +287,9 @@ export function ProfilePage({ username }: ProfilePageProps) {
           </CardHeader>
           <CardContent className="flex flex-col gap-3 sm:flex-row">
             <Button asChild className="rounded-full">
-              <Link to="/sign-in">Sign in</Link>
+              <Link to="/sign-in" search={{ redirectTo: undefined }}>
+                Sign in
+              </Link>
             </Button>
             <Button asChild variant="outline" className="rounded-full bg-white/70">
               <Link to="/sign-up">Create account</Link>

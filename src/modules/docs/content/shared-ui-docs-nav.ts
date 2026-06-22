@@ -41,30 +41,30 @@ export type SharedUiDocSlug =
   | 'tooltip'
 
 export type SharedUiDocRoute =
-  | '/docs/ui/components/shared/access-selector'
-  | '/docs/ui/components/shared/avatar'
-  | '/docs/ui/components/shared/button'
-  | '/docs/ui/components/shared/card'
-  | '/docs/ui/components/shared/checkbox'
-  | '/docs/ui/components/shared/cropper'
-  | '/docs/ui/components/shared/dialog'
-  | '/docs/ui/components/shared/dropdown-menu'
-  | '/docs/ui/components/shared/edit-player'
-  | '/docs/ui/components/shared/form'
-  | '/docs/ui/components/shared/input'
-  | '/docs/ui/components/shared/label'
-  | '/docs/ui/components/shared/progress'
-  | '/docs/ui/components/shared/register-password-input'
-  | '/docs/ui/components/shared/secure-input'
-  | '/docs/ui/components/shared/select'
-  | '/docs/ui/components/shared/separator'
-  | '/docs/ui/components/shared/sheet'
-  | '/docs/ui/components/shared/slider'
-  | '/docs/ui/components/shared/sonner'
-  | '/docs/ui/components/shared/spinning-icon'
-  | '/docs/ui/components/shared/table'
-  | '/docs/ui/components/shared/tabs'
-  | '/docs/ui/components/shared/tooltip'
+  | '/admin/docs/ui/components/shared/access-selector'
+  | '/admin/docs/ui/components/shared/avatar'
+  | '/admin/docs/ui/components/shared/button'
+  | '/admin/docs/ui/components/shared/card'
+  | '/admin/docs/ui/components/shared/checkbox'
+  | '/admin/docs/ui/components/shared/cropper'
+  | '/admin/docs/ui/components/shared/dialog'
+  | '/admin/docs/ui/components/shared/dropdown-menu'
+  | '/admin/docs/ui/components/shared/edit-player'
+  | '/admin/docs/ui/components/shared/form'
+  | '/admin/docs/ui/components/shared/input'
+  | '/admin/docs/ui/components/shared/label'
+  | '/admin/docs/ui/components/shared/progress'
+  | '/admin/docs/ui/components/shared/register-password-input'
+  | '/admin/docs/ui/components/shared/secure-input'
+  | '/admin/docs/ui/components/shared/select'
+  | '/admin/docs/ui/components/shared/separator'
+  | '/admin/docs/ui/components/shared/sheet'
+  | '/admin/docs/ui/components/shared/slider'
+  | '/admin/docs/ui/components/shared/sonner'
+  | '/admin/docs/ui/components/shared/spinning-icon'
+  | '/admin/docs/ui/components/shared/table'
+  | '/admin/docs/ui/components/shared/tabs'
+  | '/admin/docs/ui/components/shared/tooltip'
 
 export type SharedUiDocCategory =
   | 'actions'
@@ -131,7 +131,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'button',
     title: 'Button',
-    to: '/docs/ui/components/shared/button',
+    to: '/admin/docs/ui/components/shared/button',
     file: 'src/shared/ui/button.tsx',
     category: 'actions',
     icon: Play,
@@ -140,7 +140,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'card',
     title: 'Card',
-    to: '/docs/ui/components/shared/card',
+    to: '/admin/docs/ui/components/shared/card',
     file: 'src/shared/ui/card.tsx',
     category: 'surfaces',
     icon: Layers3,
@@ -149,7 +149,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'avatar',
     title: 'Avatar',
-    to: '/docs/ui/components/shared/avatar',
+    to: '/admin/docs/ui/components/shared/avatar',
     file: 'src/shared/ui/avatar.tsx',
     category: 'surfaces',
     icon: BadgeCheck,
@@ -158,7 +158,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'checkbox',
     title: 'Checkbox',
-    to: '/docs/ui/components/shared/checkbox',
+    to: '/admin/docs/ui/components/shared/checkbox',
     file: 'src/shared/ui/checkbox.tsx',
     category: 'forms',
     icon: Check,
@@ -167,7 +167,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'cropper',
     title: 'Cropper',
-    to: '/docs/ui/components/shared/cropper',
+    to: '/admin/docs/ui/components/shared/cropper',
     file: 'src/shared/ui/cropper.tsx',
     category: 'specialized',
     icon: Eye,
@@ -176,7 +176,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'dialog',
     title: 'Dialog',
-    to: '/docs/ui/components/shared/dialog',
+    to: '/admin/docs/ui/components/shared/dialog',
     file: 'src/shared/ui/dialog.tsx',
     category: 'overlays',
     icon: MessageSquare,
@@ -185,7 +185,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'dropdown-menu',
     title: 'DropdownMenu',
-    to: '/docs/ui/components/shared/dropdown-menu',
+    to: '/admin/docs/ui/components/shared/dropdown-menu',
     file: 'src/shared/ui/dropdown-menu.tsx',
     category: 'overlays',
     icon: ChevronDown,
@@ -194,7 +194,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'edit-player',
     title: 'EditPlayer',
-    to: '/docs/ui/components/shared/edit-player',
+    to: '/admin/docs/ui/components/shared/edit-player',
     file: 'src/shared/ui/edit-player.tsx',
     category: 'specialized',
     icon: Play,
@@ -203,7 +203,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'form',
     title: 'Form',
-    to: '/docs/ui/components/shared/form',
+    to: '/admin/docs/ui/components/shared/form',
     file: 'src/shared/ui/form.tsx',
     category: 'forms',
     icon: Settings2,
@@ -212,7 +212,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'input',
     title: 'Input',
-    to: '/docs/ui/components/shared/input',
+    to: '/admin/docs/ui/components/shared/input',
     file: 'src/shared/ui/input.tsx',
     category: 'forms',
     icon: Settings2,
@@ -221,7 +221,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'label',
     title: 'Label',
-    to: '/docs/ui/components/shared/label',
+    to: '/admin/docs/ui/components/shared/label',
     file: 'src/shared/ui/label.tsx',
     category: 'forms',
     icon: Settings2,
@@ -230,7 +230,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'progress',
     title: 'Progress',
-    to: '/docs/ui/components/shared/progress',
+    to: '/admin/docs/ui/components/shared/progress',
     file: 'src/shared/ui/progress.tsx',
     category: 'feedback',
     icon: TableProperties,
@@ -239,7 +239,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'register-password-input',
     title: 'RegisterPasswordInput',
-    to: '/docs/ui/components/shared/register-password-input',
+    to: '/admin/docs/ui/components/shared/register-password-input',
     file: 'src/shared/ui/register-password-input.tsx',
     category: 'forms',
     icon: LockKeyhole,
@@ -248,7 +248,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'secure-input',
     title: 'SecureInput',
-    to: '/docs/ui/components/shared/secure-input',
+    to: '/admin/docs/ui/components/shared/secure-input',
     file: 'src/shared/ui/secure-input.tsx',
     category: 'forms',
     icon: LockKeyhole,
@@ -257,7 +257,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'select',
     title: 'Select',
-    to: '/docs/ui/components/shared/select',
+    to: '/admin/docs/ui/components/shared/select',
     file: 'src/shared/ui/select.tsx',
     category: 'forms',
     icon: ChevronDown,
@@ -266,7 +266,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'separator',
     title: 'Separator',
-    to: '/docs/ui/components/shared/separator',
+    to: '/admin/docs/ui/components/shared/separator',
     file: 'src/shared/ui/separator.tsx',
     category: 'surfaces',
     icon: Layers3,
@@ -275,7 +275,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'sheet',
     title: 'Sheet',
-    to: '/docs/ui/components/shared/sheet',
+    to: '/admin/docs/ui/components/shared/sheet',
     file: 'src/shared/ui/sheet.tsx',
     category: 'overlays',
     icon: PanelRight,
@@ -284,7 +284,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'slider',
     title: 'Slider',
-    to: '/docs/ui/components/shared/slider',
+    to: '/admin/docs/ui/components/shared/slider',
     file: 'src/shared/ui/slider.tsx',
     category: 'forms',
     icon: Settings2,
@@ -293,7 +293,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'sonner',
     title: 'Sonner Toaster',
-    to: '/docs/ui/components/shared/sonner',
+    to: '/admin/docs/ui/components/shared/sonner',
     file: 'src/shared/ui/sonner.tsx',
     category: 'feedback',
     icon: Bell,
@@ -302,7 +302,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'spinning-icon',
     title: 'SpinIcon',
-    to: '/docs/ui/components/shared/spinning-icon',
+    to: '/admin/docs/ui/components/shared/spinning-icon',
     file: 'src/shared/ui/spinning-icon.tsx',
     category: 'feedback',
     icon: Settings2,
@@ -311,7 +311,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'table',
     title: 'Table',
-    to: '/docs/ui/components/shared/table',
+    to: '/admin/docs/ui/components/shared/table',
     file: 'src/shared/ui/table.tsx',
     category: 'data',
     icon: TableProperties,
@@ -320,7 +320,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'tabs',
     title: 'Tabs',
-    to: '/docs/ui/components/shared/tabs',
+    to: '/admin/docs/ui/components/shared/tabs',
     file: 'src/shared/ui/tabs.tsx',
     category: 'surfaces',
     icon: Layers3,
@@ -329,7 +329,7 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'tooltip',
     title: 'Tooltip',
-    to: '/docs/ui/components/shared/tooltip',
+    to: '/admin/docs/ui/components/shared/tooltip',
     file: 'src/shared/ui/tooltip.tsx',
     category: 'overlays',
     icon: Eye,
@@ -338,8 +338,8 @@ export const sharedUiDocNavItems: Array<SharedUiDocNavItem> = [
   {
     slug: 'access-selector',
     title: 'AccessSelector',
-    to: '/docs/ui/components/shared/access-selector',
-    file: 'src/shared/ui/edit-acess-selector.tsx',
+    to: '/admin/docs/ui/components/shared/access-selector',
+    file: 'src/shared/ui/edit-access-selector.tsx',
     category: 'specialized',
     icon: LockKeyhole,
     description: 'Small visibility selector for Public, Unlisted, and Private access states.',

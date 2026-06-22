@@ -42,7 +42,7 @@ export function OAuthCallbackPage() {
           description: oauthErrorDescription ?? oauthError,
         })
         setAnonymous()
-        await navigate({ to: '/sign-in' })
+        await navigate({ to: '/sign-in', search: { redirectTo: undefined } })
         return
       }
 
@@ -70,7 +70,7 @@ export function OAuthCallbackPage() {
           description: description.message,
         })
         setAnonymous()
-        await navigate({ to: '/sign-in' })
+        await navigate({ to: '/sign-in', search: { redirectTo: undefined } })
       }
     }
 
