@@ -27,6 +27,7 @@ import {
   type AppSidebarRoomItem,
   type AppSidebarServerItem,
 } from '../app-sidebar-items'
+import { AppSettingsDialog } from './app-settings-dialog'
 import type { ReactNode } from 'react'
 import type { AuthStatus, AuthUser } from '@/modules/auth/model/types'
 import {
@@ -45,10 +46,6 @@ import {
   AvatarImage,
   Button,
   Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
   Separator,
   SpinIcon,
@@ -255,7 +252,7 @@ function AppSidebarIdentity({
   if (!user) {
     return (
       <SidebarBrand
-        visual={<VewaveLogoMark className="size-14 text-lg" label="VW" surfaceToken="sidebar" />}
+        visual={<VewaveLogoMark className="size-14 text-lg" surfaceToken="sidebar" />}
         title="Guest workspace"
         subtitle="Sign in to sync rooms"
         meta={
@@ -271,62 +268,26 @@ function AppSidebarIdentity({
   }
 
   return (
-    <Dialog>
-      <SidebarBrand
-        visual={
-          <Link
-            to="/profile"
-            aria-label="Open profile"
-            className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
-          >
-            <Avatar className="size-14 border border-[color:var(--glass-border)] shadow-sm">
-              <AvatarImage src={user.avatarUrl ?? undefined} alt={user.name ?? 'User avatar'} />
-              <AvatarFallback>{initials}</AvatarFallback>
-            </Avatar>
-          </Link>
-        }
-        title={
-          <Link to="/profile" className="outline-none hover:text-primary focus-visible:underline">
-            {user.name ?? 'Profile'}
-          </Link>
-        }
-        subtitle={subtitle ?? user.email}
-        meta={
-          <DialogTrigger asChild>
-            <button
-              type="button"
-              aria-label="Open app settings"
-              className="grid size-10 place-items-center rounded-full border border-[color:var(--glass-border)] bg-[var(--glass-background)] text-sidebar-foreground shadow-[0_10px_26px_color-mix(in_srgb,var(--foreground)_12%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-xl transition-[background-color,color,box-shadow] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-            >
-              <SpinIcon size="sm" hoverDuration={1000} behavior="hover">
-                <Settings className="size-full" />
-              </SpinIcon>
-            </button>
-          </DialogTrigger>
-        }
-      />
-
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>App settings</DialogTitle>
-          <DialogDescription>
-            Mock workspace settings for rooms, servers, and playback defaults.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-3">
-          {[
-            ['History retention', 'Keep recent room visits visible in the app sidebar.'],
-            ['Room defaults', 'New rooms start private until you share the invite code.'],
-            ['Server preference', 'Use the closest sync relay unless a room requires another hub.'],
-          ].map(([title, description]) => (
-            <div key={title} className="rounded-2xl border bg-muted/35 p-4">
-              <div className="font-medium text-foreground">{title}</div>
-              <div className="mt-1 text-sm leading-6 text-muted-foreground">{description}</div>
-            </div>
-          ))}
-        </div>
-      </DialogContent>
-    </Dialog>
+    <SidebarBrand
+      visual={
+        <Link
+          to="/profile"
+          aria-label="Open profile"
+          className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+        >
+          <Avatar className="size-14 border border-[color:var(--glass-border)] shadow-sm">
+            <AvatarImage src={user.avatarUrl ?? undefined} alt={user.name ?? 'User avatar'} />
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>
+        </Link>
+      }
+      title={
+        <Link to="/profile" className="outline-none hover:text-primary focus-visible:underline">
+          {user.name ?? 'Profile'}
+        </Link>
+      }
+      subtitle={subtitle ?? user.email}
+    />
   )
 }
 
@@ -345,6 +306,15 @@ function AppSidebarFooter({
       <SidebarItem type="button" icon={<LifeBuoy />} value="support">
         Support
       </SidebarItem>
+
+      <Dialog>
+        <DialogTrigger asChild>
+          <SidebarItem type="button" icon={<Settings />} value="settings">
+            Settings
+          </SidebarItem>
+        </DialogTrigger>
+        <AppSettingsDialog />
+      </Dialog>
 
       <Separator className="my-1 bg-sidebar-border" />
 

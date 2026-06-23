@@ -20,7 +20,6 @@ export function LandingHeader() {
       topOffset={16}
       blurIntensity="xl"
       showGlow
-      glowColor="rgba(45, 212, 191, 0.28)"
       revealAtTop={32}
       navigationLabel="Landing"
       logo={

@@ -3,6 +3,7 @@ export const resolvedAppearanceModes = ['light', 'dark'] as const
 export const appearancePresetIds = ['default', 'vewave'] as const
 export const logoStrategies = ['auto', 'light', 'dark', 'mono'] as const
 export const glassIntensities = ['subtle', 'balanced', 'strong'] as const
+export const appearanceConfigVersion = 1
 
 export type AppearanceMode = (typeof appearanceModes)[number]
 export type ResolvedAppearanceMode = (typeof resolvedAppearanceModes)[number]
@@ -61,6 +62,7 @@ export type ThemeTokenName =
   | 'glassHighlight'
   | 'logoBorder'
   | 'logoDark'
+  | 'logoAccent'
   | 'logoDarkForeground'
   | 'logoLight'
   | 'logoLightForeground'
@@ -69,7 +71,59 @@ export type ThemeTokenName =
 
 export type ThemeTokens = Record<ThemeTokenName, string>
 
-export type EditableThemeTokenName = 'primary' | 'accent'
+export const editableThemeTokenNames = [
+  'background',
+  'foreground',
+  'card',
+  'cardForeground',
+  'popover',
+  'popoverForeground',
+  'surfaceElevated',
+  'border',
+  'input',
+  'ring',
+  'primary',
+  'primaryForeground',
+  'secondary',
+  'secondaryForeground',
+  'muted',
+  'mutedForeground',
+  'accent',
+  'accentForeground',
+  'destructive',
+  'destructiveForeground',
+  'success',
+  'successForeground',
+  'warning',
+  'warningForeground',
+  'mediaBackground',
+  'mediaForeground',
+  'sidebar',
+  'sidebarForeground',
+  'sidebarPrimary',
+  'sidebarPrimaryForeground',
+  'sidebarAccent',
+  'sidebarAccentForeground',
+  'sidebarBorder',
+  'sidebarRing',
+  'header',
+  'headerForeground',
+  'headerBorder',
+  'logoDark',
+  'logoAccent',
+  'logoDarkForeground',
+  'logoLight',
+  'logoLightForeground',
+  'tabsTrack',
+  'tabsActive',
+  'chart1',
+  'chart2',
+  'chart3',
+  'chart4',
+  'chart5',
+] as const satisfies ReadonlyArray<ThemeTokenName>
+
+export type EditableThemeTokenName = (typeof editableThemeTokenNames)[number]
 
 export type ThemePreset = {
   id: AppearancePresetId
@@ -87,6 +141,8 @@ export type CustomThemeSettings = {
 }
 
 export type AppearanceSettings = {
+  version: typeof appearanceConfigVersion
+  mode: AppearanceMode
   preset: AppearancePresetId
   logoStrategy: LogoStrategy
   glassIntensity: GlassIntensity
@@ -144,6 +200,7 @@ export const cssVariableByToken = {
   glassHighlight: '--glass-highlight',
   logoBorder: '--logo-border',
   logoDark: '--logo-dark',
+  logoAccent: '--logo-accent',
   logoDarkForeground: '--logo-dark-foreground',
   logoLight: '--logo-light',
   logoLightForeground: '--logo-light-foreground',

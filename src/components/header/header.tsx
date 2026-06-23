@@ -144,7 +144,7 @@ export function Header({
   borderRadiusCollapsed = 999,
   topOffset = 12,
   showGlow = false,
-  glowColor = 'rgba(255, 255, 255, 0.28)',
+  glowColor = 'color-mix(in srgb, var(--primary) 34%, transparent)',
 
   motionPreset = 'spring',
   smoothScrollMotion = true,

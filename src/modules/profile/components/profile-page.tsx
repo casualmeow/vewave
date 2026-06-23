@@ -7,13 +7,22 @@ import {
   KeyRound,
   Mail,
   Save,
+  Upload,
   UserRound,
 } from 'lucide-react'
-import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+  type ReactNode,
+} from 'react'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { AppearancePanel } from './appearance-panel'
+import type { UserAppConfig } from '@/shared/theme'
+import { AppearanceSettingsEntry } from '@/modules/appearance'
 import {
   getGetApiProfileByUsernameQueryKey,
   getGetApiProfileMeQueryKey,
@@ -21,8 +30,10 @@ import {
   useGetApiProfileMe,
   usePatchApiProfileMe,
   usePatchApiProfileMePassword,
+  usePostApiProfileMeAvatar,
   type PatchApiProfileMeMutationBody,
   type PatchApiProfileMePasswordMutationBody,
+  type PostApiProfileMeAvatarMutationBody,
 } from '@/core/api/generated/profile/profile'
 import { getApiErrorMessage } from '@/core/api/http/errors'
 import { useAuthStore, type AuthUser } from '@/modules/auth'
@@ -61,6 +72,7 @@ type ProfileView = {
   bio: string | null
   email?: string
   isAdmin?: boolean
+  appConfig?: UserAppConfig
   createdAt: string
   canEdit: boolean
 }
@@ -91,6 +103,10 @@ const emptyPasswordForm: PasswordFormState = {
   confirmPassword: '',
 }
 
+const avatarAccept = 'image/png,image/jpeg,image/webp,image/gif'
+const avatarMaxSize = 2 * 1024 * 1024
+const acceptedAvatarTypes = new Set(avatarAccept.split(','))
+
 function getInitials(name?: string | null, email?: string | null) {
   const source = name?.trim() || email?.trim() || 'Vewave User'
   const parts = source.split(/\s+/).filter(Boolean)
@@ -117,6 +133,10 @@ function nullableField(value: string) {
   return trimmed ? trimmed : null
 }
 
+function getPublicUsername(profile: Pick<ProfileView, 'handle' | 'username'>) {
+  return profile.username ?? profile.handle?.replace(/^@+/, '') ?? null
+}
+
 function formatProfileDate(value: string) {
   const date = new Date(value)
 
@@ -140,6 +160,7 @@ function toAuthUser(profile: ProfileView, fallback: AuthUser): AuthUser {
     avatarUrl: profile.avatarUrl,
     bio: profile.bio,
     isAdmin: profile.isAdmin ?? fallback.isAdmin,
+    appConfig: profile.appConfig ?? fallback.appConfig,
   }
 }
 
@@ -172,6 +193,7 @@ export function ProfilePage({ username }: ProfilePageProps) {
 
   const updateProfileMutation = usePatchApiProfileMe()
   const changePasswordMutation = usePatchApiProfileMePassword()
+  const uploadAvatarMutation = usePostApiProfileMeAvatar()
 
   useEffect(() => {
     if (!profile?.canEdit) return
@@ -218,14 +240,16 @@ export function ProfilePage({ username }: ProfilePageProps) {
           queryKey: getGetApiProfileByUsernameQueryKey(routeUsername),
         })
 
-        if (nextProfile.handle && nextProfile.handle !== routeUsername) {
+        const nextPublicUsername = getPublicUsername(nextProfile)
+
+        if (nextPublicUsername && nextPublicUsername !== routeUsername) {
           await navigate({
             to: '/profile/$username',
-            params: { username: nextProfile.handle },
+            params: { username: nextPublicUsername },
           })
         }
 
-        if (!nextProfile.handle) {
+        if (!nextPublicUsername) {
           await navigate({ to: '/profile' })
         }
       }
@@ -233,6 +257,61 @@ export function ProfilePage({ username }: ProfilePageProps) {
       toast.success('Profile updated')
     } catch (error) {
       toast.error(getApiErrorMessage(error, 'Unable to update profile.'))
+    }
+  }
+
+  async function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0]
+    event.currentTarget.value = ''
+
+    if (!file || !profile?.canEdit || !user) return
+
+    if (!acceptedAvatarTypes.has(file.type)) {
+      toast.error('Upload a PNG, JPEG, WebP, or GIF image.')
+      return
+    }
+
+    if (file.size > avatarMaxSize) {
+      toast.error('Avatar image must be 2 MB or smaller.')
+      return
+    }
+
+    const formData = new FormData()
+    formData.set('file', file)
+
+    try {
+      const response = await uploadAvatarMutation.mutateAsync({
+        data: formData as unknown as PostApiProfileMeAvatarMutationBody,
+      })
+      const nextProfile = response.profile
+      const nextPublicUsername = getPublicUsername(nextProfile)
+
+      setProfileForm((current) => ({
+        ...current,
+        avatarUrl: nextProfile.avatarUrl ?? '',
+      }))
+
+      if (accessToken) {
+        setAuthenticated(toAuthUser(nextProfile, user), accessToken)
+      }
+
+      await queryClient.invalidateQueries({ queryKey: getGetApiProfileMeQueryKey() })
+
+      if (routeUsername) {
+        await queryClient.invalidateQueries({
+          queryKey: getGetApiProfileByUsernameQueryKey(routeUsername),
+        })
+      }
+
+      if (nextPublicUsername) {
+        await queryClient.invalidateQueries({
+          queryKey: getGetApiProfileByUsernameQueryKey(nextPublicUsername),
+        })
+      }
+
+      toast.success('Avatar uploaded')
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Unable to upload avatar.'))
     }
   }
 
@@ -322,7 +401,8 @@ export function ProfilePage({ username }: ProfilePageProps) {
   }
 
   const initials = getInitials(profile.name, profile.email)
-  const publicHandle = profile.handle ?? (profile.username ? `@${profile.username}` : null)
+  const publicUsername = getPublicUsername(profile)
+  const publicHandle = publicUsername ? `@${publicUsername}` : null
   const canEdit = profile.canEdit
 
   return (
@@ -347,9 +427,9 @@ export function ProfilePage({ username }: ProfilePageProps) {
               </div>
             </div>
 
-            {canEdit && publicHandle ? (
+            {canEdit && publicUsername ? (
               <Button asChild variant="outline" className="rounded-full bg-card/70">
-                <Link to="/profile/$username" params={{ username: publicHandle }}>
+                <Link to="/profile/$username" params={{ username: publicUsername }}>
                   <ExternalLink className="size-4" />
                   Public view
                 </Link>
@@ -427,7 +507,7 @@ export function ProfilePage({ username }: ProfilePageProps) {
                       </Field>
                     </div>
 
-                    <Field id="profile-avatar" label="Avatar URL">
+                    <Field id="profile-avatar-file" label="Avatar image">
                       <div className="grid gap-3 sm:grid-cols-[auto_1fr] sm:items-center">
                         <Avatar className="size-16 border border-border/70 shadow-sm">
                           <AvatarImage
@@ -438,18 +518,39 @@ export function ProfilePage({ username }: ProfilePageProps) {
                             {getInitials(profileForm.name, profile.email)}
                           </AvatarFallback>
                         </Avatar>
-                        <Input
-                          id="profile-avatar"
-                          value={profileForm.avatarUrl}
-                          maxLength={2048}
-                          placeholder="https://example.com/avatar.png"
-                          onChange={(event) =>
-                            setProfileForm((current) => ({
-                              ...current,
-                              avatarUrl: event.target.value,
-                            }))
-                          }
-                        />
+                        <div className="grid gap-2">
+                          <input
+                            id="profile-avatar-file"
+                            type="file"
+                            accept={avatarAccept}
+                            className="sr-only"
+                            disabled={uploadAvatarMutation.isPending}
+                            onChange={handleAvatarUpload}
+                          />
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Button asChild variant="outline" className="rounded-full bg-card/70">
+                              <Label
+                                htmlFor="profile-avatar-file"
+                                aria-disabled={uploadAvatarMutation.isPending}
+                                className={cn(
+                                  'cursor-pointer',
+                                  uploadAvatarMutation.isPending &&
+                                    'pointer-events-none opacity-60',
+                                )}
+                              >
+                                {uploadAvatarMutation.isPending ? (
+                                  <SpinIcon size="sm" label="Uploading avatar" />
+                                ) : (
+                                  <Upload className="size-4" />
+                                )}
+                                Upload image
+                              </Label>
+                            </Button>
+                          </div>
+                          <p className="text-xs leading-5 text-muted-foreground">
+                            PNG, JPEG, WebP, or GIF up to 2 MB. The image is saved immediately.
+                          </p>
+                        </div>
                       </div>
                     </Field>
 
@@ -478,7 +579,7 @@ export function ProfilePage({ username }: ProfilePageProps) {
                       <Button
                         type="submit"
                         className="rounded-full"
-                        disabled={updateProfileMutation.isPending}
+                        disabled={updateProfileMutation.isPending || uploadAvatarMutation.isPending}
                       >
                         {updateProfileMutation.isPending ? (
                           <SpinIcon size="sm" label="Saving profile" />
@@ -561,7 +662,7 @@ export function ProfilePage({ username }: ProfilePageProps) {
                 </TabsContent>
 
                 <TabsContent value="appearance">
-                  <AppearancePanel />
+                  <AppearanceSettingsEntry />
                 </TabsContent>
               </Tabs>
             </CardContent>

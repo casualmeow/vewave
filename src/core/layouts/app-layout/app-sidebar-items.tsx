@@ -2,6 +2,7 @@ import {
   Activity,
   FolderKanban,
   History,
+  Palette,
   PlusCircle,
   Radio,
   ShieldCheck,
@@ -11,7 +12,14 @@ import {
 } from 'lucide-react'
 import type { MobileSidebarDockItem } from '@/components/sidebar'
 
-export type AppSidebarRoute = '/projects' | '/create' | '/healthcheck' | '/admin' | '/room/$code'
+export type AppSidebarRoute =
+  | '/projects'
+  | '/create'
+  | '/healthcheck'
+  | '/appearance'
+  | '/appearance/preview'
+  | '/admin'
+  | '/room/$code'
 
 export type AppSidebarItem = {
   label: string
@@ -42,6 +50,7 @@ export const appPrimaryItems: ReadonlyArray<AppSidebarItem> = [
   { label: 'Projects', to: '/projects', icon: FolderKanban },
   { label: 'New project', shortLabel: 'Create', to: '/create', icon: PlusCircle, badge: 'New' },
   { label: 'Healthcheck', shortLabel: 'Health', to: '/healthcheck', icon: Activity },
+  { label: 'Appearance', shortLabel: 'Theme', to: '/appearance', icon: Palette },
 ]
 
 export const appAdminItem: AppSidebarItem = {

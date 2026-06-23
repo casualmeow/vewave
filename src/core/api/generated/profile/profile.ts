@@ -52,6 +52,15 @@ import type {
   PatchApiProfileMePasswordBodyOne,
   PatchApiProfileMePasswordBodyThree,
   PatchApiProfileMePasswordBodyTwo,
+  PostApiProfileMeAvatar200,
+  PostApiProfileMeAvatar400,
+  PostApiProfileMeAvatar401,
+  PostApiProfileMeAvatar404,
+  PostApiProfileMeAvatar409,
+  PostApiProfileMeAvatar500,
+  PostApiProfileMeAvatarBodyOne,
+  PostApiProfileMeAvatarBodyThree,
+  PostApiProfileMeAvatarBodyTwo,
 } from '../model'
 
 import { orvalMutator } from '../../http/orval-mutator.ts'
@@ -341,6 +350,145 @@ export const usePatchApiProfileMe = <
   TContext
 > => {
   return useMutation(getPatchApiProfileMeMutationOptions(options), queryClient)
+}
+/**
+ * Uploads a custom avatar image for the authenticated user and stores its public avatar URL on the profile.
+ * @summary Upload current profile avatar
+ */
+export const postApiProfileMeAvatar = (
+  postApiProfileMeAvatarBody:
+    | BodyType<
+        | PostApiProfileMeAvatarBodyOne
+        | PostApiProfileMeAvatarBodyTwo
+        | PostApiProfileMeAvatarBodyThree
+      >
+    | PostApiProfileMeAvatarBodyTwo
+    | PostApiProfileMeAvatarBodyThree,
+  options?: SecondParameter<typeof orvalMutator>,
+  signal?: AbortSignal,
+) => {
+  return orvalMutator<PostApiProfileMeAvatar200>(
+    { url: `/api/profile/me/avatar`, method: 'POST', data: postApiProfileMeAvatarBody, signal },
+    options,
+  )
+}
+
+export const getPostApiProfileMeAvatarMutationOptions = <
+  TError = ErrorType<
+    | PostApiProfileMeAvatar400
+    | PostApiProfileMeAvatar401
+    | PostApiProfileMeAvatar404
+    | PostApiProfileMeAvatar409
+    | PostApiProfileMeAvatar500
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
+    TError,
+    {
+      data: BodyType<
+        | PostApiProfileMeAvatarBodyOne
+        | PostApiProfileMeAvatarBodyTwo
+        | PostApiProfileMeAvatarBodyThree
+      >
+    },
+    TContext
+  >
+  request?: SecondParameter<typeof orvalMutator>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
+  TError,
+  {
+    data: BodyType<
+      | PostApiProfileMeAvatarBodyOne
+      | PostApiProfileMeAvatarBodyTwo
+      | PostApiProfileMeAvatarBodyThree
+    >
+  },
+  TContext
+> => {
+  const mutationKey = ['postApiProfileMeAvatar']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
+    {
+      data: BodyType<
+        | PostApiProfileMeAvatarBodyOne
+        | PostApiProfileMeAvatarBodyTwo
+        | PostApiProfileMeAvatarBodyThree
+      >
+    }
+  > = (props) => {
+    const { data } = props ?? {}
+
+    return postApiProfileMeAvatar(data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PostApiProfileMeAvatarMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiProfileMeAvatar>>
+>
+export type PostApiProfileMeAvatarMutationBody = BodyType<
+  PostApiProfileMeAvatarBodyOne | PostApiProfileMeAvatarBodyTwo | PostApiProfileMeAvatarBodyThree
+>
+export type PostApiProfileMeAvatarMutationError = ErrorType<
+  | PostApiProfileMeAvatar400
+  | PostApiProfileMeAvatar401
+  | PostApiProfileMeAvatar404
+  | PostApiProfileMeAvatar409
+  | PostApiProfileMeAvatar500
+>
+
+/**
+ * @summary Upload current profile avatar
+ */
+export const usePostApiProfileMeAvatar = <
+  TError = ErrorType<
+    | PostApiProfileMeAvatar400
+    | PostApiProfileMeAvatar401
+    | PostApiProfileMeAvatar404
+    | PostApiProfileMeAvatar409
+    | PostApiProfileMeAvatar500
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
+      TError,
+      {
+        data: BodyType<
+          | PostApiProfileMeAvatarBodyOne
+          | PostApiProfileMeAvatarBodyTwo
+          | PostApiProfileMeAvatarBodyThree
+        >
+      },
+      TContext
+    >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
+  TError,
+  {
+    data: BodyType<
+      | PostApiProfileMeAvatarBodyOne
+      | PostApiProfileMeAvatarBodyTwo
+      | PostApiProfileMeAvatarBodyThree
+    >
+  },
+  TContext
+> => {
+  return useMutation(getPostApiProfileMeAvatarMutationOptions(options), queryClient)
 }
 /**
  * Changes the authenticated user's password. Existing password users must provide the current password.

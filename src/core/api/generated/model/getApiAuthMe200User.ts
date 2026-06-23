@@ -5,6 +5,7 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
+import type { GetApiAuthMe200UserAppConfig } from './getApiAuthMe200UserAppConfig.ts'
 
 export type GetApiAuthMe200User = {
   id: string
@@ -17,4 +18,5 @@ export type GetApiAuthMe200User = {
   /** @nullable */
   bio: string | null
   isAdmin: boolean
+  appConfig: GetApiAuthMe200UserAppConfig
 }

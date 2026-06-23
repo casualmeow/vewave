@@ -1,7 +1,11 @@
 import {
+  appearanceConfigVersion,
+  appearanceModes,
   appearancePresetIds,
+  editableThemeTokenNames,
   glassIntensities,
   logoStrategies,
+  type AppearanceMode,
   type AppearanceSettings,
   type ResolvedAppearanceMode,
   type ThemeTokenOverrides,
@@ -12,6 +16,10 @@ import { normalizeHexColor } from './validators'
 export const appearanceStorageKey = 'vewave:appearance'
 export const appearanceModeStorageKey = 'vewave:appearance-mode'
 
+export type UserAppConfig = Record<string, unknown> & {
+  appearance?: unknown
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 }
@@ -21,13 +29,17 @@ function sanitizeOverrides(value: unknown): ThemeTokenOverrides {
     return {}
   }
 
-  const primary = typeof value.primary === 'string' ? normalizeHexColor(value.primary) : null
-  const accent = typeof value.accent === 'string' ? normalizeHexColor(value.accent) : null
+  const sanitized: ThemeTokenOverrides = {}
 
-  return {
-    ...(primary ? { primary } : {}),
-    ...(accent ? { accent } : {}),
-  }
+  editableThemeTokenNames.forEach((token) => {
+    const normalized = typeof value[token] === 'string' ? normalizeHexColor(value[token]) : null
+
+    if (normalized) {
+      sanitized[token] = normalized
+    }
+  })
+
+  return sanitized
 }
 
 function sanitizeModeOverrides(
@@ -51,6 +63,11 @@ export function sanitizeAppearanceSettings(value: unknown): AppearanceSettings {
   const customTheme = isRecord(value.customTheme) ? value.customTheme : {}
 
   return {
+    version: appearanceConfigVersion,
+    mode:
+      typeof value.mode === 'string' && appearanceModes.includes(value.mode as AppearanceMode)
+        ? (value.mode as AppearanceMode)
+        : defaultAppearanceSettings.mode,
     preset:
       typeof value.preset === 'string' &&
       appearancePresetIds.includes(value.preset as AppearanceSettings['preset'])
@@ -76,15 +93,42 @@ export function sanitizeAppearanceSettings(value: unknown): AppearanceSettings {
   }
 }
 
+export function getAppearanceSettingsFromAppConfig(value: unknown) {
+  if (!isRecord(value) || !isRecord(value.appearance)) {
+    return null
+  }
+
+  return sanitizeAppearanceSettings(value.appearance)
+}
+
+export function withAppearanceSettingsInAppConfig(
+  value: unknown,
+  settings: AppearanceSettings,
+): UserAppConfig {
+  return {
+    ...(isRecord(value) ? value : {}),
+    appearance: sanitizeAppearanceSettings(settings),
+  }
+}
+
 export function loadAppearanceSettings() {
   if (typeof window === 'undefined') {
     return defaultAppearanceSettings
   }
 
   try {
-    return sanitizeAppearanceSettings(
-      JSON.parse(window.localStorage.getItem(appearanceStorageKey) ?? 'null'),
-    )
+    const rawValue = JSON.parse(window.localStorage.getItem(appearanceStorageKey) ?? 'null')
+    const settings = sanitizeAppearanceSettings(rawValue)
+
+    if (isRecord(rawValue) && typeof rawValue.mode === 'string') {
+      return settings
+    }
+
+    const legacyMode = window.localStorage.getItem(appearanceModeStorageKey)
+
+    return legacyMode && appearanceModes.includes(legacyMode as AppearanceMode)
+      ? { ...settings, mode: legacyMode as AppearanceMode }
+      : settings
   } catch {
     return defaultAppearanceSettings
   }

@@ -1,4 +1,5 @@
 export * from './contract'
+export * from './hooks'
 export * from './logo'
 export * from './persistence'
 export * from './presets'

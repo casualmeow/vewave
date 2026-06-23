@@ -77,6 +77,7 @@ code {
   --color-glass-highlight: var(--glass-highlight);
   --color-logo-border: var(--logo-border);
   --color-logo-dark: var(--logo-dark);
+  --color-logo-accent: var(--logo-accent);
   --color-logo-dark-foreground: var(--logo-dark-foreground);
   --color-logo-light: var(--logo-light);
   --color-logo-light-foreground: var(--logo-light-foreground);
@@ -134,10 +135,11 @@ code {
   --glass-border: rgba(232, 218, 223, 0.82);
   --glass-highlight: rgba(255, 255, 255, 0.92);
   --logo-border: rgba(232, 218, 223, 0.82);
-  --logo-dark: #171216;
+  --logo-dark: #667280;
+  --logo-accent: #6985aa;
   --logo-dark-foreground: #ffffff;
-  --logo-light: #ffffff;
-  --logo-light-foreground: #171216;
+  --logo-light: #a5b5cb;
+  --logo-light-foreground: #0d121a;
   --tabs-track: #f7eef2;
   --tabs-active: #ffffff;
 }
@@ -191,9 +193,10 @@ code {
   --glass-border: rgba(107, 135, 171, 0.32);
   --glass-highlight: rgba(255, 255, 255, 0.1);
   --logo-border: rgba(107, 135, 171, 0.32);
-  --logo-dark: #0d121a;
-  --logo-dark-foreground: #e8eef6;
-  --logo-light: #e8eef6;
+  --logo-dark: #667280;
+  --logo-accent: #6985aa;
+  --logo-dark-foreground: #ffffff;
+  --logo-light: #a5b5cb;
   --logo-light-foreground: #0d121a;
   --tabs-track: #1b2430;
   --tabs-active: #293241;

@@ -101,7 +101,7 @@ function LandingIndexPage() {
             <div className="overflow-hidden rounded-lg border border-background/10 bg-background/[0.06] shadow-2xl shadow-foreground/30">
               <div className="flex items-center justify-between border-b border-background/10 bg-foreground/20 px-5 py-4">
                 <div className="flex items-center gap-3">
-                  <img src="/logo192.png" alt="" className="size-8 rounded-md" />
+                  <img src="/vewave-mark.svg" alt="" className="size-8" />
                   <div>
                     <div className="text-sm font-medium text-background">Vewave launch room</div>
                     <div className="text-xs text-background/55">Public preview</div>

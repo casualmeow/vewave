@@ -5,6 +5,7 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
+import type { PatchApiProfileMeBodyThreeAppConfig } from './patchApiProfileMeBodyThreeAppConfig.ts'
 
 export type PatchApiProfileMeBodyThree = {
   /**
@@ -28,4 +29,5 @@ export type PatchApiProfileMeBodyThree = {
    * @nullable
    */
   bio?: string | null
+  appConfig?: PatchApiProfileMeBodyThreeAppConfig
 }

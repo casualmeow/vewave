@@ -5,6 +5,7 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
+import type { PostApiAuthPasskeyAuthenticationVerify200UserAppConfig } from './postApiAuthPasskeyAuthenticationVerify200UserAppConfig.ts'
 
 export type PostApiAuthPasskeyAuthenticationVerify200User = {
   id: string
@@ -17,4 +18,5 @@ export type PostApiAuthPasskeyAuthenticationVerify200User = {
   /** @nullable */
   bio: string | null
   isAdmin: boolean
+  appConfig: PostApiAuthPasskeyAuthenticationVerify200UserAppConfig
 }

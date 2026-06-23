@@ -1,73 +1,29 @@
-import { ThemeProvider as NextThemeProvider, useTheme } from 'next-themes'
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 
 import {
-  appearanceModeStorageKey,
   loadAppearanceSettings,
+  sanitizeAppearanceSettings,
   saveAppearanceSettings,
 } from './persistence'
-import { defaultAppearanceSettings, getThemePreset } from './presets'
+import { defaultAppearanceSettings } from './presets'
 import { applyThemeTokens, clearThemeTokens, resolveThemeTokens } from './resolver'
 import {
   type AppearanceMode,
-  type AppearancePresetId,
   type AppearanceSettings,
-  type EditableThemeTokenName,
-  type GlassIntensity,
-  type LogoStrategy,
   type ResolvedAppearanceMode,
 } from './contract'
-
-type AppearanceContextValue = {
-  mode: AppearanceMode
-  resolvedMode: ResolvedAppearanceMode
-  settings: AppearanceSettings
-  tokens: ReturnType<typeof resolveThemeTokens>
-  resetAppearance: () => void
-  setCustomThemeEnabled: (enabled: boolean) => void
-  setCustomToken: (
-    mode: ResolvedAppearanceMode,
-    token: EditableThemeTokenName,
-    value: string,
-  ) => void
-  setGlassIntensity: (glassIntensity: GlassIntensity) => void
-  setLogoStrategy: (logoStrategy: LogoStrategy) => void
-  setMode: (mode: AppearanceMode) => void
-  setPreset: (preset: AppearancePresetId) => void
-}
-
-const AppearanceContext = createContext<AppearanceContextValue | null>(null)
+import { normalizeHexColor } from './validators'
+import { AppearanceContext, type AppearanceContextValue } from './context'
 
 export function AppThemeProvider({ children }: { children: ReactNode }) {
-  return (
-    <NextThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      disableTransitionOnChange
-      enableSystem
-      storageKey={appearanceModeStorageKey}
-      themes={['light', 'dark']}
-      value={{ dark: 'dark', light: 'light' }}
-    >
-      <AppearanceStateProvider>{children}</AppearanceStateProvider>
-    </NextThemeProvider>
-  )
+  return <AppearanceStateProvider>{children}</AppearanceStateProvider>
 }
 
 function AppearanceStateProvider({ children }: { children: ReactNode }) {
-  const { resolvedTheme, setTheme, theme } = useTheme()
   const [settings, setSettings] = useState<AppearanceSettings>(() => loadAppearanceSettings())
-  const resolvedMode: ResolvedAppearanceMode = resolvedTheme === 'dark' ? 'dark' : 'light'
-  const mode: AppearanceMode =
-    theme === 'light' || theme === 'dark' || theme === 'system' ? theme : 'system'
+  const [systemMode, setSystemMode] = useState<ResolvedAppearanceMode>(() => getSystemMode())
+  const mode: AppearanceMode = settings.mode
+  const resolvedMode: ResolvedAppearanceMode = mode === 'system' ? systemMode : mode
   const tokens = useMemo(() => resolveThemeTokens(settings, resolvedMode), [resolvedMode, settings])
 
   useEffect(() => {
@@ -75,19 +31,40 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
   }, [settings])
 
   useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const handleSystemModeChange = () => {
+      setSystemMode(media.matches ? 'dark' : 'light')
+    }
+
+    handleSystemModeChange()
+    media.addEventListener('change', handleSystemModeChange)
+
+    return () => media.removeEventListener('change', handleSystemModeChange)
+  }, [])
+
+  useEffect(() => {
     const root = document.documentElement
+    root.classList.toggle('dark', resolvedMode === 'dark')
+    root.style.colorScheme = resolvedMode
+    root.dataset.appearanceMode = mode
+    root.dataset.resolvedMode = resolvedMode
     root.dataset.preset = settings.preset
     root.dataset.glassIntensity = settings.glassIntensity
     root.dataset.logoStrategy = settings.logoStrategy
     applyThemeTokens(tokens, root)
 
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', tokens.background)
+
     return () => {
       clearThemeTokens(root)
+      delete root.dataset.appearanceMode
+      delete root.dataset.resolvedMode
       delete root.dataset.preset
       delete root.dataset.glassIntensity
       delete root.dataset.logoStrategy
+      root.style.removeProperty('color-scheme')
     }
-  }, [settings.glassIntensity, settings.logoStrategy, settings.preset, tokens])
+  }, [mode, resolvedMode, settings.glassIntensity, settings.logoStrategy, settings.preset, tokens])
 
   const updateSettings = useCallback(
     (updater: (current: AppearanceSettings) => AppearanceSettings) => {
@@ -104,7 +81,47 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
       tokens,
       resetAppearance: () => {
         setSettings(defaultAppearanceSettings)
-        setTheme('system')
+      },
+      resetCustomMode: (targetMode) => {
+        updateSettings((current) => ({
+          ...current,
+          customTheme: {
+            ...current.customTheme,
+            overrides: {
+              ...current.customTheme.overrides,
+              [targetMode]: {},
+            },
+          },
+        }))
+      },
+      resetCustomTheme: () => {
+        updateSettings((current) => ({
+          ...current,
+          customTheme: {
+            enabled: false,
+            overrides: {
+              light: {},
+              dark: {},
+            },
+          },
+        }))
+      },
+      resetCustomToken: (targetMode, token) => {
+        updateSettings((current) => {
+          const nextModeOverrides = { ...(current.customTheme.overrides[targetMode] ?? {}) }
+          delete nextModeOverrides[token]
+
+          return {
+            ...current,
+            customTheme: {
+              ...current.customTheme,
+              overrides: {
+                ...current.customTheme.overrides,
+                [targetMode]: nextModeOverrides,
+              },
+            },
+          }
+        })
       },
       setCustomThemeEnabled: (enabled) => {
         updateSettings((current) => ({
@@ -116,6 +133,12 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
         }))
       },
       setCustomToken: (targetMode, token, tokenValue) => {
+        const normalizedTokenValue = normalizeHexColor(tokenValue)
+
+        if (!normalizedTokenValue) {
+          return
+        }
+
         updateSettings((current) => ({
           ...current,
           customTheme: {
@@ -125,7 +148,7 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
               ...current.customTheme.overrides,
               [targetMode]: {
                 ...(current.customTheme.overrides[targetMode] ?? {}),
-                [token]: tokenValue,
+                [token]: normalizedTokenValue,
               },
             },
           },
@@ -137,30 +160,26 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
       setLogoStrategy: (logoStrategy) => {
         updateSettings((current) => ({ ...current, logoStrategy }))
       },
+      setAppearanceSettings: (nextSettings) => {
+        setSettings(sanitizeAppearanceSettings(nextSettings))
+      },
       setMode: (nextMode) => {
-        setTheme(nextMode)
+        updateSettings((current) => ({ ...current, mode: nextMode }))
       },
       setPreset: (preset) => {
         updateSettings((current) => ({ ...current, preset }))
       },
     }),
-    [mode, resolvedMode, setTheme, settings, tokens, updateSettings],
+    [mode, resolvedMode, settings, tokens, updateSettings],
   )
 
   return <AppearanceContext.Provider value={value}>{children}</AppearanceContext.Provider>
 }
 
-export function useAppearance() {
-  const context = useContext(AppearanceContext)
-
-  if (!context) {
-    throw new Error('useAppearance must be used within AppThemeProvider.')
+function getSystemMode(): ResolvedAppearanceMode {
+  if (typeof window === 'undefined') {
+    return 'light'
   }
 
-  return context
-}
-
-export function useAppearancePreset() {
-  const { settings } = useAppearance()
-  return getThemePreset(settings.preset)
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
