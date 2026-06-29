@@ -3,6 +3,7 @@ import { useRoomStore } from '../model'
 import { RoomHeader } from './room-header'
 import { RoomPlaybackControls } from './room-playback-controls'
 import { RoomPresence } from './room-presence'
+import { RoomVideoList } from './room-video-list'
 import { WatchPlayer } from './watch-player'
 import { getApiErrorMessage } from '@/core/api/http/errors'
 
@@ -12,8 +13,12 @@ type RoomPageProps = {
 
 export function RoomPage({ code }: RoomPageProps) {
   const query = useRoomSnapshot(code)
-  const { sendPlaybackCommand } = useRoomRealtime(code)
-  const snapshot = useRoomStore((state) => state.snapshot) ?? query.data ?? null
+  const { sendMediaAdd, sendMediaSelect, sendPlaybackCommand } = useRoomRealtime(code)
+  const storedSnapshot = useRoomStore((state) => state.snapshot)
+  const snapshot =
+    storedSnapshot?.room.code.toLowerCase() === code.toLowerCase()
+      ? storedSnapshot
+      : (query.data ?? null)
   const playback = useRoomStore((state) => state.playback)
   const presence = useRoomStore((state) => state.presence)
   const connectionStatus = useRoomStore((state) => state.connectionStatus)
@@ -60,7 +65,15 @@ export function RoomPage({ code }: RoomPageProps) {
               sendPlaybackCommand={sendPlaybackCommand}
             />
           </div>
-          <RoomPresence members={presence} />
+          <div className="space-y-6">
+            <RoomVideoList
+              canControl={canControl}
+              sendMediaAdd={sendMediaAdd}
+              sendMediaSelect={sendMediaSelect}
+              snapshot={snapshot}
+            />
+            <RoomPresence members={presence} />
+          </div>
         </section>
       </div>
     </div>

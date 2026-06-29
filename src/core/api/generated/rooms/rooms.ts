@@ -49,6 +49,17 @@ import type {
   PostApiRoomsByCodeJoin409,
   PostApiRoomsByCodeJoin422,
   PostApiRoomsByCodeJoin500,
+  PostApiRoomsByCodeMedia200,
+  PostApiRoomsByCodeMedia400,
+  PostApiRoomsByCodeMedia401,
+  PostApiRoomsByCodeMedia403,
+  PostApiRoomsByCodeMedia404,
+  PostApiRoomsByCodeMedia409,
+  PostApiRoomsByCodeMedia422,
+  PostApiRoomsByCodeMedia500,
+  PostApiRoomsByCodeMediaBodyOne,
+  PostApiRoomsByCodeMediaBodyThree,
+  PostApiRoomsByCodeMediaBodyTwo,
 } from '../model'
 
 import { orvalMutator } from '../../http/orval-mutator.ts'
@@ -72,7 +83,7 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 }
 
 /**
- * Creates a watch room from a supported external video URL. The creator becomes owner and host.
+ * Creates a watch room from one or more supported external video URLs. Authenticated creators become owner and host; guests can create local rooms without signing in.
  * @summary Create room
  */
 export const postApiRooms = (
@@ -181,7 +192,7 @@ export const usePostApiRooms = <
   return useMutation(getPostApiRoomsMutationOptions(options), queryClient)
 }
 /**
- * Returns public room, media, server-authoritative playback state, and permissions for the current user if authenticated.
+ * Returns public room, current media, playlist media items, server-authoritative playback state, and permissions for the current user if authenticated.
  * @summary Get room snapshot
  */
 export const getApiRoomsByCode = (
@@ -352,6 +363,157 @@ export function useGetApiRoomsByCode<
   return withQueryKey(query, queryOptions.queryKey)
 }
 
+/**
+ * Adds one or more supported external video URLs to an active room playlist and returns the updated snapshot.
+ * @summary Add room video
+ */
+export const postApiRoomsByCodeMedia = (
+  code: string,
+  postApiRoomsByCodeMediaBody:
+    | BodyType<
+        | PostApiRoomsByCodeMediaBodyOne
+        | PostApiRoomsByCodeMediaBodyTwo
+        | PostApiRoomsByCodeMediaBodyThree
+      >
+    | PostApiRoomsByCodeMediaBodyTwo
+    | PostApiRoomsByCodeMediaBodyThree,
+  options?: SecondParameter<typeof orvalMutator>,
+  signal?: AbortSignal,
+) => {
+  return orvalMutator<PostApiRoomsByCodeMedia200>(
+    { url: `/api/rooms/${code}/media`, method: 'POST', data: postApiRoomsByCodeMediaBody, signal },
+    options,
+  )
+}
+
+export const getPostApiRoomsByCodeMediaMutationOptions = <
+  TError = ErrorType<
+    | PostApiRoomsByCodeMedia400
+    | PostApiRoomsByCodeMedia401
+    | PostApiRoomsByCodeMedia403
+    | PostApiRoomsByCodeMedia404
+    | PostApiRoomsByCodeMedia409
+    | PostApiRoomsByCodeMedia422
+    | PostApiRoomsByCodeMedia500
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>,
+    TError,
+    {
+      code: string
+      data: BodyType<
+        | PostApiRoomsByCodeMediaBodyOne
+        | PostApiRoomsByCodeMediaBodyTwo
+        | PostApiRoomsByCodeMediaBodyThree
+      >
+    },
+    TContext
+  >
+  request?: SecondParameter<typeof orvalMutator>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>,
+  TError,
+  {
+    code: string
+    data: BodyType<
+      | PostApiRoomsByCodeMediaBodyOne
+      | PostApiRoomsByCodeMediaBodyTwo
+      | PostApiRoomsByCodeMediaBodyThree
+    >
+  },
+  TContext
+> => {
+  const mutationKey = ['postApiRoomsByCodeMedia']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>,
+    {
+      code: string
+      data: BodyType<
+        | PostApiRoomsByCodeMediaBodyOne
+        | PostApiRoomsByCodeMediaBodyTwo
+        | PostApiRoomsByCodeMediaBodyThree
+      >
+    }
+  > = (props) => {
+    const { code, data } = props ?? {}
+
+    return postApiRoomsByCodeMedia(code, data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PostApiRoomsByCodeMediaMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>
+>
+export type PostApiRoomsByCodeMediaMutationBody = BodyType<
+  PostApiRoomsByCodeMediaBodyOne | PostApiRoomsByCodeMediaBodyTwo | PostApiRoomsByCodeMediaBodyThree
+>
+export type PostApiRoomsByCodeMediaMutationError = ErrorType<
+  | PostApiRoomsByCodeMedia400
+  | PostApiRoomsByCodeMedia401
+  | PostApiRoomsByCodeMedia403
+  | PostApiRoomsByCodeMedia404
+  | PostApiRoomsByCodeMedia409
+  | PostApiRoomsByCodeMedia422
+  | PostApiRoomsByCodeMedia500
+>
+
+/**
+ * @summary Add room video
+ */
+export const usePostApiRoomsByCodeMedia = <
+  TError = ErrorType<
+    | PostApiRoomsByCodeMedia400
+    | PostApiRoomsByCodeMedia401
+    | PostApiRoomsByCodeMedia403
+    | PostApiRoomsByCodeMedia404
+    | PostApiRoomsByCodeMedia409
+    | PostApiRoomsByCodeMedia422
+    | PostApiRoomsByCodeMedia500
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>,
+      TError,
+      {
+        code: string
+        data: BodyType<
+          | PostApiRoomsByCodeMediaBodyOne
+          | PostApiRoomsByCodeMediaBodyTwo
+          | PostApiRoomsByCodeMediaBodyThree
+        >
+      },
+      TContext
+    >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>,
+  TError,
+  {
+    code: string
+    data: BodyType<
+      | PostApiRoomsByCodeMediaBodyOne
+      | PostApiRoomsByCodeMediaBodyTwo
+      | PostApiRoomsByCodeMediaBodyThree
+    >
+  },
+  TContext
+> => {
+  return useMutation(getPostApiRoomsByCodeMediaMutationOptions(options), queryClient)
+}
 /**
  * Hydrates membership for authenticated users and returns the same room snapshot used by the room route.
  * @summary Join room

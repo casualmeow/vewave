@@ -159,8 +159,8 @@ function AvatarDemo() {
     <DemoFrame>
       <div className="flex items-center gap-4">
         <Avatar className="size-14 border border-background shadow-sm">
-          <AvatarImage src="https://github.com/shadcn.png" alt="Example avatar" />
-          <AvatarFallback>SC</AvatarFallback>
+          <AvatarImage src="/vewave-mark.svg" alt="Vewave mark avatar" />
+          <AvatarFallback>VW</AvatarFallback>
         </Avatar>
         <Avatar className="size-14 border border-background shadow-sm">
           <AvatarFallback>VW</AvatarFallback>

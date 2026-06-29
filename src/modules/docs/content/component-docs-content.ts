@@ -206,34 +206,6 @@ const sidebarUsageSnippet = `const mobileDockItems: Array<MobileSidebarDockItem>
 ]
 
 <Sidebar
-  design="liquidGlass"
-  size="md"
-  density="comfortable"
-  motion="fluid"
-  fluidPreset="expressive"
-  hoverSize={10}
-  hoverScale={1.07}
-  activeHoverScale={1.045}
-  dragScale={1.12}
-  magneticStrength={13}
-  magneticVerticalStrength={8}
-  tiltStrength={4.2}
-  focusBlur
-  focusBlurAmount={4.5}
-  focusDimOpacity={0.46}
-  liquidIntensity={1.25}
-  dragMode="both"
-  mobileFluidPreset="extreme"
-  mobileHoverSize={22}
-  mobileHoverScale={1.12}
-  mobileActiveHoverScale={1.08}
-  mobileDragScale={1.2}
-  mobileFocusBlur
-  mobileFocusBlurAmount={6}
-  mobileFocusDimOpacity={0.32}
-  mobileDragMode="both"
-  mobileDockDragMode="both"
-  mobileMaxItems={5}
   mobileDockItems={mobileDockItems}
   mobileDockPathname={location.pathname}
   mobileDockAriaLabel="Studio mobile navigation"
@@ -754,7 +726,7 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
         name: 'design',
         type: "'solid' | 'glass' | 'liquidGlass' | 'fluent'",
         description:
-          'Visual treatment for the sidebar surface and items. liquidGlass uses one floating glass shell, subtle nav platters, and a moving liquid active selector; fluent uses acrylic-like depth.',
+          'Visual treatment for the sidebar surface and items. Use glass or solid for persistent app shells; reserve liquidGlass for isolated expressive previews.',
       },
       {
         name: 'size',
@@ -776,34 +748,36 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
         name: 'motion',
         type: "'none' | 'soft' | 'fluid'",
         description:
-          'Controls entrance, hover, and active-indicator motion. fluid uses a tighter spring for the liquid-glass active highlight.',
+          'Controls entrance, hover, and active-indicator motion. Use soft for persistent navigation; fluid is for explicitly expressive surfaces.',
       },
       {
         name: 'fluidPreset',
         type: "'subtle' | 'balanced' | 'expressive' | 'extreme'",
         description:
-          'Preconfigured interaction strength for liquidGlass hover scale, magnetic movement, tilt, focus blur, and liquid intensity.',
+          'Preconfigured interaction strength for hover scale, magnetic movement, tilt, focus blur, and liquid intensity. subtle is the calm default for app shells; stronger presets are opt-in.',
       },
       {
         name: 'hoverSize',
         type: 'number',
         description:
-          'Pixel expansion of the liquid hover/active selector layer around the item shell.',
+          'Pixel expansion of the liquid hover/active selector layer around the item shell when expressive liquid effects are enabled.',
       },
       {
         name: 'hoverScale',
         type: 'number',
-        description: 'Scale applied to inactive liquid item shells on hover.',
+        description:
+          'Scale applied to inactive item shells on hover. Keep persistent navigation subtle.',
       },
       {
         name: 'activeHoverScale',
         type: 'number',
-        description: 'Scale applied to the active liquid item shell on hover.',
+        description:
+          'Scale applied to the active item shell on hover. Keep persistent navigation subtle.',
       },
       {
         name: 'dragScale',
         type: 'number',
-        description: 'Scale used while dragging a liquid item shell.',
+        description: 'Scale used while dragging an expressive liquid item shell.',
       },
       {
         name: 'magneticStrength',
@@ -823,7 +797,8 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
       {
         name: 'focusBlur',
         type: 'boolean',
-        description: 'Dims and blurs sibling items while one liquid item is focused or hovered.',
+        description:
+          'Dims and blurs sibling items while one liquid item is focused or hovered. Keep false for persistent navigation unless the focused group remains readable.',
       },
       {
         name: 'focusBlurAmount',
@@ -879,7 +854,7 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
         name: 'mobileFluidPreset',
         type: "'subtle' | 'balanced' | 'expressive' | 'extreme'",
         description:
-          'Mobile dock preset. Defaults to the desktop fluidPreset when omitted, but can be stronger for touch-first dock interactions.',
+          'Mobile dock preset. subtle is the calm default; expressive and extreme are deliberate touch-first demo choices.',
       },
       {
         name: 'mobileHoverSize',
@@ -1009,30 +984,25 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
       },
       {
         title: 'App shell usage',
-        body: 'Authenticated app layouts compose Sidebar from root pieces, then pass mobileDockItems so the same route model powers the desktop rail and the bottom dock. Use mobileDockPlacement="container" inside a relative 100svh app shell so the dock sits inside the padded surface instead of the raw viewport.',
+        body: 'Authenticated app layouts compose Sidebar from root pieces, then pass mobileDockItems so the same route model powers the desktop rail and the bottom dock. Persistent app navigation gets glass, soft motion, explicit active state, and non-draggable dock behavior from shared defaults.',
         code: `<Sidebar
-  design="liquidGlass"
-  motion="fluid"
-  fluidPreset="balanced"
-  dragMode="none"
   mobileDockItems={mobileDockItems}
   mobileDockPathname={location.pathname}
   mobileDockAriaLabel="App mobile navigation"
   mobileDockPlacement="container"
   mobileDockClassName="inset-x-3"
-  role="navigation"
   aria-label="App navigation"
 >
   <SidebarBrand
     visual={<AvatarFallback>VW</AvatarFallback>}
     title="Vewave"
-    subtitle="Watch workspace"
+    subtitle="Watch together"
   />
-  <SidebarSection title="Workspace">
+  <SidebarSection title="Watch">
     <SidebarItem asChild active>
       <Link to="/projects">
-        <SidebarItemIcon><FolderKanban /></SidebarItemIcon>
-        <SidebarItemLabel>Projects</SidebarItemLabel>
+        <SidebarItemIcon><Radio /></SidebarItemIcon>
+        <SidebarItemLabel>Rooms</SidebarItemLabel>
       </Link>
     </SidebarItem>
   </SidebarSection>
@@ -1042,29 +1012,29 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
 </Sidebar>`,
       },
       {
-        title: 'Liquid glass and fluent variants',
-        body: 'Use liquidGlass when the shell sits over a rich background and should show a fluid active highlight. Use fluent when the app needs a calmer acrylic-style panel. All variants share the same component API.',
-        code: `<Sidebar design="liquidGlass" motion="fluid" aria-label="Liquid navigation">
+        title: 'Expressive variants',
+        body: 'Use glass or fluent for normal navigation shells. liquidGlass remains available for isolated previews or intentionally expressive surfaces, but it should not be the default for persistent app or studio navigation.',
+        code: `<Sidebar design="glass" motion="soft" aria-label="Glass navigation">
   <SidebarSection title="Workspace">
     <SidebarItem active icon={<Home />}>Home</SidebarItem>
   </SidebarSection>
 </Sidebar>
 
-<Sidebar design="glass" aria-label="Glass navigation">
+<Sidebar design="fluent" motion="soft" aria-label="Fluent navigation">
   <SidebarSection title="Workspace">
     <SidebarItem active icon={<Home />}>Home</SidebarItem>
   </SidebarSection>
 </Sidebar>
 
-<Sidebar design="fluent" aria-label="Fluent navigation">
+<Sidebar design="liquidGlass" motion="fluid" aria-label="Expressive preview navigation">
   <SidebarSection title="Workspace">
     <SidebarItem active icon={<Home />}>Home</SidebarItem>
   </SidebarSection>
 </Sidebar>`,
       },
       {
-        title: 'Fluid active highlight',
-        body: 'The liquidGlass variant renders a scoped shared-layout selector behind the active item. Item content stays sharp above it. Focus blur is interaction-driven only: active items do not dim siblings until a user hovers, focuses, or drags an item.',
+        title: 'Expressive liquid highlight',
+        body: 'The liquidGlass variant renders a scoped shared-layout selector behind the active item. Keep item content sharp and use explicit active copy when the surface represents core navigation.',
         code: `<Sidebar design="liquidGlass" motion="fluid" fluidPreset="balanced">
   <SidebarSection title="Workspace">
     <SidebarItem active icon={<Home />}>Home</SidebarItem>
@@ -1096,43 +1066,36 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
       },
       {
         title: 'Interaction tuning',
-        body: 'Use fluidPreset first. Reach for hoverScale, magneticStrength, tiltStrength, liquidIntensity, focusBlur, or dragMode only when a layout needs a specific interaction profile.',
+        body: 'Use the shared defaults for persistent navigation. Reach for fluid motion, magneticStrength, tiltStrength, focusBlur, or drag only when a layout has an explicit expressive interaction reason.',
         code: `<Sidebar
   design="liquidGlass"
   motion="fluid"
-  fluidPreset="subtle"
-  hoverSize={3}
-  hoverScale={1.025}
-  activeHoverScale={1.015}
-  dragScale={1.045}
-  magneticStrength={4}
-  magneticVerticalStrength={2.5}
-  tiltStrength={1.8}
-  liquidIntensity={0.72}
-  dragMode="none"
-  focusBlur={false}
+  fluidPreset="expressive"
+  hoverSize={10}
+  magneticStrength={13}
+  tiltStrength={4.2}
+  focusBlur
+  dragMode="both"
 />`,
       },
       {
         title: 'Mobile dock tuning',
-        body: 'Sidebar can render a touch-first floating dock with its own interaction profile. Use mobileFluidPreset for broad behavior, pass mobileDockItems for compound layouts, and keep mobileDockPlacement="container" for normal app shells. Use viewport only when an intentional fixed overlay is needed.',
+        body: 'Sidebar can render a touch-first floating dock with its own interaction profile. Normal app docks are subtle and non-draggable by default; use viewport placement or expressive dock motion only for intentional overlays and demos.',
         code: `<Sidebar
   mobileDockItems={mobileDockItems}
   mobileDockPathname={location.pathname}
   mobileDockAriaLabel="Workspace mobile navigation"
-  mobileFluidPreset="extreme"
-  mobileHoverSize={22}
-  mobileHoverScale={1.12}
-  mobileActiveHoverScale={1.08}
-  mobileDragScale={1.2}
-  mobileFocusBlur
-  mobileFocusBlurAmount={6}
-  mobileFocusDimOpacity={0.32}
-  mobileDragMode="both"
-  mobileDockDragMode="both"
-  mobileMaxItems={5}
   mobileDockPlacement="container"
   mobileDockClassName="inset-x-3"
+/>
+
+<Sidebar
+  mobileDockItems={demoDockItems}
+  mobileDockPathname={location.pathname}
+  mobileFluidPreset="expressive"
+  mobileDragMode="both"
+  mobileDockDragMode="both"
+  mobileDockPlacement="viewport"
 />`,
       },
       {
@@ -1147,6 +1110,7 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
     ],
     accessibility: [
       'Consumers provide aria-label on the Sidebar root when it acts as navigation.',
+      'The root element is an aside landmark; do not add role="navigation" to it.',
       'Use mobileDockAriaLabel when the floating dock needs a more specific accessible name.',
       'Active items set aria-current="page".',
       'Mobile dock items also set aria-current and support TanStack Router params for dynamic routes.',

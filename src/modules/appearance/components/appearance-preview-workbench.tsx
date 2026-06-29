@@ -1,90 +1,75 @@
-import {
-  BarChart3,
-  Bell,
-  CalendarClock,
-  Check,
-  Eye,
-  FileVideo,
-  Filter,
-  ImageIcon,
-  LayoutDashboard,
-  MessageSquareText,
-  PanelRightOpen,
-  PlayCircle,
-  Radio,
-  RotateCcw,
-  Save,
-  Search,
-  Settings2,
-  SlidersHorizontal,
-  Sparkles,
-  Tags,
-  Upload,
-  UsersRound,
-  Wand2,
-} from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+import {
+  Bell,
+  Check,
+  Eye,
+  MousePointer2,
+  PanelRightOpen,
+  PlayCircle,
+  RotateCcw,
+  Save,
+  SlidersHorizontal,
+} from 'lucide-react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+  type ReactNode,
+} from 'react'
 import { toast } from 'sonner'
 
-import {
-  defaultAppearanceSettings,
-  getAppearanceSettingsFromAppConfig,
-  getThemeTokenStyle,
-  resolveThemeTokens,
-  useAppearance,
-  VewaveLogoMark,
-  withAppearanceSettingsInAppConfig,
-  type AppearanceSettings,
-  type EditableThemeTokenName,
-  type ResolvedAppearanceMode,
-  type ThemeTokens,
-  type UserAppConfig,
-} from '@/shared/theme'
-import {
-  getContrastRatio,
-  meetsNormalTextContrast,
-  normalizeHexColor,
-} from '@/shared/theme/validators'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Input,
-  Label,
-  Progress,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SpinIcon,
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow,
-  Tooltip,
-} from '@/shared/ui'
-import { cn } from '@/shared/lib/utils'
+import type { AppShellSurfaceId } from '@/core/layouts/app-layout/ui/app-shell-surfaces'
+import { AppSidebar } from '@/core/layouts/app-layout/ui/app-sidebar'
+import { AppShellHeader } from '@/core/layouts/app-layout/ui/app-shell-header'
 import {
   getGetApiProfileMeQueryKey,
   usePatchApiProfileMe,
   type PatchApiProfileMeMutationBody,
 } from '@/core/api/generated/profile/profile'
 import { getApiErrorMessage } from '@/core/api/http/errors'
+import {
+  RoomsDashboardView,
+  type RoomsDashboardSurfaceId,
+  type RoomWorkspaceItem,
+} from '@/modules/projects'
 import { useAuthStore } from '@/modules/auth'
+import { appearancePreviewProjects } from '@/modules/appearance/preview-scenarios'
+import {
+  defaultAppearanceSettings,
+  getAppearanceSettingsFromAppConfig,
+  getThemeTokenStyle,
+  resolveThemeTokens,
+  useAppearance,
+  withAppearanceSettingsInAppConfig,
+  type AppearanceSettings,
+  type EditableThemeTokenName,
+  type ResolvedAppearanceMode,
+  type ThemeTokens,
+} from '@/shared/theme'
+import {
+  getContrastRatio,
+  getReadableForeground,
+  meetsNormalTextContrast,
+  normalizeHexColor,
+} from '@/shared/theme/validators'
+import {
+  Button,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SpinIcon,
+  Tooltip,
+} from '@/shared/ui'
+import { cn } from '@/shared/lib/utils'
 
-type PreviewSurfaceId =
-  | 'sidebar'
-  | 'header'
-  | 'actions'
-  | 'metrics'
-  | 'queue'
-  | 'inspector'
-  | 'media'
+type PreviewSurfaceId = AppShellSurfaceId | RoomsDashboardSurfaceId
 
 type PreviewSurfaceDefinition = {
   description: string
@@ -93,52 +78,233 @@ type PreviewSurfaceDefinition = {
   tokens: Array<keyof ThemeTokens>
 }
 
+type SurfaceRole = {
+  description: string
+  foregroundToken?: EditableThemeTokenName
+  linkedTokens?: Array<EditableThemeTokenName>
+  label: string
+  token: EditableThemeTokenName
+}
+
 const previewSurfaces = {
   sidebar: {
     label: 'Sidebar',
-    description: 'Navigation surface, active state, separators, and logo contrast.',
+    description: 'Navigation shell, identity area, active items, and sidebar contrast.',
     editableTokens: ['sidebar', 'sidebarForeground', 'sidebarAccent', 'sidebarAccentForeground'],
     tokens: ['sidebar', 'sidebarForeground', 'sidebarAccent', 'sidebarAccentForeground'],
   },
   header: {
     label: 'Header',
-    description: 'Top bar surface, header text, border, and primary commands.',
+    description: 'Top app bar, header text, separators, and primary command contrast.',
     editableTokens: ['header', 'headerForeground', 'headerBorder', 'primary'],
     tokens: ['header', 'headerForeground', 'headerBorder', 'primary'],
   },
-  actions: {
-    label: 'Actions',
-    description: 'Primary and secondary command contrast across the workspace.',
-    editableTokens: ['primary', 'primaryForeground', 'secondary', 'secondaryForeground', 'ring'],
-    tokens: ['primary', 'primaryForeground', 'secondary', 'secondaryForeground', 'ring'],
+  sidebarIdentity: {
+    label: 'Sidebar identity',
+    description: 'Logo/profile area, account text, and sign-in action treatment.',
+    editableTokens: ['sidebar', 'sidebarForeground', 'sidebarPrimary', 'sidebarPrimaryForeground'],
+    tokens: ['sidebar', 'sidebarForeground', 'sidebarPrimary', 'sidebarPrimaryForeground'],
   },
-  metrics: {
-    label: 'Metrics',
-    description: 'Cards, charts, progress bars, and supporting labels.',
-    editableTokens: ['card', 'cardForeground', 'mutedForeground', 'chart1', 'chart2'],
-    tokens: ['card', 'cardForeground', 'mutedForeground', 'chart1', 'chart2'],
+  sidebarWorkspace: {
+    label: 'Workspace nav',
+    description: 'Primary sidebar links, active page background, and badges.',
+    editableTokens: [
+      'sidebarForeground',
+      'sidebarAccent',
+      'sidebarAccentForeground',
+      'sidebarPrimary',
+      'sidebarPrimaryForeground',
+    ],
+    tokens: [
+      'sidebarForeground',
+      'sidebarAccent',
+      'sidebarAccentForeground',
+      'sidebarPrimary',
+      'sidebarPrimaryForeground',
+    ],
   },
-  queue: {
-    label: 'Queue',
-    description: 'Tables, status badges, muted surfaces, and state colors.',
-    editableTokens: ['card', 'border', 'success', 'warning', 'destructive'],
-    tokens: ['card', 'border', 'success', 'warning', 'destructive'],
+  sidebarHistory: {
+    label: 'History list',
+    description: 'Recent room labels, quiet text, and activity indicators.',
+    editableTokens: ['sidebarForeground', 'mutedForeground', 'sidebarPrimary'],
+    tokens: ['sidebarForeground', 'mutedForeground', 'sidebarPrimary'],
   },
-  inspector: {
-    label: 'Inspector',
-    description: 'Detail panels, forms, input borders, and focus rings.',
-    editableTokens: ['card', 'cardForeground', 'input', 'ring', 'popover'],
-    tokens: ['card', 'cardForeground', 'input', 'ring', 'popover'],
+  sidebarRooms: {
+    label: 'Rooms group',
+    description: 'Pinned room group, count badge, and active room emphasis.',
+    editableTokens: ['sidebarForeground', 'sidebarPrimary', 'sidebarPrimaryForeground'],
+    tokens: ['sidebarForeground', 'sidebarPrimary', 'sidebarPrimaryForeground'],
   },
-  media: {
-    label: 'Media',
-    description: 'Player canvas, controls, and media foreground tokens.',
-    editableTokens: ['mediaBackground', 'mediaForeground'],
-    tokens: ['mediaBackground', 'mediaForeground', 'mediaControl', 'mediaMuted'],
+  sidebarServers: {
+    label: 'Servers group',
+    description: 'Secondary sidebar group with status and muted labels.',
+    editableTokens: ['sidebarForeground', 'mutedForeground', 'sidebarBorder'],
+    tokens: ['sidebarForeground', 'mutedForeground', 'sidebarBorder'],
+  },
+  sidebarFooter: {
+    label: 'Sidebar footer',
+    description: 'Support, settings, sign-out, and footer separators.',
+    editableTokens: ['sidebarForeground', 'sidebarBorder', 'sidebarAccent'],
+    tokens: ['sidebarForeground', 'sidebarBorder', 'sidebarAccent'],
+  },
+  headerTitle: {
+    label: 'Header title',
+    description: 'Header eyebrow, title, and product accent text.',
+    editableTokens: ['header', 'headerForeground', 'primary'],
+    tokens: ['header', 'headerForeground', 'primary'],
+  },
+  headerActions: {
+    label: 'Header actions',
+    description: 'Primary create command and account action contrast.',
+    editableTokens: ['primary', 'primaryForeground', 'card', 'border'],
+    tokens: ['primary', 'primaryForeground', 'card', 'border'],
+  },
+  hero: {
+    label: 'Page intro',
+    description: 'Primary page title, supporting copy, and soft product accent.',
+    editableTokens: ['background', 'foreground', 'mutedForeground', 'primary'],
+    tokens: ['background', 'foreground', 'mutedForeground', 'primary'],
+  },
+
+  create: {
+    label: 'Start room',
+    description: 'Focused room start panel, inputs, next-step context, and action button.',
+    editableTokens: ['card', 'foreground', 'primary', 'primaryForeground', 'input', 'ring'],
+    tokens: ['card', 'foreground', 'primary', 'primaryForeground', 'input', 'ring'],
+  },
+  createIntro: {
+    label: 'Room details intro',
+    description: 'Create form copy and text hierarchy.',
+    editableTokens: ['foreground', 'mutedForeground', 'primary', 'border'],
+    tokens: ['foreground', 'mutedForeground', 'primary', 'border'],
+  },
+  createFields: {
+    label: 'Create fields',
+    description: 'Input surfaces, field borders, text color, and keyboard focus.',
+    editableTokens: ['input', 'card', 'foreground', 'ring'],
+    tokens: ['input', 'card', 'foreground', 'ring'],
+  },
+
+  createAction: {
+    label: 'Create action',
+    description: 'Primary submit button and result copy contrast.',
+    editableTokens: ['primary', 'primaryForeground', 'ring'],
+    tokens: ['primary', 'primaryForeground', 'ring'],
+  },
+  roomList: {
+    label: 'Room grid',
+    description: 'Room cards, expandable content, media accents, and list borders.',
+    editableTokens: ['card', 'cardForeground', 'border', 'accent', 'primary'],
+    tokens: ['card', 'cardForeground', 'border', 'accent', 'primary'],
+  },
+  roomMedia: {
+    label: 'Room media',
+    description: 'Card media gradients, status chips, and room code contrast.',
+    editableTokens: ['primary', 'accent', 'secondary', 'card', 'foreground'],
+    tokens: ['primary', 'accent', 'secondary', 'card', 'foreground'],
+  },
+  roomDetails: {
+    label: 'Room details',
+    description: 'Expanded card copy, detail stats, and nested card surfaces.',
+    editableTokens: ['card', 'cardForeground', 'mutedForeground', 'primary', 'border'],
+    tokens: ['card', 'cardForeground', 'mutedForeground', 'primary', 'border'],
   },
 } satisfies Record<PreviewSurfaceId, PreviewSurfaceDefinition>
 
-type PreviewStatusTone = 'destructive' | 'muted' | 'success' | 'warning'
+const surfaceRoleTokenPriority = [
+  'sidebar',
+  'header',
+  'card',
+  'popover',
+  'background',
+  'surfaceElevated',
+  'muted',
+  'secondary',
+  'input',
+  'mediaBackground',
+] as const satisfies ReadonlyArray<EditableThemeTokenName>
+
+const contentRoleTokenPriority = [
+  'sidebarForeground',
+  'headerForeground',
+  'cardForeground',
+  'popoverForeground',
+  'foreground',
+  'mutedForeground',
+  'secondaryForeground',
+  'mediaForeground',
+  'accentForeground',
+  'primaryForeground',
+] as const satisfies ReadonlyArray<EditableThemeTokenName>
+
+const actionRoleTokenPriority = [
+  'primary',
+  'sidebarPrimary',
+  'accent',
+  'sidebarAccent',
+  'ring',
+  'success',
+  'warning',
+  'destructive',
+] as const satisfies ReadonlyArray<EditableThemeTokenName>
+
+const selectionRoleTokenPriority = [
+  'sidebarAccent',
+  'accent',
+  'secondary',
+  'muted',
+  'tabsActive',
+] as const satisfies ReadonlyArray<EditableThemeTokenName>
+
+const edgeRoleTokenPriority = [
+  'border',
+  'sidebarBorder',
+  'headerBorder',
+  'input',
+  'ring',
+  'sidebarRing',
+] as const satisfies ReadonlyArray<EditableThemeTokenName>
+
+const foregroundPairs: Partial<Record<EditableThemeTokenName, EditableThemeTokenName>> = {
+  accent: 'accentForeground',
+  card: 'cardForeground',
+  destructive: 'destructiveForeground',
+  header: 'headerForeground',
+  mediaBackground: 'mediaForeground',
+  muted: 'mutedForeground',
+  popover: 'popoverForeground',
+  primary: 'primaryForeground',
+  secondary: 'secondaryForeground',
+  sidebar: 'sidebarForeground',
+  sidebarAccent: 'sidebarAccentForeground',
+  sidebarPrimary: 'sidebarPrimaryForeground',
+  success: 'successForeground',
+  warning: 'warningForeground',
+}
+
+const linkedRoleTokens: Partial<Record<EditableThemeTokenName, Array<EditableThemeTokenName>>> = {
+  accent: ['sidebarAccent'],
+  background: ['muted'],
+  border: ['input', 'headerBorder', 'sidebarBorder'],
+  card: ['popover', 'surfaceElevated'],
+  header: ['card'],
+  input: ['border'],
+  primary: ['ring', 'sidebarPrimary', 'logoAccent', 'chart1'],
+  ring: ['sidebarRing'],
+  sidebarAccent: ['accent'],
+  sidebarBorder: ['border', 'input'],
+  sidebarPrimary: ['primary', 'ring'],
+}
+
+const globalLinkedEditableTokens: ReadonlyArray<EditableThemeTokenName> = [
+  'chart1',
+  'chart2',
+  'logoAccent',
+  'ring',
+  'sidebarAccent',
+  'sidebarPrimary',
+  'sidebarRing',
+]
 
 export function AppearancePreviewWorkbench() {
   const queryClient = useQueryClient()
@@ -164,14 +330,22 @@ export function AppearancePreviewWorkbench() {
     setPreviewMode(resolvedMode)
   }, [resolvedMode])
 
-  function updateToken(tokenName: EditableThemeTokenName, nextValue: string) {
-    const normalized = normalizeHexColor(nextValue)
+  function updateTokens(updates: Partial<Record<EditableThemeTokenName, string>>) {
+    const normalizedUpdates = Object.entries(updates).reduce<
+      Partial<Record<EditableThemeTokenName, string>>
+    >((nextUpdates, [tokenName, value]) => {
+      const normalized = normalizeHexColor(value ?? '')
 
-    if (!normalized) {
+      if (normalized) {
+        nextUpdates[tokenName as EditableThemeTokenName] = normalized
+      }
+
+      return nextUpdates
+    }, {})
+
+    if (!Object.keys(normalizedUpdates).length) {
       return
     }
-
-    const currentModeOverrides = settings.customTheme.overrides[previewMode] ?? {}
 
     setAppearanceSettings({
       ...settings,
@@ -180,32 +354,16 @@ export function AppearancePreviewWorkbench() {
         overrides: {
           ...settings.customTheme.overrides,
           [previewMode]: {
-            ...currentModeOverrides,
-            [tokenName]: normalized,
+            ...settings.customTheme.overrides[previewMode],
+            ...normalizedUpdates,
           },
         },
       },
     })
   }
 
-  function resetToken(tokenName: EditableThemeTokenName) {
-    const currentModeOverrides = { ...(settings.customTheme.overrides[previewMode] ?? {}) }
-    delete currentModeOverrides[tokenName]
-
-    setAppearanceSettings({
-      ...settings,
-      customTheme: {
-        ...settings.customTheme,
-        overrides: {
-          ...settings.customTheme.overrides,
-          [previewMode]: currentModeOverrides,
-        },
-      },
-    })
-  }
-
-  function resetSurface(tokensToReset: Array<EditableThemeTokenName>) {
-    const currentModeOverrides = { ...(settings.customTheme.overrides[previewMode] ?? {}) }
+  function resetTokens(tokensToReset: Array<EditableThemeTokenName>) {
+    const currentModeOverrides = { ...settings.customTheme.overrides[previewMode] }
 
     tokensToReset.forEach((tokenName) => {
       delete currentModeOverrides[tokenName]
@@ -221,6 +379,10 @@ export function AppearancePreviewWorkbench() {
         },
       },
     })
+  }
+
+  function resetSurface(tokensToReset: Array<EditableThemeTokenName>) {
+    resetTokens(tokensToReset)
   }
 
   async function saveAppearance() {
@@ -266,8 +428,8 @@ export function AppearancePreviewWorkbench() {
             </div>
             <h1 className="mt-2 text-3xl font-semibold tracking-normal">Preview workbench</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              Inspect the active theme against a realistic workspace surface and jump back to color
-              controls when a component needs adjustment.
+              Inspect the active theme against the real app shell and dashboard components, then
+              tune the selected surface in place.
             </p>
           </div>
           <Button asChild className="w-full md:w-auto">
@@ -283,10 +445,10 @@ export function AppearancePreviewWorkbench() {
           hasUnsavedAccountChanges={hasUnsavedAccountChanges}
           mode={previewMode}
           onResetSurface={resetSurface}
-          onResetToken={resetToken}
+          onResetTokens={resetTokens}
           onSaveAppearance={saveAppearance}
           onModeChange={setPreviewMode}
-          onTokenChange={updateToken}
+          onTokensChange={updateTokens}
           saveTarget={saveTarget}
           saving={updateProfileMutation.isPending}
           tokens={previewTokens}
@@ -302,9 +464,9 @@ function ThemePreview({
   mode,
   onModeChange,
   onResetSurface,
-  onResetToken,
+  onResetTokens,
   onSaveAppearance,
-  onTokenChange,
+  onTokensChange,
   saveTarget,
   saving,
   tokens,
@@ -314,366 +476,248 @@ function ThemePreview({
   mode: ResolvedAppearanceMode
   onModeChange: (mode: ResolvedAppearanceMode) => void
   onResetSurface: (tokens: Array<EditableThemeTokenName>) => void
-  onResetToken: (token: EditableThemeTokenName) => void
+  onResetTokens: (tokens: Array<EditableThemeTokenName>) => void
   onSaveAppearance: () => void
-  onTokenChange: (token: EditableThemeTokenName, value: string) => void
+  onTokensChange: (updates: Partial<Record<EditableThemeTokenName, string>>) => void
   saveTarget: string
   saving: boolean
   tokens: ThemeTokens
 }) {
   const [activeSurface, setActiveSurface] = useState<PreviewSurfaceId>('sidebar')
+  const [previewRooms] = useState<Array<RoomWorkspaceItem>>(appearancePreviewProjects)
+  const surfaceElementsRef = useRef<Map<PreviewSurfaceId, HTMLDivElement>>(new Map())
   const activeDefinition = previewSurfaces[activeSurface]
   const previewStyle = {
     ...getThemeTokenStyle(tokens),
     colorScheme: mode,
   } as CSSProperties
 
-  return (
-    <section className="rounded-lg border bg-card p-4 shadow-sm">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div>
-          <h2 className="text-base font-semibold">Interactive workspace preview</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Active mode resolves to {mode}.</p>
-        </div>
-        <Select
-          value={mode}
-          onValueChange={(value) => onModeChange(value as ResolvedAppearanceMode)}
-        >
-          <SelectTrigger className="w-28">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="light">Light</SelectItem>
-            <SelectItem value="dark">Dark</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+  function registerSurface(surface: PreviewSurfaceId, node: HTMLDivElement | null) {
+    if (node) {
+      surfaceElementsRef.current.set(surface, node)
+      return
+    }
 
-      <div className="grid gap-4">
+    surfaceElementsRef.current.delete(surface)
+  }
+
+  function selectSurface(surface: PreviewSurfaceId, reveal = false) {
+    setActiveSurface(surface)
+
+    if (!reveal) {
+      return
+    }
+
+    window.requestAnimationFrame(() => {
+      surfaceElementsRef.current.get(surface)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'center',
+      })
+    })
+  }
+
+  function renderQuickEditor(surface: PreviewSurfaceId) {
+    const definition = previewSurfaces[surface]
+
+    return (
+      <SurfaceQuickEditor
+        definition={definition}
+        hasUnsavedAccountChanges={hasUnsavedAccountChanges}
+        mode={mode}
+        onResetSurface={() => onResetSurface(getSurfaceResetTokens(definition))}
+        onSaveAppearance={onSaveAppearance}
+        onResetTokens={onResetTokens}
+        onTokensChange={onTokensChange}
+        saveTarget={saveTarget}
+        saving={saving}
+        settings={draft}
+        tokens={tokens}
+      />
+    )
+  }
+
+  function renderDashboardSurface(surface: RoomsDashboardSurfaceId, children: ReactNode) {
+    return (
+      <PreviewHotspot
+        active={activeSurface === surface}
+        editor={renderQuickEditor(surface)}
+        label={previewSurfaces[surface].label}
+        surfaceId={surface}
+        onRegister={registerSurface}
+        onSelect={() => selectSurface(surface)}
+      >
+        {children}
+      </PreviewHotspot>
+    )
+  }
+
+  function renderShellSurface(surface: AppShellSurfaceId, children: ReactNode) {
+    return (
+      <PreviewHotspot
+        active={activeSurface === surface}
+        editor={renderQuickEditor(surface)}
+        label={previewSurfaces[surface].label}
+        surfaceId={surface}
+        onRegister={registerSurface}
+        onSelect={() => selectSurface(surface)}
+      >
+        {children}
+      </PreviewHotspot>
+    )
+  }
+
+  function preventPreviewNavigation(event: MouseEvent<HTMLDivElement>) {
+    const target = event.target
+
+    if (target instanceof Element && target.closest('a')) {
+      event.preventDefault()
+    }
+  }
+
+  return (
+    <div
+      style={previewStyle}
+      className={cn(
+        'grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]',
+        mode === 'dark' && 'dark',
+      )}
+    >
+      <section className="min-w-0 rounded-lg border bg-card p-4 text-card-foreground shadow-sm">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold">Interactive workspace preview</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Active mode resolves to {mode}.</p>
+          </div>
+          <Select
+            value={mode}
+            onValueChange={(value) => onModeChange(value as ResolvedAppearanceMode)}
+          >
+            <SelectTrigger className="w-28">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="light">Light</SelectItem>
+              <SelectItem value="dark">Dark</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <div
-          style={previewStyle}
+          onClickCapture={preventPreviewNavigation}
           className={cn(
-            'relative overflow-x-auto rounded-xl border bg-background text-foreground shadow-sm',
+            'relative min-w-0 overflow-hidden rounded-xl border bg-background text-foreground shadow-sm',
             mode === 'dark' && 'dark',
           )}
         >
-          <div className="grid min-h-[46rem] min-w-[72rem] grid-cols-[10rem_minmax(0,1fr)]">
-            <PreviewHotspot
-              active={activeSurface === 'sidebar'}
-              label={previewSurfaces.sidebar.label}
-              onSelect={() => setActiveSurface('sidebar')}
-            >
-              <div className="flex min-w-0 flex-col border-r border-sidebar-border bg-sidebar p-3 text-sidebar-foreground">
-                <div className="mb-5 flex items-center gap-2">
-                  <VewaveLogoMark
-                    className="size-7 shrink-0"
-                    logoStrategy={draft.logoStrategy}
-                    resolvedMode={mode}
-                    surfaceColor={tokens.sidebar}
-                  />
-                  <div className="min-w-0">
-                    <div className="truncate text-xs font-semibold">Vewave</div>
-                    <div className="truncate text-[0.62rem] text-sidebar-foreground/65">
-                      Workspace
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid gap-1">
-                  <PreviewNavItem
-                    active
-                    icon={<LayoutDashboard className="size-3.5" />}
-                    label="Dashboard"
-                  />
-                  <PreviewNavItem icon={<FileVideo className="size-3.5" />} label="Uploads" />
-                  <PreviewNavItem icon={<Radio className="size-3.5" />} label="Live rooms" />
-                  <PreviewNavItem icon={<UsersRound className="size-3.5" />} label="Audience" />
-                  <PreviewNavItem icon={<Settings2 className="size-3.5" />} label="Settings" />
-                </div>
-
-                <div className="mt-auto rounded-lg border border-sidebar-border bg-sidebar-accent/55 p-2 text-sidebar-accent-foreground">
-                  <div className="flex items-center gap-1.5 text-[0.68rem] font-semibold">
-                    <Sparkles className="size-3.5" />
-                    Brand kit
-                  </div>
-                  <div className="mt-2 flex gap-1">
-                    {[tokens.primary, tokens.accent, tokens.ring].map((value) => (
-                      <span
-                        key={value}
-                        className="size-4 rounded-full border border-sidebar-border"
-                        style={{ backgroundColor: value }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </PreviewHotspot>
-
-            <div className="min-w-0 bg-background">
+          <div className="p-3">
+            <div className="relative grid h-[52rem] min-h-[42rem] min-w-0 grid-cols-[17rem_minmax(0,1fr)] items-start gap-3 rounded-[2rem] bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--primary)_18%,transparent),transparent_28rem),radial-gradient(circle_at_84%_16%,color-mix(in_srgb,var(--accent)_16%,transparent),transparent_30rem),linear-gradient(135deg,var(--background),var(--muted)_48%,var(--background))] p-3">
               <PreviewHotspot
-                active={activeSurface === 'header'}
-                label={previewSurfaces.header.label}
-                onSelect={() => setActiveSurface('header')}
+                active={activeSurface === 'sidebar'}
+                editor={renderQuickEditor('sidebar')}
+                label={previewSurfaces.sidebar.label}
+                surfaceId="sidebar"
+                onRegister={registerSurface}
+                onSelect={() => selectSurface('sidebar')}
               >
-                <div className="flex items-center justify-between gap-3 border-b border-header-border bg-header px-4 py-3 text-header-foreground">
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-semibold">Workspace overview</div>
-                    <div className="truncate text-xs text-muted-foreground">
-                      Rooms, uploads, and moderation
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button size="icon" variant="outline" aria-label="Notifications">
-                      <Bell className="size-4" />
-                    </Button>
-                    <Button size="sm">
-                      <Upload className="size-4" />
-                      Upload
-                    </Button>
-                  </div>
-                </div>
+                <AppSidebar
+                  className="h-[calc(52rem-1.5rem)] max-w-full"
+                  renderSurface={renderShellSurface}
+                />
               </PreviewHotspot>
 
-              <div className="grid gap-3 p-4">
+              <div className="min-h-0 min-w-0 flex-1 overflow-hidden rounded-[2rem] border border-border/70 bg-card/90 shadow-[0_28px_90px_color-mix(in_srgb,var(--foreground)_12%,transparent)] backdrop-blur">
                 <PreviewHotspot
-                  active={activeSurface === 'actions'}
-                  label={previewSurfaces.actions.label}
-                  onSelect={() => setActiveSurface('actions')}
+                  active={activeSurface === 'header'}
+                  editor={renderQuickEditor('header')}
+                  label={previewSurfaces.header.label}
+                  surfaceId="header"
+                  onRegister={registerSurface}
+                  onSelect={() => selectSurface('header')}
                 >
-                  <div className="flex items-center gap-2">
-                    <div className="relative min-w-0 flex-1">
-                      <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        value="Search rooms, uploads, playlists"
-                        readOnly
-                        className="h-9 pl-8 text-xs"
-                      />
-                    </div>
-                    <Button size="sm" variant="outline">
-                      <Filter className="size-4" />
-                      Filter
-                    </Button>
-                  </div>
+                  <AppShellHeader
+                    actions={<PreviewHeaderActions />}
+                    renderSurface={renderShellSurface}
+                  />
                 </PreviewHotspot>
 
-                <PreviewHotspot
-                  active={activeSurface === 'metrics'}
-                  label={previewSurfaces.metrics.label}
-                  onSelect={() => setActiveSurface('metrics')}
-                >
-                  <div className="grid gap-2 md:grid-cols-3">
-                    <PreviewMetric icon={<BarChart3 />} label="Views" value="128k" progress={74} />
-                    <PreviewMetric
-                      icon={<PlayCircle />}
-                      label="Watch time"
-                      value="421h"
-                      progress={63}
-                    />
-                    <PreviewMetric
-                      icon={<MessageSquareText />}
-                      label="Reviews"
-                      value="18"
-                      progress={42}
-                    />
-                  </div>
-                </PreviewHotspot>
-
-                <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_13rem]">
-                  <div className="grid min-w-0 gap-3">
-                    <PreviewHotspot
-                      active={activeSurface === 'queue'}
-                      label={previewSurfaces.queue.label}
-                      onSelect={() => setActiveSurface('queue')}
-                    >
-                      <Card className="rounded-lg">
-                        <CardHeader className="flex-row items-center justify-between gap-2 pb-3">
-                          <div>
-                            <CardTitle className="text-sm">Room Queue</CardTitle>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              Upcoming room assets and playback checks.
-                            </p>
-                          </div>
-                          <PreviewStatusBadge tone="success">Online</PreviewStatusBadge>
-                        </CardHeader>
-                        <CardContent>
-                          <Table>
-                            <TableHeader className="text-[0.68rem] text-muted-foreground">
-                              <TableCell className="basis-40 min-w-40 py-2">Asset</TableCell>
-                              <TableCell className="basis-20 min-w-20 py-2">State</TableCell>
-                              <TableCell className="basis-20 min-w-20 py-2">Owner</TableCell>
-                            </TableHeader>
-                            <PreviewContentRow
-                              icon={<FileVideo />}
-                              title="Launch recap"
-                              meta="Scheduled in 42m"
-                              state="Ready"
-                              tone="success"
-                              owner="Mira"
-                            />
-                            <PreviewContentRow
-                              icon={<ImageIcon />}
-                              title="Hero thumbnails"
-                              meta="Needs crop review"
-                              state="Review"
-                              tone="warning"
-                              owner="Egor"
-                            />
-                            <PreviewContentRow
-                              icon={<Radio />}
-                              title="Creator room"
-                              meta="Live rehearsal"
-                              state="Live"
-                              tone="destructive"
-                              owner="Nika"
-                            />
-                          </Table>
-                        </CardContent>
-                      </Card>
-                    </PreviewHotspot>
-
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      <div className="rounded-lg border bg-card p-3 text-card-foreground">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="text-sm font-semibold">Moderation</div>
-                          <PreviewStatusBadge tone="warning">4 pending</PreviewStatusBadge>
-                        </div>
-                        <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                          Accent, warning, and destructive states resolve from the active draft.
-                        </p>
-                      </div>
-                      <div className="rounded-lg border bg-card p-3 text-card-foreground">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="text-sm font-semibold">Campaign Tags</div>
-                          <Tags className="size-4 text-primary" />
-                        </div>
-                        <div className="mt-3 flex flex-wrap gap-1.5">
-                          <span className="rounded-md bg-primary px-2 py-1 text-[0.68rem] font-medium text-primary-foreground">
-                            Featured
-                          </span>
-                          <span className="rounded-md bg-accent px-2 py-1 text-[0.68rem] font-medium text-accent-foreground">
-                            Premiere
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid content-start gap-3">
-                    <div className="rounded-lg border bg-card p-3 text-card-foreground">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 text-sm font-semibold">
-                          <PanelRightOpen className="size-4 text-primary" />
-                          Inspector
-                        </div>
-                        <PreviewStatusBadge tone="muted">Draft</PreviewStatusBadge>
-                      </div>
-
-                      <div className="mt-3 grid gap-3">
-                        <PreviewHotspot
-                          active={activeSurface === 'media'}
-                          label={previewSurfaces.media.label}
-                          onSelect={() => setActiveSurface('media')}
-                        >
-                          <div className="mt-3 overflow-hidden rounded-md border bg-media-background text-media-foreground">
-                            <div className="grid aspect-video place-items-center">
-                              <PlayCircle className="size-8" />
-                            </div>
-                            <div className="flex items-center gap-2 border-t border-media-muted/60 bg-media-control px-2 py-1.5 text-[0.68rem]">
-                              <span className="h-1 flex-1 rounded-full bg-media-muted">
-                                <span className="block h-full w-7/12 rounded-full bg-media-foreground" />
-                              </span>
-                              <span>08:42</span>
-                            </div>
-                          </div>
-                        </PreviewHotspot>
-
-                        <PreviewHotspot
-                          active={activeSurface === 'inspector'}
-                          label={previewSurfaces.inspector.label}
-                          onSelect={() => setActiveSurface('inspector')}
-                        >
-                          <div className="grid gap-2 rounded-md border bg-popover p-2 text-popover-foreground">
-                            <Input value="Launch recap" readOnly className="h-8 text-xs" />
-                            <div className="rounded-md border bg-muted/40 p-2">
-                              <div className="mb-1 flex items-center justify-between text-[0.68rem]">
-                                <span className="text-muted-foreground">Readiness</span>
-                                <span className="font-medium">82%</span>
-                              </div>
-                              <Progress value={82} />
-                            </div>
-                            <Button size="sm" variant="outline">
-                              <Wand2 className="size-4" />
-                              Optimize
-                            </Button>
-                          </div>
-                        </PreviewHotspot>
-                      </div>
-                    </div>
-
-                    <div className="rounded-lg border bg-surface-elevated p-3">
-                      <div className="flex items-center gap-2 text-xs font-semibold">
-                        <CalendarClock className="size-4 text-primary" />
-                        Release window
-                      </div>
-                      <div className="mt-2 text-lg font-semibold">18:30</div>
-                      <div className="text-xs text-muted-foreground">Autosaves every 90 sec</div>
-                    </div>
-                  </div>
-                </div>
+                <main className="h-[calc(52rem-6.5rem)] overflow-auto pb-20">
+                  <RoomsDashboardView
+                    className="p-6"
+                    navigation="preview"
+                    rooms={previewRooms}
+                    renderSurface={renderDashboardSurface}
+                  />
+                </main>
               </div>
             </div>
           </div>
+        </div>
 
-          <SurfaceEditor
-            definition={activeDefinition}
-            hasUnsavedAccountChanges={hasUnsavedAccountChanges}
-            mode={mode}
-            onSaveAppearance={onSaveAppearance}
-            settings={draft}
-            saveTarget={saveTarget}
-            saving={saving}
-            tokens={tokens}
-            onResetSurface={() => onResetSurface(activeDefinition.editableTokens)}
-            onResetToken={onResetToken}
-            onTokenChange={onTokenChange}
+        <div className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+          <ContrastRow
+            label="Primary action"
+            passes={meetsNormalTextContrast(tokens.primaryForeground, tokens.primary)}
+            ratio={getContrastRatio(tokens.primaryForeground, tokens.primary)}
+          />
+          <ContrastRow
+            label="Accent state"
+            passes={meetsNormalTextContrast(tokens.accentForeground, tokens.accent)}
+            ratio={getContrastRatio(tokens.accentForeground, tokens.accent)}
+          />
+          <ContrastRow
+            label="Card text"
+            passes={meetsNormalTextContrast(tokens.cardForeground, tokens.card)}
+            ratio={getContrastRatio(tokens.cardForeground, tokens.card)}
+          />
+          <ContrastRow
+            label="Sidebar active"
+            passes={meetsNormalTextContrast(tokens.sidebarAccentForeground, tokens.sidebarAccent)}
+            ratio={getContrastRatio(tokens.sidebarAccentForeground, tokens.sidebarAccent)}
           />
         </div>
-      </div>
+      </section>
 
-      <div className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
-        <ContrastRow
-          label="Primary action"
-          passes={meetsNormalTextContrast(tokens.primaryForeground, tokens.primary)}
-          ratio={getContrastRatio(tokens.primaryForeground, tokens.primary)}
-        />
-        <ContrastRow
-          label="Accent state"
-          passes={meetsNormalTextContrast(tokens.accentForeground, tokens.accent)}
-          ratio={getContrastRatio(tokens.accentForeground, tokens.accent)}
-        />
-        <ContrastRow
-          label="Card text"
-          passes={meetsNormalTextContrast(tokens.cardForeground, tokens.card)}
-          ratio={getContrastRatio(tokens.cardForeground, tokens.card)}
-        />
-        <ContrastRow
-          label="Sidebar active"
-          passes={meetsNormalTextContrast(tokens.sidebarAccentForeground, tokens.sidebarAccent)}
-          ratio={getContrastRatio(tokens.sidebarAccentForeground, tokens.sidebarAccent)}
-        />
-      </div>
-    </section>
+      <SurfaceEditor
+        definition={activeDefinition}
+        hasUnsavedAccountChanges={hasUnsavedAccountChanges}
+        mode={mode}
+        onSaveAppearance={onSaveAppearance}
+        settings={draft}
+        saveTarget={saveTarget}
+        saving={saving}
+        tokens={tokens}
+        onResetSurface={() => onResetSurface(getSurfaceResetTokens(activeDefinition))}
+        onResetTokens={onResetTokens}
+        onTokensChange={onTokensChange}
+      />
+    </div>
   )
 }
 
-function SurfaceEditor({
+function PreviewHeaderActions() {
+  return (
+    <>
+      <Button type="button" variant="outline" size="icon" className="rounded-full bg-card/80">
+        <Bell className="size-4" />
+        <span className="sr-only">Notifications</span>
+      </Button>
+      <Button type="button" className="rounded-full">
+        <PlayCircle className="size-4" />
+        Start room
+      </Button>
+    </>
+  )
+}
+
+function SurfaceQuickEditor({
   definition,
   hasUnsavedAccountChanges,
   mode,
   onResetSurface,
-  onResetToken,
+  onResetTokens,
   onSaveAppearance,
-  onTokenChange,
+  onTokensChange,
   saveTarget,
   saving,
   settings,
@@ -683,21 +727,148 @@ function SurfaceEditor({
   hasUnsavedAccountChanges: boolean
   mode: ResolvedAppearanceMode
   onResetSurface: () => void
-  onResetToken: (token: EditableThemeTokenName) => void
+  onResetTokens: (tokens: Array<EditableThemeTokenName>) => void
   onSaveAppearance: () => void
-  onTokenChange: (token: EditableThemeTokenName, value: string) => void
+  onTokensChange: (updates: Partial<Record<EditableThemeTokenName, string>>) => void
   saveTarget: string
   saving: boolean
   settings: AppearanceSettings
   tokens: ThemeTokens
 }) {
   const modeOverrides = settings.customTheme.overrides[mode] ?? {}
-  const hasSurfaceOverrides = definition.editableTokens.some((tokenName) =>
+  const roles = getSurfaceRoles(definition).slice(0, 3)
+  const hasSurfaceOverrides = getSurfaceResetTokens(definition).some((tokenName) =>
     Boolean(modeOverrides[tokenName]),
   )
 
   return (
-    <aside className="absolute bottom-3 right-3 top-3 z-30 grid w-80 content-start gap-4 overflow-y-auto rounded-xl border bg-card/95 p-4 text-card-foreground shadow-2xl backdrop-blur-xl">
+    <div
+      data-appearance-editor
+      className="absolute left-2 top-2 z-30 flex max-w-[calc(100%-1rem)] items-center gap-1 rounded-full border bg-card/95 px-2 py-1 text-card-foreground shadow-2xl backdrop-blur-xl"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <div className="mr-1 hidden min-w-0 items-center gap-1.5 px-1 text-[0.68rem] font-semibold sm:flex">
+        <MousePointer2 className="size-3.5 text-primary" />
+        <span className="max-w-28 truncate">{definition.label}</span>
+      </div>
+
+      {roles.map((role) => {
+        const resolvedValue = normalizeHexColor(tokens[role.token]) ?? '#000000'
+        const customized = getRoleResetTokens(role).some((tokenName) =>
+          Boolean(modeOverrides[tokenName]),
+        )
+
+        return (
+          <Tooltip key={`${role.label}-${role.token}`} text={role.label} sideOffset={6}>
+            <label
+              className={cn(
+                'grid size-7 cursor-pointer place-items-center rounded-full border bg-background shadow-sm',
+                customized && 'border-primary ring-2 ring-primary/20',
+              )}
+            >
+              <input
+                type="color"
+                value={resolvedValue}
+                onChange={(event) => onTokensChange(getRoleTokenUpdates(role, event.target.value))}
+                className="sr-only"
+                aria-label={`${role.label} color picker`}
+              />
+              <span
+                className="size-4 rounded-full border border-border"
+                style={{ backgroundColor: resolvedValue }}
+                aria-hidden
+              />
+            </label>
+          </Tooltip>
+        )
+      })}
+
+      {roles.length ? (
+        <Tooltip text="Reset selected role" sideOffset={6}>
+          <Button
+            type="button"
+            size="icon"
+            variant="outline"
+            className="size-7 rounded-full bg-background"
+            disabled={!hasSurfaceOverrides}
+            onClick={() => onResetTokens(getRoleResetTokens(roles[0]))}
+            aria-label={`Reset ${roles[0].label}`}
+          >
+            <RotateCcw className="size-3.5" />
+          </Button>
+        </Tooltip>
+      ) : null}
+
+      <Tooltip text={`Save to ${saveTarget}`} sideOffset={6}>
+        <Button
+          type="button"
+          size="icon"
+          className="size-7 rounded-full"
+          disabled={saving || (saveTarget === 'account' && !hasUnsavedAccountChanges)}
+          onClick={onSaveAppearance}
+          aria-label={`Save ${definition.label} appearance`}
+        >
+          {saving ? (
+            <SpinIcon size="sm" label="Saving appearance" />
+          ) : (
+            <Save className="size-3.5" />
+          )}
+        </Button>
+      </Tooltip>
+
+      <Tooltip text="Reset surface" sideOffset={6}>
+        <Button
+          type="button"
+          size="icon"
+          variant="outline"
+          className="size-7 rounded-full bg-background"
+          disabled={!hasSurfaceOverrides}
+          onClick={onResetSurface}
+          aria-label={`Reset ${definition.label} appearance`}
+        >
+          <span className="text-[0.65rem] font-semibold">All</span>
+        </Button>
+      </Tooltip>
+    </div>
+  )
+}
+
+function SurfaceEditor({
+  definition,
+  hasUnsavedAccountChanges,
+  mode,
+  onResetSurface,
+  onResetTokens,
+  onSaveAppearance,
+  onTokensChange,
+  saveTarget,
+  saving,
+  settings,
+  tokens,
+}: {
+  definition: PreviewSurfaceDefinition
+  hasUnsavedAccountChanges: boolean
+  mode: ResolvedAppearanceMode
+  onResetSurface: () => void
+  onResetTokens: (tokens: Array<EditableThemeTokenName>) => void
+  onSaveAppearance: () => void
+  onTokensChange: (updates: Partial<Record<EditableThemeTokenName, string>>) => void
+  saveTarget: string
+  saving: boolean
+  settings: AppearanceSettings
+  tokens: ThemeTokens
+}) {
+  const modeOverrides = settings.customTheme.overrides[mode] ?? {}
+  const roles = getSurfaceRoles(definition)
+  const hasSurfaceOverrides = getSurfaceResetTokens(definition).some((tokenName) =>
+    Boolean(modeOverrides[tokenName]),
+  )
+
+  return (
+    <aside
+      data-appearance-editor
+      className="grid max-h-[52rem] min-w-0 content-start gap-4 overflow-y-auto rounded-xl border bg-card/95 p-4 text-card-foreground shadow-sm backdrop-blur-xl xl:sticky xl:top-4"
+    >
       <div className="grid gap-2">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -716,33 +887,38 @@ function SurfaceEditor({
           </span>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {definition.tokens.map((tokenName) => (
-            <span
-              key={tokenName}
-              className="inline-flex items-center gap-2 rounded-md border bg-background px-2 py-1 text-[0.68rem]"
+        <div className="grid grid-cols-2 gap-2">
+          {roles.slice(0, 4).map((role) => (
+            <button
+              key={`${role.label}-${role.token}`}
+              type="button"
+              className="flex items-center gap-2 rounded-lg border bg-background px-2 py-2 text-left text-xs shadow-sm transition hover:border-primary/50"
+              onClick={() =>
+                document.getElementById(getSurfaceRoleControlId(mode, definition, role))?.focus()
+              }
             >
               <span
-                className="size-3 rounded-full border"
-                style={{ backgroundColor: tokens[tokenName] }}
+                className="size-4 shrink-0 rounded-full border"
+                style={{ backgroundColor: tokens[role.token] }}
                 aria-hidden
               />
-              {formatTokenLabel(tokenName)}
-            </span>
+              <span className="min-w-0 truncate">{role.label}</span>
+            </button>
           ))}
         </div>
       </div>
 
       <div className="grid gap-3">
-        {definition.editableTokens.map((tokenName) => (
-          <SurfaceTokenControl
-            key={tokenName}
-            customValue={modeOverrides[tokenName]}
+        {roles.map((role) => (
+          <SurfaceRoleControl
+            key={`${role.label}-${role.token}`}
+            customValues={modeOverrides}
+            definition={definition}
             mode={mode}
-            tokenName={tokenName}
+            role={role}
             tokens={tokens}
-            onReset={() => onResetToken(tokenName)}
-            onTokenChange={onTokenChange}
+            onReset={() => onResetTokens(getRoleResetTokens(role))}
+            onTokensChange={onTokensChange}
           />
         ))}
       </div>
@@ -776,29 +952,33 @@ function SurfaceEditor({
   )
 }
 
-function SurfaceTokenControl({
-  customValue,
+function SurfaceRoleControl({
+  customValues,
+  definition,
   mode,
   onReset,
-  onTokenChange,
-  tokenName,
+  onTokensChange,
+  role,
   tokens,
 }: {
-  customValue?: string
+  customValues: Partial<Record<EditableThemeTokenName, string>>
+  definition: PreviewSurfaceDefinition
   mode: ResolvedAppearanceMode
   onReset: () => void
-  onTokenChange: (token: EditableThemeTokenName, value: string) => void
-  tokenName: EditableThemeTokenName
+  onTokensChange: (updates: Partial<Record<EditableThemeTokenName, string>>) => void
+  role: SurfaceRole
   tokens: ThemeTokens
 }) {
-  const resolvedValue = normalizeHexColor(tokens[tokenName]) ?? '#000000'
+  const resolvedValue = normalizeHexColor(tokens[role.token]) ?? '#000000'
   const [inputValue, setInputValue] = useState(resolvedValue)
-  const customized = Boolean(customValue)
-  const contrastBackground = getLikelyBackground(tokenName, tokens)
-  const contrastRatio = tokenName.endsWith('Foreground')
-    ? getContrastRatio(resolvedValue, contrastBackground)
+  const roleResetTokens = getRoleResetTokens(role)
+  const customized = roleResetTokens.some((tokenName) => Boolean(customValues[tokenName]))
+  const contrastForegroundToken = role.foregroundToken ?? foregroundPairs[role.token]
+  const contrastForeground = contrastForegroundToken ? tokens[contrastForegroundToken] : null
+  const contrastRatio = contrastForeground
+    ? getContrastRatio(contrastForeground, resolvedValue)
     : null
-  const inputId = `surface-${mode}-${tokenName}`
+  const inputId = getSurfaceRoleControlId(mode, definition, role)
 
   useEffect(() => {
     setInputValue(resolvedValue)
@@ -808,7 +988,7 @@ function SurfaceTokenControl({
     setInputValue(nextValue)
 
     if (normalizeHexColor(nextValue)) {
-      onTokenChange(tokenName, nextValue)
+      onTokensChange(getRoleTokenUpdates(role, nextValue))
     }
   }
 
@@ -821,11 +1001,11 @@ function SurfaceTokenControl({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <Label htmlFor={inputId} className="text-xs font-semibold">
-            {formatTokenLabel(tokenName)}
-          </Label>
-          <div className="mt-1 truncate text-[0.68rem] text-muted-foreground">
-            {customized ? 'Custom override' : 'Preset value'}
+          <label htmlFor={inputId} className="text-xs font-semibold">
+            {role.label}
+          </label>
+          <div className="mt-1 text-[0.68rem] leading-4 text-muted-foreground">
+            {role.description}
           </div>
         </div>
         <span
@@ -841,7 +1021,7 @@ function SurfaceTokenControl({
           value={resolvedValue}
           onChange={(event) => updateValue(event.target.value)}
           className="size-10 rounded-md border border-border bg-transparent"
-          aria-label={`${formatTokenLabel(tokenName)} color picker`}
+          aria-label={`${role.label} color picker`}
         />
         <Input
           id={inputId}
@@ -849,7 +1029,7 @@ function SurfaceTokenControl({
           onBlur={() => setInputValue(resolvedValue)}
           onChange={(event) => updateValue(event.target.value)}
           className="h-8 font-mono text-xs"
-          aria-label={`${formatTokenLabel(tokenName)} hex value`}
+          aria-label={`${role.label} hex value`}
         />
         <Button
           type="button"
@@ -857,7 +1037,7 @@ function SurfaceTokenControl({
           size="icon"
           disabled={!customized}
           onClick={onReset}
-          aria-label={`Reset ${formatTokenLabel(tokenName)}`}
+          aria-label={`Reset ${role.label}`}
         >
           <RotateCcw className="size-4" />
         </Button>
@@ -874,31 +1054,9 @@ function SurfaceTokenControl({
                 : 'bg-destructive/15 text-destructive',
           )}
         >
-          Contrast {contrastRatio.toFixed(2)}:1
+          Text contrast {contrastRatio.toFixed(2)}:1
         </div>
       ) : null}
-    </div>
-  )
-}
-
-function PreviewNavItem({
-  active = false,
-  icon,
-  label,
-}: {
-  active?: boolean
-  icon: ReactNode
-  label: string
-}) {
-  return (
-    <div
-      className={cn(
-        'flex min-w-0 items-center gap-2 rounded-md px-2 py-2 text-[0.72rem] text-sidebar-foreground/75',
-        active && 'bg-sidebar-accent font-medium text-sidebar-accent-foreground',
-      )}
-    >
-      <span className="shrink-0">{icon}</span>
-      <span className="truncate">{label}</span>
     </div>
   )
 }
@@ -906,34 +1064,47 @@ function PreviewNavItem({
 function PreviewHotspot({
   active,
   children,
+  editor,
   label,
+  onRegister,
   onSelect,
+  surfaceId,
 }: {
   active: boolean
   children: ReactNode
+  editor?: ReactNode
   label: string
+  onRegister: (surface: PreviewSurfaceId, node: HTMLDivElement | null) => void
   onSelect: () => void
+  surfaceId: PreviewSurfaceId
 }) {
   return (
     <div
+      ref={(node) => onRegister(surfaceId, node)}
       className={cn(
-        'group relative min-w-0 overflow-hidden',
+        'group relative min-w-0 rounded-[inherit] outline-none',
         active && 'ring-2 ring-primary/65 ring-offset-2 ring-offset-background',
       )}
+      role="group"
+      tabIndex={0}
+      aria-label={`Customize ${label}`}
+      onFocus={onSelect}
+      onPointerDownCapture={(event) => {
+        const target = event.target
+
+        if (target instanceof Element && target.closest('[data-appearance-editor]')) {
+          return
+        }
+
+        onSelect()
+      }}
     >
       {children}
-      <Tooltip text={`Customize ${label}`}>
-        <button
-          type="button"
-          className="absolute inset-0 z-10 cursor-pointer rounded-[inherit] outline-none focus-visible:ring-2 focus-visible:ring-ring/55"
-          onClick={onSelect}
-          aria-label={`Customize ${label}`}
-        />
-      </Tooltip>
+      {active ? editor : null}
       <div
         className={cn(
           'pointer-events-none absolute right-2 top-2 z-20 rounded-md border bg-background/92 px-2 py-1 text-[0.68rem] font-medium text-foreground opacity-0 shadow-sm backdrop-blur transition-opacity',
-          active ? 'opacity-100' : 'group-hover:opacity-100',
+          active ? 'opacity-100' : 'group-hover:opacity-100 group-focus-within:opacity-100',
         )}
       >
         {label}
@@ -942,107 +1113,171 @@ function PreviewHotspot({
   )
 }
 
-function PreviewMetric({
-  icon,
-  label,
-  progress,
-  value,
-}: {
-  icon: ReactNode
-  label: string
-  progress: number
-  value: string
-}) {
-  return (
-    <div className="rounded-lg border bg-card p-3 text-card-foreground">
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-xs text-muted-foreground">{label}</span>
-        <span className="text-primary [&_svg]:size-4">{icon}</span>
-      </div>
-      <div className="mt-2 text-xl font-semibold">{value}</div>
-      <Progress value={progress} className="mt-3 h-1.5" />
-    </div>
-  )
-}
+function getSurfaceRoles(definition: PreviewSurfaceDefinition) {
+  const roles: Array<SurfaceRole> = []
+  const used = new Set<EditableThemeTokenName>()
+  const addRole = (role: SurfaceRole | null) => {
+    if (!role || used.has(role.token)) {
+      return
+    }
 
-function PreviewContentRow({
-  icon,
-  meta,
-  owner,
-  state,
-  title,
-  tone,
-}: {
-  icon: ReactNode
-  meta: string
-  owner: string
-  state: string
-  title: string
-  tone: PreviewStatusTone
-}) {
-  return (
-    <TableRow className="text-xs">
-      <TableCell className="min-w-40 py-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <span className="text-primary [&_svg]:size-4">{icon}</span>
-          <div className="min-w-0">
-            <div className="truncate font-medium">{title}</div>
-            <div className="truncate text-muted-foreground">{meta}</div>
-          </div>
-        </div>
-      </TableCell>
-      <TableCell className="min-w-20 py-2">
-        <PreviewStatusBadge tone={tone}>{state}</PreviewStatusBadge>
-      </TableCell>
-      <TableCell className="min-w-20 py-2 text-muted-foreground">{owner}</TableCell>
-    </TableRow>
-  )
-}
-
-function formatTokenLabel(tokenName: keyof ThemeTokens) {
-  return tokenName.replace(/([A-Z])/g, ' $1').replace(/^./, (letter) => letter.toUpperCase())
-}
-
-function getLikelyBackground(tokenName: EditableThemeTokenName, tokens: ThemeTokens) {
-  const foregroundBackgrounds: Partial<Record<EditableThemeTokenName, keyof ThemeTokens>> = {
-    accentForeground: 'accent',
-    cardForeground: 'card',
-    destructiveForeground: 'destructive',
-    headerForeground: 'header',
-    mediaForeground: 'mediaBackground',
-    mutedForeground: 'muted',
-    popoverForeground: 'popover',
-    primaryForeground: 'primary',
-    secondaryForeground: 'secondary',
-    sidebarAccentForeground: 'sidebarAccent',
-    sidebarForeground: 'sidebar',
-    sidebarPrimaryForeground: 'sidebarPrimary',
-    successForeground: 'success',
-    warningForeground: 'warning',
+    roles.push(role)
+    used.add(role.token)
   }
-  const backgroundToken = foregroundBackgrounds[tokenName]
+  const surfaceToken = pickEditableToken(definition.editableTokens, surfaceRoleTokenPriority)
+  const contentToken = pickEditableToken(definition.editableTokens, contentRoleTokenPriority)
+  const actionToken = pickEditableToken(definition.editableTokens, actionRoleTokenPriority)
+  const selectionToken = pickEditableToken(definition.editableTokens, selectionRoleTokenPriority)
+  const edgeToken = pickEditableToken(definition.editableTokens, edgeRoleTokenPriority)
 
-  return backgroundToken ? tokens[backgroundToken] : tokens.background
+  addRole(
+    surfaceToken
+      ? {
+          label: 'Surface',
+          description: 'Changes the selected area background and keeps readable text paired to it.',
+          token: surfaceToken,
+          foregroundToken: foregroundPairs[surfaceToken],
+          linkedTokens: getLinkedTokensForRole(surfaceToken, definition.editableTokens),
+        }
+      : null,
+  )
+  addRole(
+    contentToken
+      ? {
+          label: 'Content',
+          description: 'Adjusts labels, icons, descriptions, and other readable content.',
+          token: contentToken,
+        }
+      : null,
+  )
+  addRole(
+    actionToken
+      ? {
+          label: 'Action',
+          description: 'Updates primary commands, badges, focus color, and related brand accents.',
+          token: actionToken,
+          foregroundToken: foregroundPairs[actionToken],
+          linkedTokens: getLinkedTokensForRole(actionToken, definition.editableTokens),
+        }
+      : null,
+  )
+  addRole(
+    selectionToken
+      ? {
+          label: 'Selection',
+          description: 'Tunes active items, selected states, and soft highlighted regions.',
+          token: selectionToken,
+          foregroundToken: foregroundPairs[selectionToken],
+          linkedTokens: getLinkedTokensForRole(selectionToken, definition.editableTokens),
+        }
+      : null,
+  )
+  addRole(
+    edgeToken
+      ? {
+          label: 'Edges',
+          description: 'Controls borders, field strokes, and keyboard focus treatment.',
+          token: edgeToken,
+          linkedTokens: getLinkedTokensForRole(edgeToken, definition.editableTokens),
+        }
+      : null,
+  )
+
+  return roles
+}
+
+function pickEditableToken(
+  editableTokens: Array<EditableThemeTokenName>,
+  priority: ReadonlyArray<EditableThemeTokenName>,
+) {
+  return priority.find((tokenName) => editableTokens.includes(tokenName)) ?? null
+}
+
+function getLinkedTokensForRole(
+  tokenName: EditableThemeTokenName,
+  editableTokens: Array<EditableThemeTokenName>,
+) {
+  const linkedTokens = linkedRoleTokens[tokenName] ?? []
+
+  return linkedTokens.filter(
+    (linkedToken) =>
+      linkedToken !== tokenName &&
+      (editableTokens.includes(linkedToken) || globalLinkedEditableTokens.includes(linkedToken)),
+  )
+}
+
+function getRoleTokenUpdates(role: SurfaceRole, nextValue: string) {
+  const normalized = normalizeHexColor(nextValue)
+
+  if (!normalized) {
+    return {}
+  }
+
+  const updates: Partial<Record<EditableThemeTokenName, string>> = {
+    [role.token]: normalized,
+  }
+  const pairedForeground = role.foregroundToken ?? foregroundPairs[role.token]
+
+  if (pairedForeground) {
+    updates[pairedForeground] = getReadableForeground(normalized)
+  }
+
+  role.linkedTokens?.forEach((linkedToken) => {
+    updates[linkedToken] = normalized
+
+    const linkedForeground = foregroundPairs[linkedToken]
+
+    if (linkedForeground) {
+      updates[linkedForeground] = getReadableForeground(normalized)
+    }
+  })
+
+  return updates
+}
+
+function getRoleResetTokens(role: SurfaceRole) {
+  const tokensToReset = new Set<EditableThemeTokenName>([role.token])
+  const pairedForeground = role.foregroundToken ?? foregroundPairs[role.token]
+
+  if (pairedForeground) {
+    tokensToReset.add(pairedForeground)
+  }
+
+  role.linkedTokens?.forEach((linkedToken) => {
+    tokensToReset.add(linkedToken)
+
+    const linkedForeground = foregroundPairs[linkedToken]
+
+    if (linkedForeground) {
+      tokensToReset.add(linkedForeground)
+    }
+  })
+
+  return Array.from(tokensToReset)
+}
+
+function getSurfaceResetTokens(definition: PreviewSurfaceDefinition) {
+  const tokensToReset = new Set<EditableThemeTokenName>(definition.editableTokens)
+
+  getSurfaceRoles(definition).forEach((role) => {
+    getRoleResetTokens(role).forEach((tokenName) => tokensToReset.add(tokenName))
+  })
+
+  return Array.from(tokensToReset)
+}
+
+function getSurfaceRoleControlId(
+  mode: ResolvedAppearanceMode,
+  definition: PreviewSurfaceDefinition,
+  role: SurfaceRole,
+) {
+  return `surface-${mode}-${definition.label.toLowerCase().replace(/\W+/g, '-')}-${role.label
+    .toLowerCase()
+    .replace(/\W+/g, '-')}`
 }
 
 function serializeSettings(settings: AppearanceSettings) {
   return JSON.stringify(settings)
-}
-
-function PreviewStatusBadge({ children, tone }: { children: ReactNode; tone: PreviewStatusTone }) {
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center rounded-md px-2 py-1 text-[0.66rem] font-semibold',
-        tone === 'success' && 'bg-success text-success-foreground',
-        tone === 'warning' && 'bg-warning text-warning-foreground',
-        tone === 'destructive' && 'bg-destructive text-destructive-foreground',
-        tone === 'muted' && 'bg-muted text-muted-foreground',
-      )}
-    >
-      {children}
-    </span>
-  )
 }
 
 function ContrastRow({

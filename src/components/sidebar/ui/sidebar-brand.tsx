@@ -26,7 +26,9 @@ export function SidebarBrand({
         <div className="truncate text-sm font-semibold tracking-tight text-sidebar-foreground">
           {title}
         </div>
-        {subtitle ? <div className="truncate text-xs text-muted-foreground">{subtitle}</div> : null}
+        {subtitle ? (
+          <div className="truncate text-xs text-sidebar-foreground/80">{subtitle}</div>
+        ) : null}
       </div>
 
       {meta && !collapsed ? <div className="shrink-0">{meta}</div> : null}

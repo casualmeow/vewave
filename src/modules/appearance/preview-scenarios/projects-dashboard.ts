@@ -1,6 +1,6 @@
-import type { ProjectItem } from '../types'
+import type { RoomWorkspaceItem } from '@/modules/projects'
 
-export const initialProjects: Array<ProjectItem> = [
+export const appearancePreviewProjects: Array<RoomWorkspaceItem> = [
   {
     id: 'cinema-night',
     title: 'Cinema Night',
@@ -20,9 +20,9 @@ export const initialProjects: Array<ProjectItem> = [
   {
     id: 'launch-review',
     title: 'Launch Review',
-    description: 'Private review queue for edits, sponsor checks, and team watch sessions.',
-    type: 'collection',
-    status: 'draft',
+    description: 'Private review queue for edits, sponsor checks, and team rooms.',
+    type: 'watch-room',
+    status: 'setup',
     roomCode: 'LAUNCH9',
     members: 6,
     videos: 14,
@@ -31,13 +31,13 @@ export const initialProjects: Array<ProjectItem> = [
     ctaLink: '/room/LAUNCH9',
     accent: 'from-accent/50 via-muted to-primary/25',
     summary:
-      'Draft project with three unresolved edit notes, two scheduled watch rooms, and creator-only playback permissions.',
+      'Room setup with three unresolved edit notes, a saved source list, and creator-only playback permissions.',
   },
   {
     id: 'community-replay',
     title: 'Community Replay',
     description: 'Archived audience room with replay-ready moments and shared timestamps.',
-    type: 'event',
+    type: 'watch-room',
     status: 'archived',
     roomCode: 'REPLAY4',
     members: 42,

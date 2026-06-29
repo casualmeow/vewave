@@ -12,6 +12,8 @@ export type PlaybackCommandPayload = {
 export type ClientRoomEvent =
   | { type: 'room.ping'; payload: { clientTimeMs: number } }
   | { type: 'playback.command'; payload: PlaybackCommandPayload }
+  | { type: 'media.select'; payload: { mediaItemId: string } }
+  | { type: 'media.add'; payload: { url: string } }
 
 export type PresenceMember = {
   connectionId: string
@@ -85,12 +87,20 @@ const presenceSchema = z.object({
   members: z.array(presenceMemberSchema),
 })
 
+const mediaSchema = z
+  .object({ provider: z.string(), externalId: z.string(), canonicalUrl: z.string() })
+  .passthrough()
+
+const mediaItemSchema = mediaSchema.extend({
+  id: z.string(),
+  position: z.number().min(0),
+})
+
 const snapshotSchema = z
   .object({
     room: z.object({ code: z.string() }).passthrough(),
-    media: z
-      .object({ provider: z.string(), externalId: z.string(), canonicalUrl: z.string() })
-      .passthrough(),
+    media: mediaSchema,
+    mediaItems: z.array(mediaItemSchema),
     playback: playbackSchema,
     permissions: z.object({ role: z.string(), canControlPlayback: z.boolean() }).passthrough(),
     presence: presenceSchema.optional(),
@@ -162,5 +172,19 @@ export function createPlaybackCommand(
       positionMs,
       clientTimeMs: Date.now(),
     },
+  }
+}
+
+export function createMediaSelectCommand(mediaItemId: string): ClientRoomEvent {
+  return {
+    type: 'media.select',
+    payload: { mediaItemId },
+  }
+}
+
+export function createMediaAddCommand(url: string): ClientRoomEvent {
+  return {
+    type: 'media.add',
+    payload: { url },
   }
 }

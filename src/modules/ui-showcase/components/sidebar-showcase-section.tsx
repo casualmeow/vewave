@@ -85,14 +85,14 @@ type SidebarShowcaseState = {
 }
 
 const sidebarDesigns = [
-  'liquidGlass',
   'glass',
   'fluent',
   'solid',
+  'liquidGlass',
 ] as const satisfies ReadonlyArray<SidebarDesign>
 const sidebarSizes = ['sm', 'md', 'lg'] as const satisfies ReadonlyArray<SidebarSize>
 const sidebarDensities = ['comfortable', 'compact'] as const satisfies ReadonlyArray<SidebarDensity>
-const sidebarMotionModes = ['fluid', 'soft', 'none'] as const satisfies ReadonlyArray<SidebarMotion>
+const sidebarMotionModes = ['soft', 'none', 'fluid'] as const satisfies ReadonlyArray<SidebarMotion>
 const sidebarMobileModes = [
   'auto',
   'off',
@@ -132,8 +132,22 @@ const sidebarDemoItems: ReadonlyArray<SidebarDemoItem> = [
 
 const sidebarPresets = [
   {
-    label: 'Liquid Studio',
-    description: 'Fluid glass shell with a morphing active highlight.',
+    label: 'App Shell',
+    description: 'Calm persistent navigation with explicit state and soft motion.',
+    state: createSidebarState({
+      design: 'glass',
+      size: 'md',
+      density: 'comfortable',
+      collapsed: false,
+      motion: 'soft',
+      fluidPreset: 'subtle',
+      dragMode: 'none',
+      activeItem: 'content',
+    }),
+  },
+  {
+    label: 'Expressive Preview',
+    description: 'Liquid glass treatment reserved for isolated component demos.',
     state: createSidebarState({
       design: 'liquidGlass',
       size: 'md',
@@ -181,8 +195,8 @@ const sidebarPresets = [
 
 const designDescriptions: Record<SidebarDesign, string> = {
   liquidGlass:
-    'Telegram/iOS-style liquid glass with one floating shell, subtle section platters, and a shared liquid selector that glides between items.',
-  glass: 'Layered liquid glass, blur, reflection lines, and soft tint for rich studio shells.',
+    'Expressive liquid material for isolated previews; avoid it as the default for persistent app or studio navigation.',
+  glass: 'Calmer translucent app navigation with soft motion and a focused active rail.',
   fluent: 'Calmer acrylic-style panel with Mica-like depth and a focused active rail.',
   solid: 'Token-driven solid app shell for dense operational interfaces.',
 }
@@ -197,7 +211,7 @@ function mobilePresetValues(fluidPreset: SidebarFluidPreset) {
   return {
     mobileMode: 'auto',
     mobileFluidPreset: fluidPreset,
-    mobileHoverSize: Math.max(18, preset.hoverSize),
+    mobileHoverSize: Math.max(8, preset.hoverSize),
     mobileHoverScale: preset.hoverScale,
     mobileActiveHoverScale: preset.activeHoverScale,
     mobileDragScale: preset.dragScale,
@@ -209,7 +223,7 @@ function mobilePresetValues(fluidPreset: SidebarFluidPreset) {
     mobileFocusDimOpacity: preset.focusDimOpacity,
     mobileLiquidIntensity: preset.liquidIntensity,
     mobileDragMode: preset.dragMode,
-    mobileDockDragMode: 'both',
+    mobileDockDragMode: preset.dragMode,
     mobileMaxItems: 5,
     mobileDockPlacement: 'container',
     mobileDockClassName: 'inset-x-3',
@@ -289,38 +303,20 @@ function createSidebarState(
     focusDimOpacity: preset.focusDimOpacity,
     liquidIntensity: preset.liquidIntensity,
     dragMode: state.dragMode ?? preset.dragMode,
-    ...mobilePresetValues('extreme'),
+    ...mobilePresetValues(state.fluidPreset),
   }
 }
 
-const initialState: SidebarShowcaseState = {
-  design: 'liquidGlass',
+const initialState: SidebarShowcaseState = createSidebarState({
+  design: 'glass',
   size: 'md',
   density: 'comfortable',
   collapsed: false,
-  motion: 'fluid',
-  fluidPreset: 'expressive',
+  motion: 'soft',
+  fluidPreset: 'subtle',
+  dragMode: 'none',
   activeItem: 'content',
-  ...fluidPresetValues('expressive'),
-  mobileMode: 'auto',
-  mobileFluidPreset: 'extreme',
-  mobileHoverSize: 22,
-  mobileHoverScale: 1.12,
-  mobileActiveHoverScale: 1.08,
-  mobileDragScale: 1.2,
-  mobileMagneticStrength: 18,
-  mobileMagneticVerticalStrength: 12,
-  mobileTiltStrength: 5.8,
-  mobileFocusBlur: true,
-  mobileFocusBlurAmount: 6,
-  mobileFocusDimOpacity: 0.32,
-  mobileLiquidIntensity: 1.8,
-  mobileDragMode: 'both',
-  mobileDockDragMode: 'both',
-  mobileMaxItems: 5,
-  mobileDockPlacement: 'container',
-  mobileDockClassName: 'inset-x-3',
-}
+})
 
 const sidebarPropRows = [
   'design',
@@ -398,10 +394,9 @@ export function SidebarShowcaseSection() {
             Decomposable sidebar variants
           </h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-            A real Sidebar instance driven by controls, plus compact comparisons for liquid glass,
-            glass, fluent, and solid surfaces. The liquid variant keeps item content sharp while a
-            single selector moves through the nav group and the shell catches a subtle desktop
-            shine.
+            A real Sidebar instance driven by controls, plus compact comparisons for glass, fluent,
+            solid, and liquid glass surfaces. The default preset mirrors production app shells:
+            state is explicit, motion is soft, and drag behavior is off.
           </p>
         </div>
 
@@ -882,7 +877,7 @@ function SidebarVariantComparison({ activeItem }: { activeItem: SidebarDemoItemI
             magneticStrength={4}
             magneticVerticalStrength={2.5}
             tiltStrength={1.8}
-            focusBlur
+            focusBlur={false}
             focusBlurAmount={2}
             focusDimOpacity={0.72}
             liquidIntensity={0.72}

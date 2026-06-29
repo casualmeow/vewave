@@ -36,11 +36,14 @@ httpClient.interceptors.response.use(
       '/api/auth/register',
     ].some((endpoint) => requestUrl.includes(endpoint))
 
+    const accessToken = useAuthStore.getState().accessToken
+
     if (
       error.response?.status !== 401 ||
       !originalRequest ||
       originalRequest._retry ||
-      isAuthEndpoint
+      isAuthEndpoint ||
+      !accessToken
     ) {
       return Promise.reject(error)
     }
@@ -48,9 +51,9 @@ httpClient.interceptors.response.use(
     originalRequest._retry = true
 
     try {
-      const accessToken = await refreshSessionOnce()
-      useAuthStore.getState().setAccessToken(accessToken)
-      originalRequest.headers.Authorization = `Bearer ${accessToken}`
+      const refreshedAccessToken = await refreshSessionOnce()
+      useAuthStore.getState().setAccessToken(refreshedAccessToken)
+      originalRequest.headers.Authorization = `Bearer ${refreshedAccessToken}`
 
       return httpClient(originalRequest)
     } catch (refreshError) {

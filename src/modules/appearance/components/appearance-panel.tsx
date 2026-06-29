@@ -39,7 +39,6 @@ import {
   type LogoStrategy,
   type ResolvedAppearanceMode,
   type ThemeTokens,
-  type UserAppConfig,
 } from '@/shared/theme'
 import {
   getContrastRatio,
@@ -180,7 +179,7 @@ const tokenSections = [
       token('tabsTrack', 'Tabs track', 'Tabs list surface'),
       token('tabsActive', 'Active tab', 'Selected tab surface'),
       token('logoDark', 'Logo base', 'Base fill for the W mark'),
-      token('logoAccent', 'Logo accent', 'Secondary blue fill inside the W mark'),
+      token('logoAccent', 'Logo accent', 'Secondary brand fill inside the W mark'),
       token('logoLight', 'Logo light', 'Light fill variant for dark surfaces'),
     ],
   },

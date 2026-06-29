@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
-import { useRoomStore } from '../model'
+import { rememberRoomSnapshot, useRoomStore } from '../model'
 import {
   buildRoomRealtimeUrl,
+  createMediaAddCommand,
+  createMediaSelectCommand,
   createPlaybackCommand,
   parseServerRoomEvent,
   serializeClientRoomEvent,
@@ -15,6 +17,7 @@ const maxReconnectAttempts = 5
 
 export function useRoomRealtime(code: string) {
   const accessToken = useAuthStore((state) => state.accessToken)
+  const userId = useAuthStore((state) => state.user?.id ?? null)
   const applyServerEvent = useRoomStore((state) => state.applyServerEvent)
   const setConnectionStatus = useRoomStore((state) => state.setConnectionStatus)
   const setLastError = useRoomStore((state) => state.setLastError)
@@ -76,6 +79,10 @@ export function useRoomRealtime(code: string) {
 
           applyServerEvent(event)
 
+          if (event.type === 'room.snapshot') {
+            rememberRoomSnapshot(event.payload, userId)
+          }
+
           if (event.type === 'command.rejected') {
             toast.error(event.payload.message)
           }
@@ -124,7 +131,7 @@ export function useRoomRealtime(code: string) {
       socketRef.current?.close()
       socketRef.current = null
     }
-  }, [accessToken, applyServerEvent, code, setConnectionStatus, setLastError])
+  }, [accessToken, applyServerEvent, code, setConnectionStatus, setLastError, userId])
 
   const sendPlaybackCommand = useCallback((action: PlaybackCommandAction, positionMs?: number) => {
     const socket = socketRef.current
@@ -137,8 +144,32 @@ export function useRoomRealtime(code: string) {
     return true
   }, [])
 
+  const sendMediaAdd = useCallback((url: string) => {
+    const socket = socketRef.current
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      return false
+    }
+
+    socket.send(serializeClientRoomEvent(createMediaAddCommand(url)))
+    return true
+  }, [])
+
+  const sendMediaSelect = useCallback((mediaItemId: string) => {
+    const socket = socketRef.current
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      return false
+    }
+
+    socket.send(serializeClientRoomEvent(createMediaSelectCommand(mediaItemId)))
+    return true
+  }, [])
+
   return {
     connectionStatus,
+    sendMediaAdd,
+    sendMediaSelect,
     sendPlaybackCommand,
   }
 }

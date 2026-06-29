@@ -3,6 +3,9 @@ node_modules
 dist
 dist-ssr
 *.local
+blob-report/
+playwright-report/
+test-results/
 src/routeTree.gen.ts
 merge.ps1
 .tanstack/tmp

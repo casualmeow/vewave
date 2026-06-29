@@ -147,3 +147,17 @@ Before finishing substantial UI work:
 - run `npm run test` then `npm run check ` and find out if there some errors;
 - remove stale imports and dead files;
 - report any command failures honestly.
+
+## Visual Design Rules
+
+- `DESIGN.md` is the source of truth for visual hierarchy, brand voice, icon style, screenshot
+  sourcing, and interaction tone.
+- Do not ship new marketing or shell UI based only on generated placeholder blocks; use real product
+  screenshots or reference-driven mocks tied to existing routes.
+- Persistent navigation must prioritize current-state clarity over decorative motion.
+- Avoid starter assets in product UI, including sample avatars, placeholder logos, default demo
+  copy, and generic dashboard filler.
+- Rounded surfaces must express hierarchy; do not apply the same radius and contrast treatment to
+  every layer.
+- Top-level product and navigation icons should use Vewave-specific assets when the surface is
+  identity-bearing. Use Lucide for low-risk utility actions.

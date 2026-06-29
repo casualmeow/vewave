@@ -70,6 +70,7 @@ export function SidebarItem({
   const setCssVariables = useRafCssVariables()
   const canAnimate = motionPreset !== 'none' && !prefersReducedMotion
   const canFluid = interactiveGlass && !disabled
+  const showLiquidEffects = canFluid
   const transition = motionPreset === 'fluid' ? SIDEBAR_FLUID_TRANSITION : SIDEBAR_SOFT_TRANSITION
 
   const resolvedHoverScale = hoverScale ?? fluidConfig.hoverScale
@@ -87,7 +88,8 @@ export function SidebarItem({
   const resolvedDragMode = dragMode ?? fluidConfig.dragMode
   const effectiveFocusedItemKey = focusedItemKey
   const hasFocusedSibling = Boolean(
-    resolvedFocusBlur &&
+    showLiquidEffects &&
+      resolvedFocusBlur &&
       effectiveFocusedItemKey &&
       effectiveFocusedItemKey !== interactionKey &&
       canAnimate,
@@ -102,13 +104,15 @@ export function SidebarItem({
     perspective: 900,
   })
 
-  const liquidInset = isDragging
-    ? -resolvedHoverSize * 1.45
-    : isHovered
-      ? -resolvedHoverSize
-      : active
-        ? -Math.max(2, resolvedHoverSize * 0.25)
-        : 0
+  const liquidInset = showLiquidEffects
+    ? isDragging
+      ? -resolvedHoverSize * 1.45
+      : isHovered
+        ? -resolvedHoverSize
+        : active
+          ? -Math.max(2, resolvedHoverSize * 0.25)
+          : 0
+    : 0
 
   const itemStyle = {
     '--item-pointer-glow': isHovered || isDragging ? 1 : 0,
@@ -160,12 +164,15 @@ export function SidebarItem({
   }
 
   const handleFocusCapture = (event: ReactFocusEvent<HTMLDivElement>) => {
-    setFocusedItemKey(interactionKey)
+    if (showLiquidEffects) {
+      setFocusedItemKey(interactionKey)
+    }
+
     onFocusCapture?.(event)
   }
 
   const handleBlurCapture = (event: ReactFocusEvent<HTMLDivElement>) => {
-    if (!event.currentTarget.contains(event.relatedTarget)) {
+    if (showLiquidEffects && !event.currentTarget.contains(event.relatedTarget)) {
       setFocusedItemKey(null)
     }
 
@@ -173,7 +180,7 @@ export function SidebarItem({
   }
 
   const sharedProps = {
-    'data-slot': 'liquid-sidebar-item',
+    'data-slot': 'sidebar-item',
     'data-active': active ? 'true' : 'false',
     'aria-current': active ? ('page' as const) : undefined,
     'aria-disabled': disabled || undefined,
@@ -191,9 +198,16 @@ export function SidebarItem({
     </>
   )
 
+  const activeIndicatorContent = (
+    <>
+      <span className="pointer-events-none absolute bottom-2 left-0 top-2 w-1 rounded-full bg-sidebar-primary" />
+      <span className="pointer-events-none absolute inset-x-3 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--glass-highlight),transparent)]" />
+    </>
+  )
+
   return (
     <motion.div
-      data-slot="liquid-sidebar-item-shell"
+      data-slot="sidebar-item-shell"
       data-focused={effectiveFocusedItemKey === interactionKey ? 'true' : 'false'}
       data-deemphasized={hasFocusedSibling ? 'true' : 'false'}
       className="group/sidebar-item-shell relative isolate [--item-pointer-glow:0] [--item-pointer-x:50%] [--item-pointer-y:50%]"
@@ -208,7 +222,7 @@ export function SidebarItem({
             }
           : undefined
       }
-      drag={canFluid ? toMotionDragMode(resolvedDragMode) : false}
+      drag={showLiquidEffects ? toMotionDragMode(resolvedDragMode) : false}
       dragConstraints={{
         left: -resolvedHoverSize,
         right: resolvedHoverSize,
@@ -224,7 +238,11 @@ export function SidebarItem({
           : undefined
       }
       whileTap={canAnimate && !disabled ? { scale: 0.95 } : undefined}
-      whileDrag={canAnimate && !disabled ? { scale: resolvedDragScale, zIndex: 50 } : undefined}
+      whileDrag={
+        showLiquidEffects && canAnimate && !disabled
+          ? { scale: resolvedDragScale, zIndex: 50 }
+          : undefined
+      }
       transition={transition}
       onPointerMove={handlePointerMove}
       onPointerEnter={handlePointerEnter}
@@ -232,6 +250,7 @@ export function SidebarItem({
       onFocusCapture={handleFocusCapture}
       onBlurCapture={handleBlurCapture}
       onDragStart={() => {
+        if (!showLiquidEffects) return
         setIsDragging(true)
         setFocusedItemKey(interactionKey)
       }}
@@ -240,7 +259,7 @@ export function SidebarItem({
         resetFluidTransform()
       }}
     >
-      {design === 'liquidGlass' ? (
+      {showLiquidEffects ? (
         <motion.span
           aria-hidden="true"
           className="pointer-events-none absolute rounded-[1.6rem] border border-transparent bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),var(--glass-highlight),color-mix(in_srgb,var(--glass-highlight)_34%,transparent)_35%,transparent_64%),linear-gradient(135deg,color-mix(in_srgb,var(--glass-highlight)_28%,transparent),transparent)] opacity-[calc(var(--item-pointer-glow)*0.95)] shadow-[inset_0_1px_0_var(--glass-highlight)] backdrop-blur-sm transition-[opacity,border-color] duration-150 group-hover/sidebar-item-shell:border-[color:var(--glass-border)]"
@@ -256,7 +275,7 @@ export function SidebarItem({
       ) : null}
 
       <AnimatePresence initial={false}>
-        {(isHovered || isDragging) && design === 'liquidGlass' ? (
+        {showLiquidEffects && (isHovered || isDragging) ? (
           <motion.span
             key="fluid-field"
             aria-hidden="true"
@@ -303,50 +322,26 @@ export function SidebarItem({
       </AnimatePresence>
 
       {active ? (
-        <motion.span
-          layoutId={canAnimate ? `${scopeId}-active-sidebar-item` : undefined}
-          transition={transition}
-          className={sidebarActiveIndicatorVariants({ design })}
-          animate={{
-            top: liquidInset,
-            right: liquidInset,
-            bottom: liquidInset,
-            left: liquidInset,
-          }}
-        >
-          <span
-            className="pointer-events-none absolute inset-0"
-            style={{ filter: `url(#${filterIds.refraction})` }}
-          />
-          <span className="pointer-events-none absolute inset-x-2 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--glass-highlight),transparent)]" />
-          <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),var(--glass-highlight),transparent_38%)] opacity-[calc(0.35+var(--item-pointer-glow)*0.55)]" />
-          <span
-            className="pointer-events-none absolute inset-0"
-            style={{ filter: `url(#${filterIds.gooStrong})` }}
+        showLiquidEffects ? (
+          <motion.span
+            aria-hidden="true"
+            layoutId={canAnimate ? `${scopeId}-active-sidebar-item` : undefined}
+            transition={transition}
+            className={sidebarActiveIndicatorVariants({ design })}
+            animate={{
+              top: liquidInset,
+              right: liquidInset,
+              bottom: liquidInset,
+              left: liquidInset,
+            }}
           >
-            <motion.span
-              className="absolute -left-4 top-1/2 size-16 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--accent)_30%,transparent)]"
-              animate={canAnimate ? { x: [0, 8, -3, 0], scale: [1, 1.18, 0.94, 1] } : undefined}
-              transition={
-                canAnimate ? { duration: 3.2, repeat: Infinity, ease: 'easeInOut' } : undefined
-              }
-            />
-            <motion.span
-              className="absolute left-[var(--item-pointer-x)] top-[var(--item-pointer-y)] size-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--glass-highlight)_46%,transparent)]"
-              animate={canAnimate ? { scale: [0.76, 1.24, 0.88] } : undefined}
-              transition={
-                canAnimate ? { duration: 1.05, repeat: Infinity, ease: 'easeInOut' } : undefined
-              }
-            />
-            <motion.span
-              className="absolute -right-5 bottom-0 size-16 rounded-full bg-[color-mix(in_srgb,var(--primary)_30%,transparent)]"
-              animate={canAnimate ? { x: [0, -7, 3, 0], scale: [1, 0.88, 1.12, 1] } : undefined}
-              transition={
-                canAnimate ? { duration: 2.9, repeat: Infinity, ease: 'easeInOut' } : undefined
-              }
-            />
+            {activeIndicatorContent}
+          </motion.span>
+        ) : (
+          <span aria-hidden="true" className={sidebarActiveIndicatorVariants({ design })}>
+            {activeIndicatorContent}
           </span>
-        </motion.span>
+        )
       ) : null}
 
       {asChild ? (

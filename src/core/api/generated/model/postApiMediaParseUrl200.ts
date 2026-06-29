@@ -12,4 +12,6 @@ export type PostApiMediaParseUrl200 = {
   externalId: string
   canonicalUrl: string
   embedUrl?: string
+  title?: string
+  thumbnailUrl?: string
 }

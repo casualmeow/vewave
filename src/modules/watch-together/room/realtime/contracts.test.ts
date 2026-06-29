@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { createPlaybackCommand, parseServerRoomEvent } from './contracts'
+import {
+  createMediaAddCommand,
+  createMediaSelectCommand,
+  createPlaybackCommand,
+  parseServerRoomEvent,
+} from './contracts'
 
 describe('room realtime contracts', () => {
   it('parses playback.state events', () => {
@@ -29,6 +34,16 @@ describe('room realtime contracts', () => {
           externalId: 'dQw4w9WgXcQ',
           canonicalUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         },
+        mediaItems: [
+          {
+            id: 'item-1',
+            position: 0,
+            provider: 'youtube',
+            externalId: 'dQw4w9WgXcQ',
+            canonicalUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            thumbnailUrl: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+          },
+        ],
         playback: {
           status: 'paused',
           positionMs: 0,
@@ -56,6 +71,7 @@ describe('room realtime contracts', () => {
     expect(event?.type).toBe('room.snapshot')
     if (event?.type === 'room.snapshot') {
       expect(event.payload.presence?.members[0]?.connectionId).toBe('conn-1')
+      expect(event.payload.mediaItems[0]?.thumbnailUrl).toContain('hqdefault.jpg')
     }
   })
 
@@ -111,11 +127,24 @@ describe('room realtime contracts', () => {
     expect(parseServerRoomEvent({ type: 'unknown', payload: {} })).toBeNull()
   })
 
+  it('creates media select and add commands', () => {
+    expect(createMediaSelectCommand('item-1')).toEqual({
+      type: 'media.select',
+      payload: { mediaItemId: 'item-1' },
+    })
+    expect(createMediaAddCommand('https://youtu.be/oHg5SJYRHA0')).toEqual({
+      type: 'media.add',
+      payload: { url: 'https://youtu.be/oHg5SJYRHA0' },
+    })
+  })
+
   it('creates playback commands with client time', () => {
     const command = createPlaybackCommand('seek', 3000)
 
     expect(command.type).toBe('playback.command')
-    expect(command.payload).toMatchObject({ action: 'seek', positionMs: 3000 })
-    expect(command.payload.clientTimeMs).toBeGreaterThan(0)
+    if (command.type === 'playback.command') {
+      expect(command.payload).toMatchObject({ action: 'seek', positionMs: 3000 })
+      expect(command.payload.clientTimeMs).toBeGreaterThan(0)
+    }
   })
 })

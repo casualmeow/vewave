@@ -3,7 +3,7 @@ import { z } from 'zod'
 const defaultApiUrl = 'http://localhost:3001'
 const defaultWsUrl = 'ws://localhost:3001'
 
-const urlSchema = z.string().url()
+const urlSchema = z.url()
 
 function readUrl(name: 'VITE_API_URL' | 'VITE_WS_URL', fallback: string) {
   const value = import.meta.env[name] || fallback

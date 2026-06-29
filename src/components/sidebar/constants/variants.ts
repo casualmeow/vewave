@@ -23,18 +23,18 @@ export const SIDEBAR_MAGNETIC_TRANSITION = {
 
 export const SIDEBAR_FLUID_PRESETS = {
   subtle: {
-    hoverScale: 1.025,
-    activeHoverScale: 1.015,
-    dragScale: 1.045,
-    hoverSize: 3,
-    magneticStrength: 4,
-    magneticVerticalStrength: 2.5,
-    tiltStrength: 1.8,
-    focusBlur: true,
-    focusBlurAmount: 2,
-    focusDimOpacity: 0.72,
-    liquidIntensity: 0.72,
-    dragMode: 'both',
+    hoverScale: 1.018,
+    activeHoverScale: 1.01,
+    dragScale: 1,
+    hoverSize: 4,
+    magneticStrength: 0,
+    magneticVerticalStrength: 0,
+    tiltStrength: 0,
+    focusBlur: false,
+    focusBlurAmount: 1.2,
+    focusDimOpacity: 0.82,
+    liquidIntensity: 0.35,
+    dragMode: 'none',
   },
   balanced: {
     hoverScale: 1.045,
@@ -48,7 +48,7 @@ export const SIDEBAR_FLUID_PRESETS = {
     focusBlurAmount: 3.2,
     focusDimOpacity: 0.58,
     liquidIntensity: 1,
-    dragMode: 'both',
+    dragMode: 'none',
   },
   expressive: {
     hoverScale: 1.07,
@@ -83,13 +83,13 @@ export const SIDEBAR_FLUID_PRESETS = {
 export const SIDEBAR_INITIAL_STYLE = {
   '--sidebar-pointer-x': '50%',
   '--sidebar-pointer-y': '8%',
-  '--sidebar-glass-spot-opacity': '0.2',
+  '--sidebar-glass-spot-opacity': '0.12',
   '--sidebar-glass-sheen-x': '18%',
   '--sidebar-glass-sheen-y': '8%',
-  '--sidebar-focus-blur': '4px',
-  '--sidebar-focus-opacity': '0.5',
-  '--sidebar-hover-size': '10px',
-  '--sidebar-liquid-intensity': '1.25',
+  '--sidebar-focus-blur': '1.2px',
+  '--sidebar-focus-opacity': '0.82',
+  '--sidebar-hover-size': '4px',
+  '--sidebar-liquid-intensity': '0.35',
 } as const
 
 export const sidebarRootVariants = cva(
@@ -103,7 +103,7 @@ export const sidebarRootVariants = cva(
       design: {
         solid: 'border-sidebar-border bg-sidebar shadow-sm',
         glass:
-          'border-[color:var(--glass-border)] bg-[var(--glass-background)] shadow-[0_24px_70px_color-mix(in_srgb,var(--foreground)_14%,transparent)] backdrop-blur-2xl',
+          'border-[color:var(--glass-border)] bg-[var(--glass-background)] shadow-[0_18px_48px_color-mix(in_srgb,var(--foreground)_10%,transparent)] backdrop-blur-xl',
         liquidGlass: [
           'border-[color:var(--glass-border)] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--glass-highlight)_72%,transparent),var(--glass-background)_46%,color-mix(in_srgb,var(--accent)_24%,transparent)_100%)]',
           'shadow-[0_34px_96px_color-mix(in_srgb,var(--foreground)_22%,transparent),0_12px_36px_color-mix(in_srgb,var(--accent)_14%,transparent),inset_0_1px_0_var(--glass-highlight)]',
@@ -123,7 +123,7 @@ export const sidebarRootVariants = cva(
       },
     },
     defaultVariants: {
-      design: 'liquidGlass',
+      design: 'glass',
       size: 'md',
       collapsed: false,
     },
@@ -149,7 +149,7 @@ export const sidebarBrandVariants = cva('relative z-10 flex items-center gap-3 b
     },
   },
   defaultVariants: {
-    design: 'liquidGlass',
+    design: 'glass',
     size: 'md',
     collapsed: false,
   },
@@ -203,7 +203,7 @@ export const sidebarItemVariants = cva(
       },
     },
     defaultVariants: {
-      design: 'liquidGlass',
+      design: 'glass',
       size: 'md',
       collapsed: false,
     },
@@ -217,17 +217,17 @@ export const sidebarActiveIndicatorVariants = cva(
       design: {
         solid: 'border-sidebar-border bg-sidebar-accent shadow-sm',
         glass:
-          'border-[color:var(--glass-border)] bg-sidebar-accent shadow-[0_14px_34px_color-mix(in_srgb,var(--foreground)_11%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-xl',
+          'border-[color:var(--glass-border)] bg-sidebar-accent shadow-[0_10px_24px_color-mix(in_srgb,var(--foreground)_8%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-md',
         liquidGlass: [
-          'border-[color:var(--glass-border)] bg-[radial-gradient(circle_at_var(--item-pointer-x,18%)_var(--item-pointer-y,0%),var(--glass-highlight),transparent_36%),linear-gradient(135deg,var(--sidebar-accent),var(--glass-background)_54%,color-mix(in_srgb,var(--accent)_28%,transparent))]',
-          'shadow-[0_20px_50px_color-mix(in_srgb,var(--accent)_22%,transparent),0_8px_20px_color-mix(in_srgb,var(--foreground)_12%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-xl backdrop-saturate-200',
+          'border-[color:var(--glass-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--glass-highlight)_72%,transparent),var(--sidebar-accent))]',
+          'shadow-[0_10px_24px_color-mix(in_srgb,var(--foreground)_10%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-lg',
         ],
         fluent:
           'border-sidebar-border bg-sidebar-accent shadow-[inset_3px_0_0_var(--sidebar-primary),0_8px_22px_color-mix(in_srgb,var(--sidebar-primary)_14%,transparent)]',
       },
     },
     defaultVariants: {
-      design: 'liquidGlass',
+      design: 'glass',
     },
   },
 )
@@ -245,7 +245,7 @@ export const sidebarBadgeVariants = cva(
       },
     },
     defaultVariants: {
-      design: 'liquidGlass',
+      design: 'glass',
     },
   },
 )
@@ -265,7 +265,7 @@ export const sidebarFooterVariants = cva('relative z-10 mt-auto border-t', {
     },
   },
   defaultVariants: {
-    design: 'liquidGlass',
+    design: 'glass',
     size: 'md',
   },
 })

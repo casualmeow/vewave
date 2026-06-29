@@ -6,7 +6,7 @@ const snapshot: GetApiRoomsByCode200 = {
   room: {
     id: '11111111-1111-1111-1111-111111111111',
     code: 'ABCD',
-    title: 'Watch room',
+    title: 'Friday room',
     visibility: 'unlisted',
     status: 'active',
     createdAt: '2026-05-19T12:00:00.000Z',
@@ -18,6 +18,16 @@ const snapshot: GetApiRoomsByCode200 = {
     canonicalUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
   },
+  mediaItems: [
+    {
+      id: '22222222-2222-2222-2222-222222222222',
+      position: 0,
+      provider: 'youtube',
+      externalId: 'dQw4w9WgXcQ',
+      canonicalUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    },
+  ],
   playback: {
     status: 'paused',
     positionMs: 0,

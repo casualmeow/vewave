@@ -12,7 +12,7 @@ export type UseResolvedFluidConfigOptions = SidebarFluidInteractionProps & {
 }
 
 export function useResolvedFluidConfig({
-  fluidPreset = 'expressive',
+  fluidPreset = 'subtle',
   minHoverSize = 0,
   hoverScale,
   activeHoverScale,

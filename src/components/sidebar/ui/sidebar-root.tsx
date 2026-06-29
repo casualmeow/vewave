@@ -24,12 +24,12 @@ type SidebarStyle = CSSProperties & Record<`--${string}`, string | number>
 
 export function SidebarRoot({
   ref,
-  design = 'liquidGlass',
+  design = 'glass',
   size = 'md',
   density = 'comfortable',
   collapsed = false,
-  motion: motionPreset = 'fluid',
-  fluidPreset = 'expressive',
+  motion: motionPreset = 'soft',
+  fluidPreset = 'subtle',
   hoverScale,
   activeHoverScale,
   dragScale,
@@ -52,7 +52,8 @@ export function SidebarRoot({
   const prefersReducedMotion = useReducedMotion()
   const finePointer = useFinePointer()
   const canAnimate = motionPreset !== 'none' && !prefersReducedMotion
-  const interactiveGlass = design === 'liquidGlass' && canAnimate && finePointer
+  const interactiveGlass =
+    design === 'liquidGlass' && motionPreset === 'fluid' && canAnimate && finePointer
   const scopeId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const filterIds = useMemo(
     () => ({
@@ -64,6 +65,7 @@ export function SidebarRoot({
   )
   const motionTransition =
     motionPreset === 'fluid' ? SIDEBAR_FLUID_TRANSITION : SIDEBAR_SOFT_TRANSITION
+  const shouldRenderLiquidFilters = design === 'liquidGlass'
   const [focusedItemKey, setFocusedItemKey] = useState<string | null>(null)
   const setCssVariables = useRafCssVariables()
 
@@ -162,7 +164,7 @@ export function SidebarRoot({
       '--sidebar-pointer-y': '8%',
       '--sidebar-glass-sheen-x': '18%',
       '--sidebar-glass-sheen-y': '8%',
-      '--sidebar-glass-spot-opacity': '0.2',
+      '--sidebar-glass-spot-opacity': '0.12',
     })
     setFocusedItemKey(null)
     resetFluidTransform()
@@ -172,8 +174,9 @@ export function SidebarRoot({
     <SidebarProvider value={contextValue}>
       <motion.aside
         ref={ref}
-        data-slot="liquid-sidebar"
+        data-slot="sidebar"
         data-design={design}
+        data-motion={motionPreset}
         data-fluid-preset={fluidPreset}
         data-collapsed={collapsed ? 'true' : 'false'}
         className={cn(sidebarRootVariants({ design, size, collapsed }), className)}
@@ -185,47 +188,52 @@ export function SidebarRoot({
         onPointerLeave={handlePointerLeave}
         {...props}
       >
-        <svg aria-hidden="true" className="pointer-events-none absolute size-0" focusable="false">
-          <defs>
-            <filter id={filterIds.goo}>
-              <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
-              <feColorMatrix
-                in="blur"
-                mode="matrix"
-                values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -11"
-                result="goo"
-              />
-              <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-            </filter>
-            <filter id={filterIds.gooStrong}>
-              <feGaussianBlur in="SourceGraphic" stdDeviation="11" result="blur" />
-              <feColorMatrix
-                in="blur"
-                mode="matrix"
-                values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 28 -14"
-                result="goo"
-              />
-              <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-            </filter>
-            <filter id={filterIds.refraction} x="-20%" y="-20%" width="140%" height="140%">
-              <feTurbulence
-                type="fractalNoise"
-                baseFrequency="0.012 0.032"
-                numOctaves="2"
-                seed="7"
-                result="noise"
-              />
-              <feDisplacementMap
-                in="SourceGraphic"
-                in2="noise"
-                scale="11"
-                xChannelSelector="R"
-                yChannelSelector="G"
-              />
-            </filter>
-          </defs>
-        </svg>
-        <SidebarSurfaceEffects design={design} filterIds={filterIds} />
+        {shouldRenderLiquidFilters ? (
+          <svg aria-hidden="true" className="pointer-events-none absolute size-0" focusable="false">
+            <defs>
+              <filter id={filterIds.goo}>
+                <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+                <feColorMatrix
+                  in="blur"
+                  mode="matrix"
+                  values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -11"
+                  result="goo"
+                />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+              </filter>
+              <filter id={filterIds.gooStrong}>
+                <feGaussianBlur in="SourceGraphic" stdDeviation="11" result="blur" />
+                <feColorMatrix
+                  in="blur"
+                  mode="matrix"
+                  values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 28 -14"
+                  result="goo"
+                />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+              </filter>
+              <filter id={filterIds.refraction} x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence
+                  type="fractalNoise"
+                  baseFrequency="0.012 0.032"
+                  numOctaves="2"
+                  seed="7"
+                  result="noise"
+                />
+                <feDisplacementMap
+                  in="SourceGraphic"
+                  in2="noise"
+                  scale="11"
+                  xChannelSelector="R"
+                  yChannelSelector="G"
+                />
+              </filter>
+            </defs>
+          </svg>
+        ) : null}
+        <SidebarSurfaceEffects
+          design={design}
+          filterIds={shouldRenderLiquidFilters ? filterIds : undefined}
+        />
         <motion.div
           initial={canAnimate ? { opacity: 0, x: -10, scale: 0.985 } : false}
           animate={{ opacity: 1, x: 0, scale: 1 }}

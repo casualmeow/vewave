@@ -19,9 +19,6 @@ import {
   useStudioSidebar,
 } from '@/components/sidebar'
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -30,6 +27,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/shared/ui'
+import { VewaveLogoMark } from '@/shared/theme'
 import { cn } from '@/shared/lib/utils'
 
 export function StudioSidebar({ className }: { className?: string }) {
@@ -40,11 +38,6 @@ export function StudioSidebar({ className }: { className?: string }) {
 
   return (
     <Sidebar
-      design="liquidGlass"
-      size="md"
-      density="comfortable"
-      motion="fluid"
-      mobileMode="auto"
       mobileDockItems={mobileDockItems}
       mobileDockPathname={dockPathname}
       mobileDockPlacement="app"
@@ -55,15 +48,16 @@ export function StudioSidebar({ className }: { className?: string }) {
       <div className="flex min-h-0 flex-1 flex-col">
         <SidebarBrand
           visual={
-            <Avatar className="size-14 shadow-sm">
-              <AvatarImage src="https://github.com/shadcn.png" alt="Studio channel avatar" />
-              <AvatarFallback>VC</AvatarFallback>
-            </Avatar>
+            <VewaveLogoMark
+              className="size-14 rounded-full border-logo-border bg-sidebar shadow-sm"
+              label="Vewave studio"
+              surfaceToken="sidebar"
+            />
           }
-          title="Your channel"
-          subtitle="Channel name"
+          title="Vewave studio"
+          subtitle="Creator workspace"
           meta={
-            <span className="inline-flex items-center gap-1 rounded-full bg-card/65 px-2 py-0.5 text-[0.68rem] font-medium text-muted-foreground shadow-sm">
+            <span className="inline-flex items-center gap-1 rounded-full bg-background/80 px-2 py-0.5 text-[0.68rem] font-medium text-sidebar-foreground shadow-sm">
               <Clapperboard className="size-3" />
               Creator studio
             </span>
@@ -82,8 +76,18 @@ export function StudioSidebar({ className }: { className?: string }) {
                     <Icon />
                   </SidebarItemIcon>
                   <SidebarItemLabel>{item.label}</SidebarItemLabel>
+                  {active ? (
+                    <span className="ml-auto inline-flex items-center rounded-full border border-border bg-background px-2 py-0.5 text-[0.64rem] font-semibold uppercase tracking-[0.12em] text-sidebar-foreground shadow-sm">
+                      Current
+                    </span>
+                  ) : null}
                   {item.badge ? (
-                    <span className="ml-auto rounded-full bg-primary px-2 py-0.5 text-[0.68rem] font-semibold leading-none text-primary-foreground shadow-sm">
+                    <span
+                      className={cn(
+                        'rounded-full bg-primary px-2 py-0.5 text-[0.68rem] font-semibold leading-none text-primary-foreground shadow-sm',
+                        active ? 'ml-1' : 'ml-auto',
+                      )}
+                    >
                       {item.badge}
                     </span>
                   ) : null}

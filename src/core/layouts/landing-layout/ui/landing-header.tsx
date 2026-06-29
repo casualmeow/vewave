@@ -23,12 +23,16 @@ export function LandingHeader() {
       revealAtTop={32}
       navigationLabel="Landing"
       logo={
-        <HeaderLogo href="/" icon={<VewaveLogoMark surfaceToken="foreground" />} text="Vewave" />
+        <HeaderLogo
+          href="/"
+          icon={<VewaveLogoMark decorative surfaceToken="header" />}
+          text="Vewave"
+        />
       }
       navigation={
         <HeaderNav>
           {headerItems.map((item) => (
-            <HeaderNavItem key={item.label} onClick={() => void navigate({ to: item.href })}>
+            <HeaderNavItem key={item.href} href={item.href}>
               {item.label}
             </HeaderNavItem>
           ))}

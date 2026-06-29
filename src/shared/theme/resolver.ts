@@ -29,6 +29,9 @@ export function resolveThemeTokens(
       linkDerivedToken(tokens, overrides, 'ring', primary)
       linkDerivedToken(tokens, overrides, 'sidebarPrimary', primary)
       linkDerivedToken(tokens, overrides, 'sidebarPrimaryForeground', tokens.primaryForeground)
+      linkDerivedToken(tokens, overrides, 'logoDark', primary)
+      linkDerivedToken(tokens, overrides, 'logoLight', primary)
+      linkDerivedToken(tokens, overrides, 'logoAccent', primary)
     }
 
     if (accent) {
@@ -36,6 +39,7 @@ export function resolveThemeTokens(
       linkDerivedToken(tokens, overrides, 'accentForeground', getReadableForeground(accent))
       linkDerivedToken(tokens, overrides, 'sidebarAccent', accent)
       linkDerivedToken(tokens, overrides, 'sidebarAccentForeground', tokens.accentForeground)
+      linkDerivedToken(tokens, overrides, 'logoAccent', accent)
       linkDerivedToken(
         tokens,
         overrides,

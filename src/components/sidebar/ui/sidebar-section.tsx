@@ -15,7 +15,7 @@ export function SidebarSection({ ref, title, className, children, ...props }: Si
       {title ? (
         <div
           className={cn(
-            'px-2 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground',
+            'px-2 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-sidebar-foreground/80',
             collapsed && 'sr-only',
           )}
         >

@@ -5,6 +5,7 @@ import {
   sanitizeAppearanceSettings,
   saveAppearanceSettings,
 } from './persistence'
+import { getVewaveLogoFaviconHref } from './logo'
 import { defaultAppearanceSettings } from './presets'
 import { applyThemeTokens, clearThemeTokens, resolveThemeTokens } from './resolver'
 import {
@@ -54,6 +55,13 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
     applyThemeTokens(tokens, root)
 
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', tokens.background)
+    updateDocumentThemeIcons(
+      getVewaveLogoFaviconHref({
+        logoStrategy: settings.logoStrategy,
+        resolvedMode,
+        tokens,
+      }),
+    )
 
     return () => {
       clearThemeTokens(root)
@@ -182,4 +190,27 @@ function getSystemMode(): ResolvedAppearanceMode {
   }
 
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+function updateDocumentThemeIcons(faviconHref: string) {
+  const favicon = ensureDocumentIconLink('icon')
+  favicon.setAttribute('href', faviconHref)
+  favicon.setAttribute('type', 'image/svg+xml')
+
+  const appleTouchIcon = ensureDocumentIconLink('apple-touch-icon')
+  appleTouchIcon.setAttribute('href', faviconHref)
+}
+
+function ensureDocumentIconLink(rel: 'apple-touch-icon' | 'icon') {
+  const existingLink = document.head.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`)
+
+  if (existingLink) {
+    return existingLink
+  }
+
+  const link = document.createElement('link')
+  link.setAttribute('rel', rel)
+  document.head.append(link)
+
+  return link
 }
