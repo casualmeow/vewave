@@ -5,8 +5,8 @@ import {
   getLogoColorsForTone,
   getVewaveLogoFaviconHref,
   resolveLogoTone,
-} from './logo'
-import { themePresets } from './presets'
+} from '@/shared/theme/logo'
+import { themePresets } from '@/shared/theme/presets'
 
 const defaultLightTokens = themePresets[0].light
 const defaultDarkTokens = themePresets[0].dark

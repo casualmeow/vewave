@@ -4,7 +4,7 @@ import {
   createMediaSelectCommand,
   createPlaybackCommand,
   parseServerRoomEvent,
-} from './contracts'
+} from '@/modules/watch-together/room/realtime/contracts'
 
 describe('room realtime contracts', () => {
   it('parses playback.state events', () => {

@@ -7,12 +7,8 @@ export default mergeConfig(
     test: {
       globals: true,
       environment: 'jsdom',
-      include: [
-        'src/**/__tests__/**/*.test.{ts,tsx}',
-        'src/**/__tests__/*.test.{ts,tsx}',
-        'src/**/?(*.)+(spec|test).[tj]s?(x)',
-      ],
-      exclude: ['node_modules', 'dist'],
+      include: ['src/__tests__/unit/**/*.{spec,test}.{ts,tsx}'],
+      exclude: ['node_modules', 'dist', 'src/__tests__/e2e/**'],
       coverage: {
         reporter: ['text', 'json', 'html'],
         reportsDirectory: './coverage',
@@ -22,7 +18,7 @@ export default mergeConfig(
           'src/vitest.setup.ts',
           'src/**/*.stories.tsx',
           'node_modules/',
-          'src/**/__tests__/**',
+          'src/__tests__/**',
         ],
       },
     },

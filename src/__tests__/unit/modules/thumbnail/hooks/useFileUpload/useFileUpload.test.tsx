@@ -1,8 +1,8 @@
 import { render, act } from '@testing-library/react'
 import { useEffect } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { useFileUpload } from './useFileUpload'
-import type { FileUploadActions } from './types'
+import type { FileUploadActions } from '@/modules/thumbnail/hooks/useFileUpload/types'
+import { useFileUpload } from '@/modules/thumbnail/hooks/useFileUpload/useFileUpload'
 
 const OriginalURL = URL
 

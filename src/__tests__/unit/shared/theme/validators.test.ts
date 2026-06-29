@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { getContrastRatio, getReadableForeground, normalizeHexColor } from './validators'
+import {
+  getContrastRatio,
+  getReadableForeground,
+  normalizeHexColor,
+} from '@/shared/theme/validators'
 
 describe('theme validators', () => {
   it('normalizes short and long hex values', () => {

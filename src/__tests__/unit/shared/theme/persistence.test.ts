@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
+import type { AppearanceSettings } from '@/shared/theme/contract'
 import {
   getAppearanceSettingsFromAppConfig,
   sanitizeAppearanceSettings,
   withAppearanceSettingsInAppConfig,
-} from './persistence'
-import { defaultAppearanceSettings } from './presets'
-import type { AppearanceSettings } from './contract'
+} from '@/shared/theme/persistence'
+import { defaultAppearanceSettings } from '@/shared/theme/presets'
 
 describe('appearance persistence', () => {
   it('stores appearance settings inside app config without dropping unrelated keys', () => {

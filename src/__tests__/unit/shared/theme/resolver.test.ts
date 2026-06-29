@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { defaultAppearanceSettings } from './presets'
-import { resolveThemeTokens } from './resolver'
-import type { AppearanceSettings, ResolvedAppearanceMode, ThemeTokenOverrides } from './contract'
+import type {
+  AppearanceSettings,
+  ResolvedAppearanceMode,
+  ThemeTokenOverrides,
+} from '@/shared/theme/contract'
+import { defaultAppearanceSettings } from '@/shared/theme/presets'
+import { resolveThemeTokens } from '@/shared/theme/resolver'
 
 function settingsWithOverrides(
   mode: ResolvedAppearanceMode,

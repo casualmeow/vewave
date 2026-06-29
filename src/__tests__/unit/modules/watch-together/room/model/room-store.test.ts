@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { initialRoomState, useRoomStore } from './room-store'
 import type { GetApiRoomsByCode200 } from '@/core/api/generated/model'
+import { initialRoomState, useRoomStore } from '@/modules/watch-together/room/model/room-store'
 
 const snapshot: GetApiRoomsByCode200 = {
   room: {

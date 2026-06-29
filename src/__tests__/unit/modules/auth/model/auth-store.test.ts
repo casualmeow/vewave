@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { initialAuthState, useAuthStore } from './auth-store'
+import { initialAuthState, useAuthStore } from '@/modules/auth/model/auth-store'
 
 const user = {
   id: '11111111-1111-1111-1111-111111111111',

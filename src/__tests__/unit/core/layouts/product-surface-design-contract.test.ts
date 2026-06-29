@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
-import landingIndexPageSource from '../../modules/landing/landing-index-page.tsx?raw'
+import landingIndexPageSource from '@/modules/landing/landing-index-page.tsx?raw'
 
-import projectCardContentSource from '../../modules/projects/components/project-card-content.tsx?raw'
-import projectsPageSource from '../../modules/projects/components/projects-page.tsx?raw'
-import createRoomFormSource from '../../modules/watch-together/create-room/components/create-room-form.tsx?raw'
-import roomPageSource from '../../modules/watch-together/room/components/room-page.tsx?raw'
-import roomVideoListSource from '../../modules/watch-together/room/components/room-video-list.tsx?raw'
-import useRoomRealtimeSource from '../../modules/watch-together/room/hooks/use-room-realtime.ts?raw'
-import appLayoutSource from './app-layout/layout.tsx?raw'
-import landingHeaderSource from './landing-layout/ui/landing-header.tsx?raw'
+import appLayoutSource from '@/core/layouts/app-layout/layout.tsx?raw'
+import landingHeaderSource from '@/core/layouts/landing-layout/ui/landing-header.tsx?raw'
+import projectCardContentSource from '@/modules/projects/components/project-card-content.tsx?raw'
+import projectsPageSource from '@/modules/projects/components/projects-page.tsx?raw'
+import createRoomFormSource from '@/modules/watch-together/create-room/components/create-room-form.tsx?raw'
+import roomPageSource from '@/modules/watch-together/room/components/room-page.tsx?raw'
+import roomVideoListSource from '@/modules/watch-together/room/components/room-video-list.tsx?raw'
+import useRoomRealtimeSource from '@/modules/watch-together/room/hooks/use-room-realtime.ts?raw'
 
 const workflowSurfaces = [
   {

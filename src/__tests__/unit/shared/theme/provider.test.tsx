@@ -1,9 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useAppearance } from './hooks'
-import { AppThemeProvider } from './provider'
-import { appearanceStorageKey } from './persistence'
+import { useAppearance } from '@/shared/theme/hooks'
+import { appearanceStorageKey } from '@/shared/theme/persistence'
+import { AppThemeProvider } from '@/shared/theme/provider'
 
 function createStorageMock(): Storage {
   let entries: Record<string, string> = {}

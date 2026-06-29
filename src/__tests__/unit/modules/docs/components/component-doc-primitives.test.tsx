@@ -1,7 +1,7 @@
 import { render, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { DocsCodeBlock } from './component-doc-primitives'
+import { DocsCodeBlock } from '@/modules/docs/components/component-doc-primitives'
 
 describe('DocsCodeBlock', () => {
   it('renders Shiki token colors instead of plain code text', async () => {

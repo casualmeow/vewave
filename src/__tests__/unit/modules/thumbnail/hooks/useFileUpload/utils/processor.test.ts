@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { processIncomingFiles } from './processor'
+import { processIncomingFiles } from '@/modules/thumbnail/hooks/useFileUpload/utils/processor'
 
 const OriginalURL = URL
 

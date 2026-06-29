@@ -2,8 +2,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { RoomHeader } from './room-header'
 import type { GetApiRoomsByCode200 } from '@/core/api/generated/model'
+import { RoomHeader } from '@/modules/watch-together/room/components/room-header'
 
 vi.mock('sonner', () => ({
   toast: {

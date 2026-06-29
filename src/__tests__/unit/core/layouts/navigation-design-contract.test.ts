@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import sidebarVariantsSource from '../../components/sidebar/constants/variants.ts?raw'
-import sidebarFluidConfigSource from '../../components/sidebar/hooks/use-resolved-fluid-config.ts?raw'
-import mobileSidebarDockSource from '../../components/sidebar/ui/mobile-sidebar-dock.tsx?raw'
-import sidebarItemSource from '../../components/sidebar/ui/sidebar-item.tsx?raw'
-import sidebarRootSource from '../../components/sidebar/ui/sidebar-root.tsx?raw'
-import appSidebarItemsSource from './app-layout/app-sidebar-items.tsx?raw'
-import appSidebarSource from './app-layout/ui/app-sidebar.tsx?raw'
-import studioSidebarSource from './studio-layout/studio-sidebar.tsx?raw'
+import sidebarVariantsSource from '@/components/sidebar/constants/variants.ts?raw'
+import sidebarFluidConfigSource from '@/components/sidebar/hooks/use-resolved-fluid-config.ts?raw'
+import mobileSidebarDockSource from '@/components/sidebar/ui/mobile-sidebar-dock.tsx?raw'
+import sidebarItemSource from '@/components/sidebar/ui/sidebar-item.tsx?raw'
+import sidebarRootSource from '@/components/sidebar/ui/sidebar-root.tsx?raw'
+import appSidebarItemsSource from '@/core/layouts/app-layout/app-sidebar-items.tsx?raw'
+import appSidebarSource from '@/core/layouts/app-layout/ui/app-sidebar.tsx?raw'
+import studioSidebarSource from '@/core/layouts/studio-layout/studio-sidebar.tsx?raw'
 
 const productionSidebars = [
   {

@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { createRoomSchema, getCreateRoomVideoLinks } from './create-room-schema'
+import {
+  createRoomSchema,
+  getCreateRoomVideoLinks,
+} from '@/modules/watch-together/create-room/schema/create-room-schema'
 
 describe('createRoomSchema', () => {
   it('accepts supported video links with an optional room name', () => {

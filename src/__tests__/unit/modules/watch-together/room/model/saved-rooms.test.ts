@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
+import type { GetApiRoomsByCode200, PostApiRooms200 } from '@/core/api/generated/model'
 import {
   readSavedRooms,
   rememberCreatedRoom,
   rememberRoomSnapshot,
   rememberSavedRoom,
-} from './saved-rooms'
-import type { GetApiRoomsByCode200, PostApiRooms200 } from '@/core/api/generated/model'
+} from '@/modules/watch-together/room/model/saved-rooms'
 
 const storagePrefix = 'vewave:saved-rooms:v1'
 
