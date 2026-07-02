@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { CloudOff, PlayCircle, Radio } from 'lucide-react'
+import { PlayCircle, Radio } from 'lucide-react'
 import { useEffect, useMemo, useRef } from 'react'
 
 import { RoomExpandedContent, RoomMedia } from './project-card-content'
@@ -28,28 +28,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/ui'
-import { VewaveLogoMark } from '@/shared/theme'
 
 export type RoomsDashboardViewProps = {
   className?: string
   navigation?: 'live' | 'preview'
   renderSurface?: RoomsDashboardSurfaceRenderer
   rooms: Array<RoomWorkspaceItem>
-  showGuestNotice?: boolean
 }
 
 export function ProjectsPage() {
-  const status = useAuthStore((state) => state.status)
   const userId = useAuthStore((state) => state.user?.id ?? null)
   const savedRooms = useSavedRooms(userId)
   const rooms = useMemo(() => savedRooms.map(getSavedRoomWorkspaceItem), [savedRooms])
   useHydrateSavedRoomSnapshots(savedRooms, userId)
 
-  if (status === 'anonymous' && rooms.length === 0) {
-    return <FirstRoomPage />
-  }
-
-  return <RoomsDashboardView rooms={rooms} showGuestNotice={status === 'anonymous'} />
+  return <RoomsDashboardView rooms={rooms} />
 }
 
 function useHydrateSavedRoomSnapshots(rooms: Array<SavedRoomSummary>, userId: string | null) {
@@ -89,72 +82,24 @@ function useHydrateSavedRoomSnapshots(rooms: Array<SavedRoomSummary>, userId: st
   }, [rooms, userId])
 }
 
-function FirstRoomPage() {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="flex w-full items-center justify-between px-6 py-6 md:px-10">
-        <Link to="/" className="inline-flex items-center gap-3 font-semibold text-foreground">
-          <VewaveLogoMark className="size-9" surfaceToken="background" />
-          <span>Vewave</span>
-        </Link>
-        <Button asChild variant="outline" size="sm">
-          <Link to="/sign-in" search={{ redirectTo: undefined }}>
-            Sign in
-          </Link>
-        </Button>
-      </header>
-
-      <main className="px-6 pb-20 pt-[clamp(6rem,14vh,10rem)] md:pb-32">
-        <div className="mx-auto grid w-full max-w-[35rem] gap-6">
-          <section>
-            <h1 className="text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
-              Create your first room
-            </h1>
-            <p className="mt-3 max-w-xl text-base leading-7 text-muted-foreground">
-              Start a shared watch session from a video or playlist.
-            </p>
-          </section>
-
-          <div className="flex flex-col gap-2 rounded-lg border border-border/70 bg-muted/30 px-3 py-2.5 text-xs leading-5 text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-            <p>
-              <span className="font-medium text-foreground">Guest mode:</span> rooms are saved only
-              in this browser until you sign in.
-            </p>
-            <Link
-              to="/sign-in"
-              search={{ redirectTo: undefined }}
-              className="w-fit shrink-0 font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-            >
-              Sign in to sync
-            </Link>
-          </div>
-
-          <CreateRoomForm variant="firstRun" />
-        </div>
-      </main>
-    </div>
-  )
-}
-
 export function RoomsDashboardView({
   className,
   navigation = 'live',
   renderSurface,
   rooms,
-  showGuestNotice = false,
 }: RoomsDashboardViewProps) {
   const activeRoom = useMemo(() => rooms.find((room) => room.status === 'live') ?? null, [rooms])
   const hasRooms = rooms.length > 0
   const wrapSurface = (surface: RoomsDashboardSurfaceId, children: ReactNode) =>
     renderSurface ? renderSurface(surface, children) : children
 
-  const defaultClassName = 'min-h-[calc(100vh-6rem)] overflow-auto px-6 py-8 md:px-10'
+  const defaultClassName = 'px-6 py-8 md:px-10'
   const contentClassName = 'max-w-5xl'
   const gapClassName = hasRooms ? 'gap-6' : 'gap-8'
 
   return (
     <div className={className ?? defaultClassName}>
-      <div className={`mx-auto grid w-full ${contentClassName} ${gapClassName}`}>
+      <div className={`grid w-full ${contentClassName} ${gapClassName}`}>
         {hasRooms ? (
           <RoomsListState
             activeRoom={activeRoom}
@@ -164,7 +109,7 @@ export function RoomsDashboardView({
             wrapSurface={wrapSurface}
           />
         ) : (
-          <EmptyRoomsState showGuestNotice={showGuestNotice} wrapSurface={wrapSurface} />
+          <EmptyRoomsState wrapSurface={wrapSurface} />
         )}
       </div>
     </div>
@@ -172,10 +117,8 @@ export function RoomsDashboardView({
 }
 
 function EmptyRoomsState({
-  showGuestNotice,
   wrapSurface,
 }: {
-  showGuestNotice: boolean
   wrapSurface: (surface: RoomsDashboardSurfaceId, children: ReactNode) => ReactNode
 }) {
   return (
@@ -224,8 +167,6 @@ function EmptyRoomsState({
           </div>
         </section>,
       )}
-
-      {showGuestNotice ? <GuestModeNotice /> : null}
     </>
   )
 }
@@ -323,20 +264,6 @@ function StartRoomDialog() {
         <CreateRoomForm variant="plain" />
       </DialogContent>
     </Dialog>
-  )
-}
-
-function GuestModeNotice() {
-  return (
-    <div className="flex items-start gap-3 rounded-lg border border-border bg-card/80 p-3 text-sm text-muted-foreground shadow-sm">
-      <span className="mt-0.5 hidden size-8 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground sm:grid">
-        <CloudOff className="size-4" />
-      </span>
-      <p>
-        <span className="font-medium text-foreground">Guest mode:</span> rooms are saved only in
-        this browser until you sign in.
-      </p>
-    </div>
   )
 }
 

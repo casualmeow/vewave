@@ -199,10 +199,7 @@ export function SidebarItem({
   )
 
   const activeIndicatorContent = (
-    <>
-      <span className="pointer-events-none absolute bottom-2 left-0 top-2 w-1 rounded-full bg-sidebar-primary" />
-      <span className="pointer-events-none absolute inset-x-3 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--glass-highlight),transparent)]" />
-    </>
+    <span className="pointer-events-none absolute inset-x-3 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--glass-highlight),transparent)]" />
   )
 
   return (
@@ -373,11 +370,14 @@ export function SidebarItem({
 }
 
 export function SidebarItemIcon({ ref, className, ...props }: SidebarItemPartProps) {
+  const { collapsed } = useSidebarContext()
+
   return (
     <span
       ref={ref}
       className={cn(
-        'relative z-10 grid size-4 shrink-0 place-items-center transition-transform duration-200 group-hover/sidebar-item-shell:scale-110 [&_svg]:size-full',
+        'relative z-10 grid shrink-0 place-items-center transition-transform duration-200 group-hover/sidebar-item-shell:scale-110 [&_svg]:size-full',
+        collapsed ? 'size-5' : 'size-4',
         className,
       )}
       {...props}

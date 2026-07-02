@@ -147,6 +147,12 @@ const previewSurfaces = {
     editableTokens: ['sidebarForeground', 'sidebarBorder', 'sidebarAccent'],
     tokens: ['sidebarForeground', 'sidebarBorder', 'sidebarAccent'],
   },
+  headerSidebarToggle: {
+    label: 'Sidebar toggle',
+    description: 'Single icon button outside the sidebar that cycles its three states.',
+    editableTokens: ['card', 'border', 'mutedForeground', 'accent'],
+    tokens: ['card', 'border', 'mutedForeground', 'accent'],
+  },
   headerTitle: {
     label: 'Header title',
     description: 'Header eyebrow, title, and product accent text.',
@@ -418,8 +424,8 @@ export function AppearancePreviewWorkbench() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-2rem)] overflow-auto p-6">
-      <div className="mx-auto grid w-full max-w-7xl gap-6">
+    <div className="p-6">
+      <div className="grid w-full max-w-7xl gap-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="flex items-center gap-2 text-sm font-medium text-primary">

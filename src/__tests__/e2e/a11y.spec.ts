@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
+import { authenticateE2EUser } from './helpers/auth'
 
 test.describe('accessibility smoke', () => {
   test('landing has no automatically detectable accessibility issues', async ({ page }) => {
@@ -33,6 +34,7 @@ test.describe('accessibility smoke', () => {
 
   test('app sidebar has no automatically detectable accessibility issues', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
+    await authenticateE2EUser(page)
     await page.goto('/projects')
 
     await expect(page.getByLabel('App navigation')).toBeVisible()

@@ -1,5 +1,3 @@
-# Vewave Design Contract
-
 ## Purpose
 
 Vewave should feel deliberate, broadcast-adjacent, and product-specific. The interface should not

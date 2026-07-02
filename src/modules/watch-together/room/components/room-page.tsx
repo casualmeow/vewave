@@ -26,7 +26,7 @@ export function RoomPage({ code }: RoomPageProps) {
 
   if (query.isPending) {
     return (
-      <div className="grid min-h-[calc(100vh-2rem)] place-items-center px-6 text-sm text-muted-foreground">
+      <div className="grid min-h-full place-items-center px-6 text-sm text-muted-foreground">
         Loading room...
       </div>
     )
@@ -34,7 +34,7 @@ export function RoomPage({ code }: RoomPageProps) {
 
   if (query.isError || !snapshot) {
     return (
-      <div className="grid min-h-[calc(100vh-2rem)] place-items-center px-6">
+      <div className="grid min-h-full place-items-center px-6">
         <div className="max-w-md text-center">
           <h1 className="text-2xl font-semibold">Room unavailable</h1>
           <p className="mt-3 text-sm text-muted-foreground">
@@ -48,8 +48,8 @@ export function RoomPage({ code }: RoomPageProps) {
   const canControl = snapshot.permissions.canControlPlayback
 
   return (
-    <div className="min-h-[calc(100vh-2rem)] overflow-auto px-6 py-8">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
+    <div className="px-6 py-8">
+      <div className="flex w-full max-w-6xl flex-col gap-8">
         <RoomHeader snapshot={snapshot} connectionStatus={connectionStatus} />
         {lastError ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">

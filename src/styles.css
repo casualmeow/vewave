@@ -1,5 +1,7 @@
-@import 'tailwindcss';
+/* fumadocs ships a prebuilt Tailwind bundle using the same cascade layers;
+   it must come first so app utilities (incl. responsive variants) win the cascade. */
 @import 'fumadocs-ui/style.css';
+@import 'tailwindcss';
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));

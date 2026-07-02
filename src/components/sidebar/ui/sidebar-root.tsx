@@ -28,6 +28,7 @@ export function SidebarRoot({
   size = 'md',
   density = 'comfortable',
   collapsed = false,
+  hidden = false,
   motion: motionPreset = 'soft',
   fluidPreset = 'subtle',
   hoverScale,
@@ -179,7 +180,10 @@ export function SidebarRoot({
         data-motion={motionPreset}
         data-fluid-preset={fluidPreset}
         data-collapsed={collapsed ? 'true' : 'false'}
-        className={cn(sidebarRootVariants({ design, size, collapsed }), className)}
+        data-hidden={hidden ? 'true' : 'false'}
+        aria-hidden={hidden || undefined}
+        inert={hidden || undefined}
+        className={cn(sidebarRootVariants({ design, size, collapsed, hidden }), className)}
         style={{
           ...sidebarStyle,
           ...fluidTransformStyle,

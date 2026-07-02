@@ -185,6 +185,22 @@ export function readSavedRooms(userId?: string | null): Array<SavedRoomSummary> 
   }
 }
 
+export function forgetSavedRoom(userId: string | null | undefined, code: string) {
+  const normalizedCode = code.trim().toLowerCase()
+
+  if (!normalizedCode) {
+    return readSavedRooms(userId)
+  }
+
+  const nextRooms = readSavedRooms(userId).filter(
+    (room) => room.code.toLowerCase() !== normalizedCode,
+  )
+
+  writeSavedRooms(userId, nextRooms)
+
+  return nextRooms
+}
+
 export function rememberSavedRoom(userId: string | null | undefined, input: SaveRoomInput) {
   const code = input.code.trim()
 

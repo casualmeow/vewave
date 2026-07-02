@@ -160,4 +160,37 @@ describe('production navigation design contract', () => {
     expect(appSidebarItemsSource).toContain("label: 'Admin'")
     expect(appSidebarSource).toContain('user?.isAdmin')
   })
+
+  it('app sidebar opens full category lists in a shared sheet', () => {
+    expect(appSidebarSource).toContain('SheetContent')
+    expect(appSidebarSource).toContain('activeCategory')
+  })
+
+  it('app sidebar categories preview a few items inline under muted clickable headers', () => {
+    expect(appSidebarSource).toContain('sidebarCategoryPreviewLimit = 3')
+    expect(appSidebarSource).toContain('Show {count - sidebarCategoryPreviewLimit} more')
+    expect(appSidebarSource).toContain('uppercase tracking-[0.16em]')
+  })
+
+  it('empty sidebar categories explain themselves inline instead of opening a panel', () => {
+    expect(appSidebarSource).toContain('emptyHint')
+    expect(appSidebarSource).toContain('count === 0 ? (')
+    expect(appSidebarSource).not.toContain('bg-sidebar-accent/35')
+  })
+
+  it('active navigation state relies on the accent surface without a left bar marker', () => {
+    expect(sidebarItemSource).not.toContain('w-1 rounded-full bg-sidebar-primary')
+    expect(appSidebarSource).not.toContain('w-1 rounded-full bg-sidebar-primary')
+  })
+
+  it('new room and server actions open a dedicated modal instead of an inline flyout form', () => {
+    expect(appSidebarSource).toContain('DialogContent')
+    expect(appSidebarSource).not.toContain('variant="compact"')
+    expect(appSidebarSource).not.toContain('Create and open a watch room.')
+  })
+
+  it('sidebar rows stay quiet: no status chips, categories separated by hairlines', () => {
+    expect(appSidebarSource).not.toContain('{room.badge')
+    expect(appSidebarSource).toContain('border-t border-sidebar-border/60')
+  })
 })

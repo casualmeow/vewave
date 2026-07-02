@@ -4,6 +4,9 @@ import landingIndexPageSource from '@/modules/landing/landing-index-page.tsx?raw
 
 import appLayoutSource from '@/core/layouts/app-layout/layout.tsx?raw'
 import landingHeaderSource from '@/core/layouts/landing-layout/ui/landing-header.tsx?raw'
+import createRoomRouteSource from '@/routes/_app/create/index.tsx?raw'
+import projectsRouteSource from '@/routes/_app/projects/index.tsx?raw'
+import roomRouteSource from '@/routes/_app/room/$code/index.tsx?raw'
 import projectCardContentSource from '@/modules/projects/components/project-card-content.tsx?raw'
 import projectsPageSource from '@/modules/projects/components/projects-page.tsx?raw'
 import createRoomFormSource from '@/modules/watch-together/create-room/components/create-room-form.tsx?raw'
@@ -38,6 +41,16 @@ describe('product surface design contract', () => {
     expect(appLayoutSource).not.toContain('radial-gradient')
   })
 
+  it('app shell keeps an exact viewport height and scrolls inside main', () => {
+    expect(appLayoutSource).toContain('md:h-[calc(100vh-2rem)]')
+    expect(appLayoutSource).toContain('overflow-auto')
+    expect(appLayoutSource).not.toContain('md:min-h-[calc(100vh-2rem)]')
+  })
+
+  it('app pages align content to the shell instead of centering with mx-auto', () => {
+    expect(projectsPageSource).not.toContain('mx-auto grid w-full')
+  })
+
   it('rooms page start action stays a stable task surface', () => {
     expect(projectsPageSource).not.toContain('motion.')
     expect(projectsPageSource).not.toContain('useMotionValue')
@@ -46,22 +59,17 @@ describe('product surface design contract', () => {
     expect(projectsPageSource).not.toContain('SIDEBAR_FLUID_TRANSITION')
   })
 
-  it('guest zero-room state is a focused first-run creation page', () => {
-    const firstRoomPageSource = projectsPageSource.slice(
-      projectsPageSource.indexOf('function FirstRoomPage'),
-      projectsPageSource.indexOf('export function RoomsDashboardView'),
-    )
+  it('watch-together app routes require an authenticated user', () => {
+    const protectedRouteSources = [projectsRouteSource, createRoomRouteSource, roomRouteSource]
 
-    expect(appLayoutSource).toContain('firstRunCreationState')
-    expect(appLayoutSource).toContain('return <Outlet />')
-    expect(firstRoomPageSource).toContain('Create your first room')
-    expect(firstRoomPageSource).toContain('max-w-[35rem]')
-    expect(firstRoomPageSource).toContain('pt-[clamp(6rem,14vh,10rem)]')
-    expect(firstRoomPageSource).toContain('CreateRoomForm variant="firstRun"')
-    expect(firstRoomPageSource).toContain('Sign in to sync')
-    expect(firstRoomPageSource).not.toContain('>Rooms</p>')
-    expect(projectsPageSource).not.toContain('RoomStartSummary')
-    expect(projectsPageSource).not.toContain('Ready in one step')
+    protectedRouteSources.forEach((source) => {
+      expect(source).toContain('requireAuthRoute')
+      expect(source).toContain('beforeLoad')
+    })
+    expect(appLayoutSource).not.toContain('firstRunCreationState')
+    expect(projectsPageSource).not.toContain('function FirstRoomPage')
+    expect(projectsPageSource).not.toContain('Guest mode:')
+    expect(projectsPageSource).not.toContain('Sign in to sync')
   })
 
   it('room cards render real thumbnail collages for multi-video rooms', () => {

@@ -1,13 +1,26 @@
-import { History, Radio, ShieldCheck, Sparkles, UsersRound, type LucideIcon } from 'lucide-react'
+import {
+  Compass,
+  History,
+  Radio,
+  ShieldCheck,
+  Sparkles,
+  UsersRound,
+  type LucideIcon,
+} from 'lucide-react'
 import type { MobileSidebarDockItem } from '@/components/sidebar'
 
-export type AppSidebarRoute = '/projects' | '/admin' | '/room/$code'
+export type AppSidebarRoute =
+  | '/projects'
+  | '/community'
+  | '/admin'
+  | '/room/$code'
+  | '/servers/$serverId'
 
 export type AppSidebarItem = {
   label: string
   shortLabel?: string
   to: AppSidebarRoute
-  params?: { code: string }
+  params?: { code: string } | { serverId: string }
   icon: LucideIcon
   badge?: string
 }
@@ -22,6 +35,7 @@ export type AppSidebarRoomItem = {
 
 export const appPrimaryItems: ReadonlyArray<AppSidebarItem> = [
   { label: 'Rooms', to: '/projects', icon: Radio },
+  { label: 'Community', to: '/community', icon: Compass },
 ]
 
 export const appAdminItem: AppSidebarItem = {
@@ -32,6 +46,7 @@ export const appAdminItem: AppSidebarItem = {
 
 export function isAppPrimaryItemActive(pathname: string, item: AppSidebarItem) {
   if (item.to === '/room/$code') return pathname.startsWith('/room/')
+  if (item.to === '/servers/$serverId') return pathname.startsWith('/servers/')
   if (item.to === '/projects') return pathname === item.to || pathname.startsWith('/room/')
 
   return pathname === item.to || pathname.startsWith(`${item.to}/`)

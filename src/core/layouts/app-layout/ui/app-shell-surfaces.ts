@@ -9,6 +9,7 @@ export type AppShellSurfaceId =
   | 'sidebarServers'
   | 'sidebarFooter'
   | 'header'
+  | 'headerSidebarToggle'
   | 'headerTitle'
   | 'headerActions'
 

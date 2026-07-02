@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { authenticateE2EUser, seedE2ESavedRooms } from './helpers/auth'
 
 const landingViewports = [
   { name: 'mobile', width: 390, height: 844 },
@@ -12,7 +13,7 @@ const studioRoutes = [
   { path: '/studio/channel-settings', label: 'Channel Settings' },
 ] as const
 
-const appRoutes = [{ path: '/projects', label: 'Projects' }] as const
+const appRoutes = [{ path: '/projects', label: 'Rooms' }] as const
 
 test.describe('visual smoke', () => {
   for (const viewport of landingViewports) {
@@ -130,23 +131,8 @@ test.describe('visual smoke', () => {
   for (const route of appRoutes) {
     test(`app navigation is explicit on ${route.path}`, async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 })
-      await page.addInitScript(() => {
-        window.localStorage.setItem(
-          'vewave:saved-rooms:v1:guest',
-          JSON.stringify([
-            {
-              code: 'REAL1',
-              title: 'Saved guest room',
-              role: 'owner',
-              status: 'active',
-              visibility: 'unlisted',
-              provider: 'youtube',
-              createdAt: '2026-05-19T12:00:00.000Z',
-              lastOpenedAt: new Date().toISOString(),
-            },
-          ]),
-        )
-      })
+      await authenticateE2EUser(page)
+      await seedE2ESavedRooms(page)
       await page.goto(route.path)
 
       const navigation = page.getByLabel('App navigation')
@@ -155,7 +141,7 @@ test.describe('visual smoke', () => {
       await expect(navigation).toBeVisible()
       await expect(currentItem).toContainText(route.label)
       await expect(currentItem).not.toContainText('Current')
-      await expect(navigation).toContainText('Saved guest room')
+      await expect(navigation).toContainText('Saved auth room')
       await expect(navigation).not.toContainText('Friday watch room')
       await expect(navigation).not.toContainText('Healthcheck')
       await expect(navigation).not.toContainText('Appearance')

@@ -96,7 +96,7 @@ export const sidebarRootVariants = cva(
   [
     'relative isolate flex min-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-[2rem] border',
     'text-sidebar-foreground outline-none [transform-style:preserve-3d]',
-    'transition-[width,background-color,border-color,box-shadow] duration-300',
+    'transition-[width,background-color,border-color,box-shadow,opacity] duration-300 motion-reduce:transition-none',
   ],
   {
     variants: {
@@ -121,11 +121,16 @@ export const sidebarRootVariants = cva(
         true: 'w-[5.25rem]',
         false: '',
       },
+      hidden: {
+        true: 'pointer-events-none w-0 border-transparent opacity-0 shadow-none',
+        false: '',
+      },
     },
     defaultVariants: {
       design: 'glass',
       size: 'md',
       collapsed: false,
+      hidden: false,
     },
   },
 )

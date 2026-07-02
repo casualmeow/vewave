@@ -137,8 +137,8 @@ export function HealthcheckPage() {
   }, [runChecks])
 
   return (
-    <div className="min-h-[calc(100vh-2rem)] overflow-auto p-6">
-      <div className="mx-auto grid w-full max-w-6xl gap-6">
+    <div className="p-6">
+      <div className="grid w-full max-w-6xl gap-6">
         <section className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">

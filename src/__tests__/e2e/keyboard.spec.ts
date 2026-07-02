@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
+import { authenticateE2EUser } from './helpers/auth'
 
 test.describe('keyboard focus', () => {
   test('studio current navigation item is reachable and visibly focused', async ({ page }) => {
@@ -30,7 +31,7 @@ test.describe('keyboard focus', () => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/')
 
-    const primaryAction = page.getByRole('link', { name: /Start free/i })
+    const primaryAction = page.locator('#overview').getByRole('link', { name: /Create room/i })
 
     await expect(primaryAction).toBeVisible()
     await tabUntilFocused(page, primaryAction)
@@ -39,13 +40,14 @@ test.describe('keyboard focus', () => {
 
   test('app current navigation item is reachable and visibly focused', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
+    await authenticateE2EUser(page)
     await page.goto('/projects')
 
     const navigation = page.getByLabel('App navigation')
     const currentItem = navigation.locator('[aria-current="page"]')
 
     await expect(navigation).toBeVisible()
-    await expect(currentItem).toContainText('Projects')
+    await expect(currentItem).toContainText('Rooms')
     await expect(currentItem).not.toContainText('Current')
 
     await tabUntilFocused(page, currentItem)

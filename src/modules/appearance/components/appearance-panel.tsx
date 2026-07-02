@@ -992,8 +992,8 @@ function ColorControl({
 
 export function AppearanceColorStudioPage() {
   return (
-    <div className="min-h-[calc(100vh-2rem)] overflow-auto p-6">
-      <div className="mx-auto grid w-full max-w-7xl gap-6">
+    <div className="p-6">
+      <div className="grid w-full max-w-7xl gap-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="flex items-center gap-2 text-sm font-medium text-primary">

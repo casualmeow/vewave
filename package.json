@@ -10,7 +10,7 @@
     "typecheck": "npm run routes:gen && npm run typecheck:tsc",
     "typecheck:tsc": "tsc -p tsconfig.json --noEmit",
     "serve": "vite preview",
-    "api:gen": "orval --config orval.config.ts && node -e \"setTimeout(() => {}, 2000)\" && prettier --write src/core/api/generated",
+    "api:gen": "orval --config orval.config.ts && node -e \"setTimeout(() => {}, 2000)\"",
     "test": "vitest run",
     "test:a11y": "playwright test src/__tests__/e2e/a11y.spec.ts",
     "test:keyboard": "playwright test src/__tests__/e2e/keyboard.spec.ts",

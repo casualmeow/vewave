@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { createRoomSchema, getCreateRoomVideoLinks, type CreateRoomFields } from '../schema'
-import type { PostApiMediaParseUrl200 } from '@/core/api/generated/model'
+import type { PostApiMediaParseUrl200, PostApiRooms200 } from '@/core/api/generated/model'
 import { usePostApiMediaParseUrl } from '@/core/api/generated/media/media'
 import { usePostApiRooms } from '@/core/api/generated/rooms/rooms'
 import { getApiErrorMessage } from '@/core/api/http/errors'
@@ -28,11 +28,13 @@ import {
 } from '@/shared/ui'
 
 type CreateRoomFormProps = {
-  variant?: 'card' | 'firstRun' | 'plain'
+  onCreated?: (room: PostApiRooms200) => void
+  variant?: 'card' | 'compact' | 'firstRun' | 'plain'
 }
 
-export function CreateRoomForm({ variant = 'card' }: CreateRoomFormProps) {
+export function CreateRoomForm({ onCreated, variant = 'card' }: CreateRoomFormProps) {
   const navigate = useNavigate()
+  const compact = variant === 'compact'
   const userId = useAuthStore((state) => state.user?.id ?? null)
   const [parsedMedia, setParsedMedia] = useState<Array<PostApiMediaParseUrl200>>([])
   const [validatedUrl, setValidatedUrl] = useState<string | null>(null)
@@ -110,6 +112,7 @@ export function CreateRoomForm({ variant = 'card' }: CreateRoomFormProps) {
       })
       rememberCreatedRoom(response, userId)
       toast.success('Room created')
+      onCreated?.(response)
       await navigate({
         to: '/room/$code',
         params: {
@@ -125,7 +128,7 @@ export function CreateRoomForm({ variant = 'card' }: CreateRoomFormProps) {
 
   const formContent = (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className={compact ? 'space-y-4' : 'space-y-6'}>
         <FormField
           control={form.control}
           name="title"
@@ -135,7 +138,9 @@ export function CreateRoomForm({ variant = 'card' }: CreateRoomFormProps) {
               <FormControl>
                 <Input {...field} placeholder="Friday movie night" />
               </FormControl>
-              <FormDescription>This name will be shown to invited viewers.</FormDescription>
+              {compact ? null : (
+                <FormDescription>This name will be shown to invited viewers.</FormDescription>
+              )}
               <FormMessage />
             </FormItem>
           )}
@@ -151,7 +156,7 @@ export function CreateRoomForm({ variant = 'card' }: CreateRoomFormProps) {
                   {...field}
                   className="border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive min-h-24 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs outline-none transition-[color,box-shadow] focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                   placeholder="https://youtube.com/watch?v=...\nhttps://youtu.be/..."
-                  rows={3}
+                  rows={compact ? 2 : 3}
                   onBlur={(event) => {
                     field.onBlur()
 
@@ -176,7 +181,7 @@ export function CreateRoomForm({ variant = 'card' }: CreateRoomFormProps) {
         <div className="grid gap-2">
           <Button
             type="submit"
-            className="w-full sm:w-fit"
+            className={compact ? 'w-full' : 'w-full sm:w-fit'}
             disabled={
               form.formState.isSubmitting || parseMutation.isPending || createMutation.isPending
             }
@@ -187,16 +192,18 @@ export function CreateRoomForm({ variant = 'card' }: CreateRoomFormProps) {
                 ? 'Creating room...'
                 : 'Create and open room'}
           </Button>
-          <p className="text-xs leading-5 text-muted-foreground">
-            After creation, the room opens with the video source, invite link, and synced playback
-            controls.
-          </p>
+          {compact ? null : (
+            <p className="text-xs leading-5 text-muted-foreground">
+              After creation, the room opens with the video source, invite link, and synced playback
+              controls.
+            </p>
+          )}
         </div>
       </form>
     </Form>
   )
 
-  if (variant === 'plain') {
+  if (variant === 'plain' || variant === 'compact') {
     return formContent
   }
 

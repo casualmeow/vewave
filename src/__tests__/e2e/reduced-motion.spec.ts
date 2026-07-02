@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { authenticateE2EUser } from './helpers/auth'
 
 test.describe('reduced motion', () => {
   test('studio sidebar keeps explicit state without fluid navigation', async ({ page }) => {
@@ -33,6 +34,7 @@ test.describe('reduced motion', () => {
   test('app sidebar keeps explicit state without fluid navigation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     await page.setViewportSize({ width: 1440, height: 900 })
+    await authenticateE2EUser(page)
     await page.goto('/projects')
 
     const sidebar = page.getByLabel('App navigation')
@@ -42,7 +44,7 @@ test.describe('reduced motion', () => {
     await expect(sidebar).toHaveAttribute('data-design', 'glass')
     await expect(sidebar).toHaveAttribute('data-motion', 'soft')
     await expect(sidebar).toHaveAttribute('data-fluid-preset', 'subtle')
-    await expect(currentItem).toContainText('Projects')
+    await expect(currentItem).toContainText('Rooms')
     await expect(currentItem).not.toContainText('Current')
   })
 })
