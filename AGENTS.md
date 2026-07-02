@@ -12,7 +12,7 @@
 
 ## General Working Rules
 
-- Inspect the existing implementation and local conventions before creating new abstractions.
+- Inspect the existing implementation and local conventions before creating new abstractions (in-folder).
 - Prefer extending current project patterns over inventing new folder structures or competing APIs.
 - Do not move code across architectural layers without a clear reason.
 - Do not duplicate existing reusable components or recreate abstractions that already exist.
