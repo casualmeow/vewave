@@ -6,12 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type PostApiRoomsByCodeJoin200PlaybackStatus =
-  (typeof PostApiRoomsByCodeJoin200PlaybackStatus)[keyof typeof PostApiRoomsByCodeJoin200PlaybackStatus]
+export type PostApiRoomsByCodeJoin200PlaybackStatus = typeof PostApiRoomsByCodeJoin200PlaybackStatus[keyof typeof PostApiRoomsByCodeJoin200PlaybackStatus];
+
 
 export const PostApiRoomsByCodeJoin200PlaybackStatus = {
   playing: 'playing',
   paused: 'paused',
   buffering: 'buffering',
   ended: 'ended',
-} as const
+} as const;

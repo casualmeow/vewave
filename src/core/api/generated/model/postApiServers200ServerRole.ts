@@ -6,8 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export const PostApiServers200ServerRole = {
-  owner: 'owner',
+export const PostApiServers200ServerRole = {  owner: 'owner',
   moderator: 'moderator',
   member: 'member',
 } as const

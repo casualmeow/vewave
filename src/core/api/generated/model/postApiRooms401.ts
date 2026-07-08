@@ -5,8 +5,8 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
-import type { PostApiRooms401Error } from './postApiRooms401Error.ts'
+import type { PostApiRooms401Error } from './postApiRooms401Error.ts';
 
 export type PostApiRooms401 = {
-  error: PostApiRooms401Error
-}
+  error: PostApiRooms401Error;
+};

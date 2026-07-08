@@ -11,7 +11,7 @@ import type { MobileSidebarDockItem } from '@/components/sidebar'
 
 export type AppSidebarRoute =
   | '/projects'
-  | '/community'
+  | '/servers/discover'
   | '/admin'
   | '/room/$code'
   | '/servers/$serverId'
@@ -35,7 +35,7 @@ export type AppSidebarRoomItem = {
 
 export const appPrimaryItems: ReadonlyArray<AppSidebarItem> = [
   { label: 'Rooms', to: '/projects', icon: Radio },
-  { label: 'Community', to: '/community', icon: Compass },
+  { label: 'Community', to: '/servers/discover', icon: Compass },
 ]
 
 export const appAdminItem: AppSidebarItem = {

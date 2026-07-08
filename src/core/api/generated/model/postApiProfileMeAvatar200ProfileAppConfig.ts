@@ -6,4 +6,4 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type PostApiProfileMeAvatar200ProfileAppConfig = { [key: string]: unknown }
+export type PostApiProfileMeAvatar200ProfileAppConfig = { [key: string]: unknown };

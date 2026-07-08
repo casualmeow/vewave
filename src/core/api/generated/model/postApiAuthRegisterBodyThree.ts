@@ -8,14 +8,14 @@
 
 export type PostApiAuthRegisterBodyThree = {
   /**
-   * @minLength 1
-   * @maxLength 120
-   */
-  name: string
-  email: string
+     * @minLength 1
+     * @maxLength 120
+     */
+  name: string;
+  email: string;
   /**
-   * @minLength 8
-   * @maxLength 256
-   */
-  password: string
-}
+     * @minLength 8
+     * @maxLength 256
+     */
+  password: string;
+};

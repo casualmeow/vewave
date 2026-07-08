@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type PostApiServersByServerIdJoin404ErrorCode =
-  (typeof PostApiServersByServerIdJoin404ErrorCode)[keyof typeof PostApiServersByServerIdJoin404ErrorCode]
+export type PostApiServersByServerIdJoin404ErrorCode = typeof PostApiServersByServerIdJoin404ErrorCode[keyof typeof PostApiServersByServerIdJoin404ErrorCode];
+
 
 export const PostApiServersByServerIdJoin404ErrorCode = {
   VALIDATION_ERROR: 'VALIDATION_ERROR',
@@ -23,6 +23,8 @@ export const PostApiServersByServerIdJoin404ErrorCode = {
   PROFILE_NOT_FOUND: 'PROFILE_NOT_FOUND',
   SERVER_NOT_FOUND: 'SERVER_NOT_FOUND',
   SERVER_FORBIDDEN: 'SERVER_FORBIDDEN',
+  FORUM_THREAD_NOT_FOUND: 'FORUM_THREAD_NOT_FOUND',
+  FORUM_RULE_NOT_FOUND: 'FORUM_RULE_NOT_FOUND',
   ROOM_NOT_FOUND: 'ROOM_NOT_FOUND',
   ROOM_FORBIDDEN: 'ROOM_FORBIDDEN',
   ROOM_NOT_ACTIVE: 'ROOM_NOT_ACTIVE',
@@ -33,4 +35,4 @@ export const PostApiServersByServerIdJoin404ErrorCode = {
   ADMIN_FORBIDDEN: 'ADMIN_FORBIDDEN',
   DATABASE_UNAVAILABLE: 'DATABASE_UNAVAILABLE',
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
-} as const
+} as const;

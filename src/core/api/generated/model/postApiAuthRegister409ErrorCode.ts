@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type PostApiAuthRegister409ErrorCode =
-  (typeof PostApiAuthRegister409ErrorCode)[keyof typeof PostApiAuthRegister409ErrorCode]
+export type PostApiAuthRegister409ErrorCode = typeof PostApiAuthRegister409ErrorCode[keyof typeof PostApiAuthRegister409ErrorCode];
+
 
 export const PostApiAuthRegister409ErrorCode = {
   VALIDATION_ERROR: 'VALIDATION_ERROR',
@@ -23,6 +23,8 @@ export const PostApiAuthRegister409ErrorCode = {
   PROFILE_NOT_FOUND: 'PROFILE_NOT_FOUND',
   SERVER_NOT_FOUND: 'SERVER_NOT_FOUND',
   SERVER_FORBIDDEN: 'SERVER_FORBIDDEN',
+  FORUM_THREAD_NOT_FOUND: 'FORUM_THREAD_NOT_FOUND',
+  FORUM_RULE_NOT_FOUND: 'FORUM_RULE_NOT_FOUND',
   ROOM_NOT_FOUND: 'ROOM_NOT_FOUND',
   ROOM_FORBIDDEN: 'ROOM_FORBIDDEN',
   ROOM_NOT_ACTIVE: 'ROOM_NOT_ACTIVE',
@@ -33,4 +35,4 @@ export const PostApiAuthRegister409ErrorCode = {
   ADMIN_FORBIDDEN: 'ADMIN_FORBIDDEN',
   DATABASE_UNAVAILABLE: 'DATABASE_UNAVAILABLE',
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
-} as const
+} as const;

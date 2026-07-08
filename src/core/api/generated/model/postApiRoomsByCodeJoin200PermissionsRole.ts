@@ -6,11 +6,11 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type PostApiRoomsByCodeJoin200PermissionsRole =
-  (typeof PostApiRoomsByCodeJoin200PermissionsRole)[keyof typeof PostApiRoomsByCodeJoin200PermissionsRole]
+export type PostApiRoomsByCodeJoin200PermissionsRole = typeof PostApiRoomsByCodeJoin200PermissionsRole[keyof typeof PostApiRoomsByCodeJoin200PermissionsRole];
+
 
 export const PostApiRoomsByCodeJoin200PermissionsRole = {
   owner: 'owner',
   host: 'host',
   viewer: 'viewer',
-} as const
+} as const;

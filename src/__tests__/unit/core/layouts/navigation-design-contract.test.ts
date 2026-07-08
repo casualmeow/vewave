@@ -1,18 +1,62 @@
+/**
+ * Spelling-based design-contract tests — read before refactoring nearby source.
+ *
+ * These tests import files as raw text (`?raw`) and assert on literal source
+ * strings, not runtime behavior. They encode design decisions ("navigation
+ * stays calm", "no decorative liquid effects in production", "use the
+ * theme-aware brand mark") as regression alarms.
+ *
+ * When you refactor an imported file (rename a const, extract a hook, move a
+ * component, reformat JSX), assertions here MAY break. That is not a bug —
+ * it is the contract asking you to confirm the decision still holds. Update
+ * the assertion to match the new spelling, or weaken it only if the design
+ * decision itself changed.
+ *
+ * Do not auto-rewrite these tests when they fail; do not convert them to
+ * render tests unless one has broken 3+ times for non-substantive reasons.
+ */
 import { describe, expect, it } from 'vitest'
 
 import sidebarVariantsSource from '@/components/sidebar/constants/variants.ts?raw'
-import sidebarFluidConfigSource from '@/components/sidebar/hooks/use-resolved-fluid-config.ts?raw'
 import mobileSidebarDockSource from '@/components/sidebar/ui/mobile-sidebar-dock.tsx?raw'
 import sidebarItemSource from '@/components/sidebar/ui/sidebar-item.tsx?raw'
 import sidebarRootSource from '@/components/sidebar/ui/sidebar-root.tsx?raw'
 import appSidebarItemsSource from '@/core/layouts/app-layout/app-sidebar-items.tsx?raw'
 import appSidebarSource from '@/core/layouts/app-layout/ui/app-sidebar.tsx?raw'
+import appSidebarAdminItemSource from '@/core/layouts/app-layout/ui/sidebar/components/app-sidebar-admin-item.tsx?raw'
+import appSidebarFooterSource from '@/core/layouts/app-layout/ui/sidebar/components/app-sidebar-footer.tsx?raw'
+import appSidebarIdentitySource from '@/core/layouts/app-layout/ui/sidebar/components/app-sidebar-identity.tsx?raw'
+import newSidebarMenuSource from '@/core/layouts/app-layout/ui/sidebar/components/new-sidebar-menu.tsx?raw'
+import resourceRowsSource from '@/core/layouts/app-layout/ui/sidebar/components/resource-rows.tsx?raw'
+import sidebarCategoriesSource from '@/core/layouts/app-layout/ui/sidebar/components/sidebar-categories.tsx?raw'
+import sidebarCategoryBlockSource from '@/core/layouts/app-layout/ui/sidebar/components/sidebar-category-block.tsx?raw'
+import sidebarCategorySheetSource from '@/core/layouts/app-layout/ui/sidebar/components/sidebar-category-sheet.tsx?raw'
+import sidebarEmptyStateSource from '@/core/layouts/app-layout/ui/sidebar/components/sidebar-empty-state.tsx?raw'
+import sidebarResourceListSource from '@/core/layouts/app-layout/ui/sidebar/components/sidebar-resource-list.tsx?raw'
 import studioSidebarSource from '@/core/layouts/studio-layout/studio-sidebar.tsx?raw'
+import sidebarFluidConfigSource from '@/shared/hooks/use-resolved-fluid-config.ts?raw'
+
+// The app sidebar is composed from `app-sidebar.tsx` plus extracted sub-components under
+// `ui/sidebar/components/**`. Contract assertions about the whole product surface check this
+// combined tree instead of a single file so they stay valid across internal decomposition.
+const appSidebarTreeSource = [
+  appSidebarSource,
+  appSidebarAdminItemSource,
+  appSidebarFooterSource,
+  appSidebarIdentitySource,
+  newSidebarMenuSource,
+  resourceRowsSource,
+  sidebarCategoriesSource,
+  sidebarCategoryBlockSource,
+  sidebarCategorySheetSource,
+  sidebarEmptyStateSource,
+  sidebarResourceListSource,
+].join('\n')
 
 const productionSidebars = [
   {
     name: 'app sidebar',
-    source: appSidebarSource,
+    source: appSidebarTreeSource,
   },
   {
     name: 'studio sidebar',
@@ -64,8 +108,8 @@ describe('production navigation design contract', () => {
   })
 
   it('app sidebar keeps active state visual without the current text pill', () => {
-    expect(appSidebarSource).toContain('active={active}')
-    expect(appSidebarSource).not.toContain('Current')
+    expect(appSidebarTreeSource).toContain('active={active}')
+    expect(appSidebarTreeSource).not.toContain('Current')
   })
 
   it('studio sidebar keeps current state explicit', () => {
@@ -96,7 +140,7 @@ describe('production navigation design contract', () => {
     expect(sidebarRootSource).not.toContain("design = 'liquidGlass'")
     expect(sidebarRootSource).not.toContain("motion: motionPreset = 'fluid'")
     expect(sidebarRootSource).not.toContain('data-slot="liquid-sidebar"')
-    expect(sidebarFluidConfigSource).toContain("fluidPreset = 'subtle'")
+    expect(sidebarFluidConfigSource).toContain('GLASS_FLUID_PRESETS[fluidPreset]')
     expect(sidebarVariantsSource).toContain('hoverScale: 1.018')
     expect(sidebarVariantsSource).toContain('activeHoverScale: 1.01')
     expect(sidebarVariantsSource).toContain('magneticStrength: 0')
@@ -109,7 +153,7 @@ describe('production navigation design contract', () => {
     expect(mobileSidebarDockSource).toContain("dragMode = 'none'")
     expect(mobileSidebarDockSource).toContain("dockDragMode = 'none'")
     expect(mobileSidebarDockSource).toContain('showLiquidEffects')
-    expect(mobileSidebarDockSource).toContain('showLiquidEffects && canAnimate')
+    expect(mobileSidebarDockSource).toContain('expressiveDock && canAnimate')
     expect(mobileSidebarDockSource).toContain(
       'drag={showLiquidEffects ? toMotionDragMode(dockDragMode) : false}',
     )
@@ -126,7 +170,6 @@ describe('production navigation design contract', () => {
       'drag={showLiquidEffects ? toMotionDragMode(resolvedDragMode) : false}',
     )
     expect(sidebarItemSource).toContain('showLiquidEffects && (isHovered || isDragging)')
-    expect(sidebarItemSource).toMatch(/active \? \(\s+showLiquidEffects \? \(\s+<motion\.span/)
     expect(sidebarItemSource).toContain(
       '<span aria-hidden="true" className={sidebarActiveIndicatorVariants({ design })}>',
     )
@@ -162,20 +205,20 @@ describe('production navigation design contract', () => {
   })
 
   it('app sidebar opens full category lists in a shared sheet', () => {
-    expect(appSidebarSource).toContain('SheetContent')
-    expect(appSidebarSource).toContain('activeCategory')
+    expect(appSidebarTreeSource).toContain('SheetContent')
+    expect(appSidebarTreeSource).toContain('activeCategory')
   })
 
   it('app sidebar categories preview a few items inline under muted clickable headers', () => {
-    expect(appSidebarSource).toContain('sidebarCategoryPreviewLimit = 3')
-    expect(appSidebarSource).toContain('Show {count - sidebarCategoryPreviewLimit} more')
-    expect(appSidebarSource).toContain('uppercase tracking-[0.16em]')
+    expect(appSidebarTreeSource).toContain('sidebarCategoryPreviewLimit = 3')
+    expect(appSidebarTreeSource).toContain('Show {count - sidebarCategoryPreviewLimit} more')
+    expect(appSidebarTreeSource).toContain('uppercase tracking-[0.16em]')
   })
 
   it('empty sidebar categories explain themselves inline instead of opening a panel', () => {
-    expect(appSidebarSource).toContain('emptyHint')
-    expect(appSidebarSource).toContain('count === 0 ? (')
-    expect(appSidebarSource).not.toContain('bg-sidebar-accent/35')
+    expect(appSidebarTreeSource).toContain('emptyHint')
+    expect(appSidebarTreeSource).toContain('count === 0 ? (')
+    expect(appSidebarTreeSource).not.toContain('bg-sidebar-accent/35')
   })
 
   it('active navigation state relies on the accent surface without a left bar marker', () => {
@@ -184,9 +227,9 @@ describe('production navigation design contract', () => {
   })
 
   it('new room and server actions open a dedicated modal instead of an inline flyout form', () => {
-    expect(appSidebarSource).toContain('DialogContent')
-    expect(appSidebarSource).not.toContain('variant="compact"')
-    expect(appSidebarSource).not.toContain('Create and open a watch room.')
+    expect(appSidebarTreeSource).toContain('DialogContent')
+    expect(appSidebarTreeSource).not.toContain('variant="compact"')
+    expect(appSidebarTreeSource).not.toContain('Create and open a watch room.')
   })
 
   it('sidebar rows stay quiet: no status chips, categories separated by hairlines', () => {

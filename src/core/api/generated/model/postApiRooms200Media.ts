@@ -5,13 +5,13 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
-import type { PostApiRooms200MediaProvider } from './postApiRooms200MediaProvider.ts'
+import type { PostApiRooms200MediaProvider } from './postApiRooms200MediaProvider.ts';
 
 export type PostApiRooms200Media = {
-  provider: PostApiRooms200MediaProvider
-  externalId: string
-  canonicalUrl: string
-  embedUrl?: string
-  title?: string
-  thumbnailUrl?: string
-}
+  provider: PostApiRooms200MediaProvider;
+  externalId: string;
+  canonicalUrl: string;
+  embedUrl?: string;
+  title?: string;
+  thumbnailUrl?: string;
+};

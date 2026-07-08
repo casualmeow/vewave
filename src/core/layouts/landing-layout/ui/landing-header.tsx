@@ -1,8 +1,10 @@
-import { useNavigate } from '@tanstack/react-router'
+import { createLink, useNavigate } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
-import { headerItems } from '../config'
+import { headerRouteItems } from '../config'
 import { Header, HeaderButton, HeaderLogo, HeaderNav, HeaderNavItem } from '@/components/header'
 import { VewaveLogoMark } from '@/shared/theme'
+
+const HeaderNavLink = createLink(HeaderNavItem)
 
 export function LandingHeader() {
   const navigate = useNavigate()
@@ -31,31 +33,20 @@ export function LandingHeader() {
       }
       navigation={
         <HeaderNav>
-          {headerItems.map((item) => (
-            <HeaderNavItem key={item.href} href={item.href}>
+          {headerRouteItems.map((item) => (
+            <HeaderNavLink key={item.href} to={item.href}>
               {item.label}
-            </HeaderNavItem>
+            </HeaderNavLink>
           ))}
         </HeaderNav>
       }
       actions={
-        <>
-          {/*
-            <HeaderButton
-            variant="ghost"
-            className="hidden sm:inline-flex"
-            startIcon={<Play className="size-4" />}
-            onClick={() => void navigate({ to: '/studio' })}
-          >
-            Studio
-          </HeaderButton>*/}
-          <HeaderButton
-            endIcon={<ArrowRight className="size-4" />}
-            onClick={() => navigate({ to: '/create' })}
-          >
-            Get started
-          </HeaderButton>
-        </>
+        <HeaderButton
+          endIcon={<ArrowRight className="size-4" />}
+          onClick={() => navigate({ to: '/create' })}
+        >
+          Get started
+        </HeaderButton>
       }
     />
   )

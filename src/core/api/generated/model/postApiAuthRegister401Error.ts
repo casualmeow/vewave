@@ -5,10 +5,10 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
-import type { PostApiAuthRegister401ErrorCode } from './postApiAuthRegister401ErrorCode.ts'
+import type { PostApiAuthRegister401ErrorCode } from './postApiAuthRegister401ErrorCode.ts';
 
 export type PostApiAuthRegister401Error = {
-  code: PostApiAuthRegister401ErrorCode
-  message: string
-  details?: unknown
-}
+  code: PostApiAuthRegister401ErrorCode;
+  message: string;
+  details?: unknown;
+};

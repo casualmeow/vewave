@@ -8,20 +8,20 @@
 
 export type PostApiRoomsBodyOne = {
   /**
-   * @minLength 1
-   * @maxLength 2048
-   */
-  url?: string
+     * @minLength 1
+     * @maxLength 2048
+     */
+  url?: string;
   /**
-   * @minItems 1
-   * @maxItems 20
-   * @items.minLength 1
-   * @items.maxLength 2048
-   */
-  urls?: string[]
+     * @minItems 1
+     * @maxItems 20
+     * @items.minLength 1
+     * @items.maxLength 2048
+     */
+  urls?: string[];
   /**
-   * @minLength 1
-   * @maxLength 180
-   */
-  title?: string
-}
+     * @minLength 1
+     * @maxLength 180
+     */
+  title?: string;
+};

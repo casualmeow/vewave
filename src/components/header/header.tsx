@@ -32,16 +32,13 @@ import {
   type HeaderSlotClassNames,
 } from './types'
 import { toLength } from './helpers'
-import { useHeaderCollapsedState, useHeaderMotion, useHeaderVisibility } from './hooks'
-import { HeaderContent, HeaderGlow, HeaderSurfaceEffects } from './ui'
-
 import {
-  getPointerProgress,
-  useFinePointer,
-  useFluidTransform,
-  useRafCssVariables,
-  useResolvedGlassFluidConfig,
-} from '@/components/glass'
+  useHeaderCollapsedState,
+  useHeaderInteractiveGlass,
+  useHeaderMotion,
+  useHeaderVisibility,
+} from './hooks'
+import { HeaderContent, HeaderGlow, HeaderRefractionFilter, HeaderSurfaceEffects } from './ui'
 import { cn } from '@/shared/lib/utils'
 
 type MotionHeaderNativeProps = Omit<
@@ -204,67 +201,39 @@ export function Header({
 
   const scopeId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const refractionId = `${scopeId}-header-refraction`
-  const finePointer = useFinePointer()
-  const setCssVariables = useRafCssVariables()
-  const fluidConfig = useResolvedGlassFluidConfig({
+
+  const {
+    canInteractiveGlass,
+    fluidConfig,
+    fluidTransformStyle,
+    handleFocusCapture: glassHandleFocusCapture,
+    handlePointerMove: glassHandlePointerMove,
+    handlePointerLeave: glassHandlePointerLeave,
+  } = useHeaderInteractiveGlass({
+    interactiveGlass,
+    variant,
     fluidPreset,
     magneticStrength,
     magneticVerticalStrength,
     tiltStrength,
     liquidIntensity,
-  })
-  const canInteractiveGlass = Boolean(
-    interactiveGlass && isInteractiveHeaderVariant(variant) && finePointer && !prefersReducedMotion,
-  )
-  const { fluidTransformStyle, updateFluidTransform, resetFluidTransform } = useFluidTransform({
-    enabled: canInteractiveGlass,
-    magneticStrength: fluidConfig.magneticStrength,
-    magneticVerticalStrength: fluidConfig.magneticVerticalStrength,
-    tiltStrength: fluidConfig.tiltStrength,
-    perspective: 1200,
-    tiltSpring: { stiffness: 180, damping: 28, mass: 0.72 },
+    prefersReducedMotion,
+    onRevealHeader: revealHeader,
   })
 
   const handleFocusCapture = (event: FocusEvent<HTMLElement>) => {
-    revealHeader()
+    glassHandleFocusCapture(event)
     onFocusCapture?.(event)
   }
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLElement>) => {
     onPointerMove?.(event)
-
-    if (!canInteractiveGlass) return
-
-    const pointerProgress = getPointerProgress({
-      clientX: event.clientX,
-      clientY: event.clientY,
-      rect: event.currentTarget.getBoundingClientRect(),
-    })
-
-    setCssVariables(event.currentTarget, {
-      '--header-pointer-x': `${pointerProgress.localX}px`,
-      '--header-pointer-y': `${pointerProgress.localY}px`,
-      '--header-sheen-x': `${pointerProgress.percentX}%`,
-      '--header-sheen-y': `${pointerProgress.percentY}%`,
-      '--header-glass-spot-opacity': variant === 'telegramGlass' ? '0.62' : '0.78',
-    })
-
-    updateFluidTransform(pointerProgress.normalizedX, pointerProgress.normalizedY)
+    glassHandlePointerMove(event)
   }
 
   const handlePointerLeave = (event: ReactPointerEvent<HTMLElement>) => {
     onPointerLeave?.(event)
-
-    if (!canInteractiveGlass) return
-
-    setCssVariables(event.currentTarget, {
-      '--header-pointer-x': '50%',
-      '--header-pointer-y': '10%',
-      '--header-sheen-x': '18%',
-      '--header-sheen-y': '10%',
-      '--header-glass-spot-opacity': variant === 'telegramGlass' ? '0.18' : '0.24',
-    })
-    resetFluidTransform()
+    glassHandlePointerLeave(event)
   }
 
   const blurValue = BLUR_VALUE[blurIntensity]
@@ -324,26 +293,7 @@ export function Header({
       {...props}
     >
       {isInteractiveHeaderVariant(variant) ? (
-        <svg aria-hidden="true" className="pointer-events-none absolute size-0" focusable="false">
-          <defs>
-            <filter id={refractionId} x="-20%" y="-20%" width="140%" height="140%">
-              <feTurbulence
-                type="fractalNoise"
-                baseFrequency={variant === 'telegramGlass' ? '0.01 0.026' : '0.012 0.034'}
-                numOctaves="2"
-                seed="13"
-                result="noise"
-              />
-              <feDisplacementMap
-                in="SourceGraphic"
-                in2="noise"
-                scale={variant === 'telegramGlass' ? '7' : '10'}
-                xChannelSelector="R"
-                yChannelSelector="G"
-              />
-            </filter>
-          </defs>
-        </svg>
+        <HeaderRefractionFilter id={refractionId} variant={variant} />
       ) : null}
 
       <HeaderGlow showGlow={showGlow} prefersReducedMotion={Boolean(prefersReducedMotion)} />

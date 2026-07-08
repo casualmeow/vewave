@@ -377,7 +377,7 @@ export function SidebarItemIcon({ ref, className, ...props }: SidebarItemPartPro
       ref={ref}
       className={cn(
         'relative z-10 grid shrink-0 place-items-center transition-transform duration-200 group-hover/sidebar-item-shell:scale-110 [&_svg]:size-full',
-        collapsed ? 'size-5' : 'size-4',
+        collapsed ? 'size-6' : 'size-4',
         className,
       )}
       {...props}

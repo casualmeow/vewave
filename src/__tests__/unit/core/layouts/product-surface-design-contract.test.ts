@@ -1,3 +1,10 @@
+/**
+ * Spelling-based design-contract tests — see navigation-design-contract.test.ts
+ * for the full maintenance contract. These assert on raw source strings, so
+ * refactors near imported files will break assertions: update the spelling to
+ * match, do not auto-rewrite the test. Convert to render tests only if a
+ * single assertion has broken 3+ times for non-substantive reasons.
+ */
 import { describe, expect, it } from 'vitest'
 
 import landingIndexPageSource from '@/modules/landing/landing-index-page.tsx?raw'

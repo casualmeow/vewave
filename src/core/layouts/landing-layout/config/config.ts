@@ -1,8 +1,7 @@
 import type { HeaderItem } from '@/components/header'
 
-export const headerItems = [
-  { label: 'Overview', href: '#overview' },
-  { label: 'Features', href: '#features' },
-  { label: 'Workflow', href: '#workflow' },
-  { label: 'Launch', href: '#launch' },
+export const headerRouteItems = [
+  { label: 'Changelog', href: '/changelog' },
+  { label: 'Community', href: '/community' },
+  { label: 'Help', href: '/help' },
 ] satisfies Array<HeaderItem>

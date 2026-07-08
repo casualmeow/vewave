@@ -1,1 +1,5 @@
-export * from './community-page'
+export * from './forum-home-page'
+export * from './forum-rules-page'
+export * from './forum-category-page'
+export * from './forum-thread-page'
+export * from './forum-new-thread-page'

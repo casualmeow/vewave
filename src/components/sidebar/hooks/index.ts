@@ -1,6 +1,9 @@
-export * from './use-fine-pointer'
-export * from './use-fluid-transform'
-export * from './use-raf-css-variables'
-export * from './use-resolved-fluid-config'
 export * from './use-sidebar-context'
 export * from './use-studio-sidebar'
+export * from './use-mobile-dock-physics'
+export {
+  useFinePointer,
+  useFluidTransform,
+  useRafCssVariables,
+  useResolvedGlassFluidConfig as useResolvedFluidConfig,
+} from '@/shared/hooks'

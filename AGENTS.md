@@ -1,163 +1,55 @@
-## Project Stack
+# Client Conventions
 
-- React 19
-- TypeScript
-- Tailwind CSS
-- TanStack Router with folder-based route structure
-- zustand for state management
-- zod for schema validation
-- React Query for data fetching
-- Motion/gsap for animation where already used
-- CVA / variant-driven styling where already used by reusable components
+Adds to root `AGENTS.md`. Stack, formatting, imports, and the `routes → modules → components → shared/ui → core` layering are defined there and apply here. This file covers what is specific to the client.
 
-## General Working Rules
+## Architecture Boundaries (client-specific detail)
 
-- Inspect the existing implementation and local conventions before creating new abstractions (in-folder).
-- Prefer extending current project patterns over inventing new folder structures or competing APIs.
-- Do not move code across architectural layers without a clear reason.
-- Do not duplicate existing reusable components or recreate abstractions that already exist.
-- Keep changes scoped to the task, but update adjacent documentation when component APIs change.
-- Remove dead code, unused imports, and obsolete helper files when replacing an implementation.
-- Use module architecture.
-- Prefer CVA for component variants.
-- Shared UI primitives live in src/shared/ui.
-- Do not put business logic inside route components.
+- `src/components/**`: reusable complex UI components. May include local `hooks`, `helpers`, `constants`, `types`, `ui` folders when that pattern already exists nearby. Do not put route-specific showcase orchestration here unless it is truly part of the reusable component.
+- `src/shared/ui/**`: low-level generic primitives only. Do not move richer reusable components here just because they are reused once.
+- `src/modules/**`: feature modules and page/component compositions. Compose from `components/**` and `shared/ui/**`; do not push page/showcase composition down into `components/**` unless it is reusable as part of the component package.
+- `src/core/layouts/**`: app shell and layout composition. Landing, studio, and app shells stay separate.
+- `src/routes/**`: thin TanStack Router route definitions. Preserve folder-based convention; do not switch to dot-based naming unless the repo already uses it for that area. Route groups in parentheses (e.g. `(landings)`) are organizational, not URL segments.
 
-## Architecture Boundaries
-
-### `src/components/**`
-
-Use this area for reusable component-level building blocks that may contain internal logic,
-animation, and local UI substructure.
-
-Rules:
-
-- Reusable complex UI components belong here.
-- Component packages may include local `hooks`, `helpers`, `constants`, `types`, and `ui`
-  folders when that pattern already exists.
-- If a public component API changes, update the matching docs page under
-  `src/modules/docs/**` and `/docs/ui/components/**`.
-- Do not put route-specific showcase orchestration here unless it is truly part of the reusable
-  component itself.
-
-### `src/shared/ui/**`
-
-Use this area for low-level shared UI primitives and small base components.
-
-Rules:
-
-- Keep this layer generic and lightweight.
-- Do not move richer reusable components with significant behavior or animation into `shared/ui`
-  only because they are reusable.
-- Do not place showcase orchestration, route logic, or feature-specific compositions here.
-
-### `src/modules/**`
-
-Use this area for feature modules and page-level/component-level compositions.
-
-Rules:
-
-- Route-specific interactive compositions belong here when they are not reusable primitives.
-- Modules may compose reusable components from `src/components/**` and shared primitives from
-  `src/shared/ui/**`.
-- Do not push page/showcase composition down into `src/components/**` unless it is reusable as
-  part of the actual component package.
-
-### `src/core/layouts/**`
-
-Use this area for application shell and layout composition.
-
-Rules:
-
-- Layouts compose page shells, persistent navigation, and `<Outlet />`.
-- Page-specific content does not belong in layouts.
-- Landing, studio, and app shells must remain separate when the repository already separates them.
-
-### `src/routes/**`
-
-Use this area for TanStack Router route definitions.
-
-Rules:
-
-- Route files should stay thin and primarily wire URLs to layouts, modules, or page components.
-- Prefer importing feature/page compositions from modules instead of placing large UI
-  implementations directly in route files.
-- Preserve the current folder-based route convention.
-- Do not switch to dot-based route naming unless the repository itself already uses it for that
-  exact area.
-- Route groups in parentheses, such as `(landings)`, are organizational and must not accidentally
-  become URL segments.
-- Follow existing repository patterns for `route.tsx`, pathless layouts, and nested folders instead
-  of inventing routing conventions.
-
-## UI Showcase Rules
-
-The `/ui/showcase` area is an interactive catalog of reusable UI components.
-
-Rules:
+## UI Showcase (`/ui/showcase`)
 
 - Prefer live, state-driven demos over static screenshot-like examples.
-- A showcase should expose meaningful controls or presets when the component is customizable.
-- If a preview requires isolation, justify the approach and avoid brittle cross-document
-  implementations.
-- Do not create repeated iframe galleries or disconnected static preview cards when one live
-  configurable preview is the intended UX.
+- Expose meaningful controls/presets when the component is customizable.
+- One live configurable preview beats repeated iframe galleries or disconnected static cards.
 - Keep reusable component code separate from showcase orchestration.
-- Showcase composition should follow the current module/page composition conventions and should not
-  be placed in `src/shared/ui/**`.
+
+## Reusable Component Docs
+
+When a reusable component under `src/components/**` gains a new public prop, behavior mode, or structural variant: update its UI-kit docs page under `/docs/ui/components/**`. Document the real API, distinguish visual from structural variants, include basic + advanced usage, and note interaction/accessibility behavior.
 
 ## React 19 Conventions
 
-- Write new function components in React 19 style.
-- Prefer `ref` as a normal prop for new internal components instead of introducing `forwardRef`,
-  unless a real compatibility reason is explicitly required.
-- Prefer named runtime imports from `react` and `import type` for types when editing files.
-- Do not add `import * as React` by default in new code unless the local file pattern or a concrete
-  need justifies it.
+- New function components use React 19 style; prefer `ref` as a normal prop — do not introduce `forwardRef` unless a real compatibility reason requires it.
+- Prefer named runtime imports from `react` and `import type` for types. Do not add `import * as React` unless the local file pattern justifies it.
+- Use `index.ts` reexports at each layer to expose components consistently; consume the reexported components in showcase code.
 - Preserve accessibility semantics and keyboard behavior when refactoring interactive components.
-- use reexports like `index.ts` at every layer to expose components consistently, then use the
-  reexported components in showcase code.
-
-## Reusable Component Documentation
-
-When a reusable component under `src/components/**` gains a new public prop, behavior mode, or
-structural variant:
-
-- update its UI-kit docs page under `/docs/ui/components/**`;
-- document the real API only;
-- distinguish visual variants from structural or presentation variants;
-- include basic usage and advanced usage when relevant;
-- mention important interaction and accessibility behavior.
 
 ## Motion And Animation
 
-When editing animated components:
-
-- preserve the intended interaction quality, not only the TypeScript shape;
-- verify that portals, scroll containers, and preview hosts do not break the intended motion
-  behavior;
-- keep reduced-motion support intact when it already exists.
+- Preserve the intended interaction quality, not only the TypeScript shape.
+- Verify portals, scroll containers, and preview hosts do not break the intended motion.
+- Keep reduced-motion support intact when it exists.
 
 ## Validation Expectations
 
-Before finishing substantial UI work:
+Verification should match the size of the change, not run on autopilot.
 
-- run the project build command;
-- make sure that you are using barrel imports
-- run `npm run test` then `npm run check ` and find out if there some errors;
-- remove stale imports and dead files;
-- report any command failures honestly.
+- For small changes (a class, a prop, copy, a single component edit): confirm the edit in the diff and stop. Do not run the full build, the full test suite, or launch a browser to visually verify.
+- Run only the single test file that covers the touched surface — for sidebar/navigation work that is `src/__tests__/unit/core/layouts/navigation-design-contract.test.ts`. Not the whole suite.
+- Run `npm run check` (typecheck) only when you changed types, imports, or signatures. Not a default step for markup or CSS edits.
+- Use barrel imports; remove stale imports and dead files you created. Do not delete code you did not write.
+- Never repair pre-existing test or typecheck failures unrelated to the change. Report them in one line and continue. See root `AGENTS.md` "Effort And Scope Discipline".
+- If you did not run a command, do not claim you did. Report failures honestly and stop.
 
 ## Visual Design Rules
 
-- `DESIGN.md` is the source of truth for visual hierarchy, brand voice, icon style, screenshot
-  sourcing, and interaction tone.
-- Do not ship new marketing or shell UI based only on generated placeholder blocks; use real product
-  screenshots or reference-driven mocks tied to existing routes.
-- Persistent navigation must prioritize current-state clarity over decorative motion.
-- Avoid starter assets in product UI, including sample avatars, placeholder logos, default demo
-  copy, and generic dashboard filler.
-- Rounded surfaces must express hierarchy; do not apply the same radius and contrast treatment to
-  every layer.
-- Top-level product and navigation icons should use Vewave-specific assets when the surface is
-  identity-bearing. Use Lucide for low-risk utility actions.
+- `DESIGN.md` is the source of truth for visual hierarchy, brand voice, icon style, screenshot sourcing, and interaction tone.
+- Do not ship new marketing or shell UI based only on generated placeholder blocks; use real product screenshots or reference-driven mocks tied to existing routes.
+- Persistent navigation prioritizes current-state clarity over decorative motion.
+- Avoid starter assets in product UI (sample avatars, placeholder logos, default demo copy, generic dashboard filler).
+- Rounded surfaces express hierarchy — do not apply the same radius and contrast treatment to every layer.
+- Top-level product/navigation icons use Vewave-specific assets when the surface is identity-bearing; Lucide for low-risk utility actions.

@@ -5,10 +5,10 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
-import type { PostApiRoomsByCodeJoin409ErrorCode } from './postApiRoomsByCodeJoin409ErrorCode.ts'
+import type { PostApiRoomsByCodeJoin409ErrorCode } from './postApiRoomsByCodeJoin409ErrorCode.ts';
 
 export type PostApiRoomsByCodeJoin409Error = {
-  code: PostApiRoomsByCodeJoin409ErrorCode
-  message: string
-  details?: unknown
-}
+  code: PostApiRoomsByCodeJoin409ErrorCode;
+  message: string;
+  details?: unknown;
+};

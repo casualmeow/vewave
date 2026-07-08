@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type PostApiAuthRegister503ErrorCode =
-  (typeof PostApiAuthRegister503ErrorCode)[keyof typeof PostApiAuthRegister503ErrorCode]
+export type PostApiAuthRegister503ErrorCode = typeof PostApiAuthRegister503ErrorCode[keyof typeof PostApiAuthRegister503ErrorCode];
+
 
 export const PostApiAuthRegister503ErrorCode = {
   VALIDATION_ERROR: 'VALIDATION_ERROR',
@@ -23,6 +23,8 @@ export const PostApiAuthRegister503ErrorCode = {
   PROFILE_NOT_FOUND: 'PROFILE_NOT_FOUND',
   SERVER_NOT_FOUND: 'SERVER_NOT_FOUND',
   SERVER_FORBIDDEN: 'SERVER_FORBIDDEN',
+  FORUM_THREAD_NOT_FOUND: 'FORUM_THREAD_NOT_FOUND',
+  FORUM_RULE_NOT_FOUND: 'FORUM_RULE_NOT_FOUND',
   ROOM_NOT_FOUND: 'ROOM_NOT_FOUND',
   ROOM_FORBIDDEN: 'ROOM_FORBIDDEN',
   ROOM_NOT_ACTIVE: 'ROOM_NOT_ACTIVE',
@@ -33,4 +35,4 @@ export const PostApiAuthRegister503ErrorCode = {
   ADMIN_FORBIDDEN: 'ADMIN_FORBIDDEN',
   DATABASE_UNAVAILABLE: 'DATABASE_UNAVAILABLE',
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
-} as const
+} as const;

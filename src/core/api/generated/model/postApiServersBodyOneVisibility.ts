@@ -6,11 +6,11 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type PostApiServersBodyOneVisibility =
-  (typeof PostApiServersBodyOneVisibility)[keyof typeof PostApiServersBodyOneVisibility]
+export type PostApiServersBodyOneVisibility = typeof PostApiServersBodyOneVisibility[keyof typeof PostApiServersBodyOneVisibility];
+
 
 export const PostApiServersBodyOneVisibility = {
   private: 'private',
   invite: 'invite',
   community: 'community',
-} as const
+} as const;

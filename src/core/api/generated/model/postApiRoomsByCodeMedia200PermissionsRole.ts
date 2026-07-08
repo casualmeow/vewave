@@ -6,11 +6,11 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type PostApiRoomsByCodeMedia200PermissionsRole =
-  (typeof PostApiRoomsByCodeMedia200PermissionsRole)[keyof typeof PostApiRoomsByCodeMedia200PermissionsRole]
+export type PostApiRoomsByCodeMedia200PermissionsRole = typeof PostApiRoomsByCodeMedia200PermissionsRole[keyof typeof PostApiRoomsByCodeMedia200PermissionsRole];
+
 
 export const PostApiRoomsByCodeMedia200PermissionsRole = {
   owner: 'owner',
   host: 'host',
   viewer: 'viewer',
-} as const
+} as const;

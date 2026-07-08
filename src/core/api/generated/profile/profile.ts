@@ -5,7 +5,10 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
-import { useMutation, useQuery } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -18,8 +21,8 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from '@tanstack/react-query'
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   GetApiProfileByUsername200,
@@ -60,749 +63,404 @@ import type {
   PostApiProfileMeAvatar500,
   PostApiProfileMeAvatarBodyOne,
   PostApiProfileMeAvatarBodyThree,
-  PostApiProfileMeAvatarBodyTwo,
-} from '../model'
+  PostApiProfileMeAvatarBodyTwo
+} from '../model';
 
-import { orvalMutator } from '../../http/orval-mutator.ts'
-import type { ErrorType, BodyType } from '../../http/orval-mutator.ts'
+import { orvalMutator } from '../../http/orval-mutator.ts';
+import type { ErrorType , BodyType } from '../../http/orval-mutator.ts';
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
-  const result = { queryKey } as T & { queryKey: K }
+  const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
     // The explicit queryKey always wins, matching the previous
     // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue
+    if (key === 'queryKey') continue;
     Object.defineProperty(result, key, {
       enumerable: true,
       configurable: true,
       get: () => (query as Record<string, unknown>)[key],
-    })
+    });
   }
-  return result
-}
+  return result;
+};
 
 /**
  * Returns the profile for the authenticated user, including private editable fields.
  * @summary Current profile
  */
 export const getApiProfileMe = (
-  options?: SecondParameter<typeof orvalMutator>,
-  signal?: AbortSignal,
+
+ options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
 ) => {
-  return orvalMutator<GetApiProfileMe200>(
-    { url: `/api/profile/me`, method: 'GET', signal },
-    options,
-  )
-}
+
+
+      return orvalMutator<GetApiProfileMe200>(
+      {url: `/api/profile/me`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
 
 export const getGetApiProfileMeQueryKey = () => {
-  return [`/api/profile/me`] as const
-}
+    return [
+    `/api/profile/me`
+    ] as const;
+    }
 
-export const getGetApiProfileMeQueryOptions = <
-  TData = Awaited<ReturnType<typeof getApiProfileMe>>,
-  TError = ErrorType<
-    | GetApiProfileMe400
-    | GetApiProfileMe401
-    | GetApiProfileMe404
-    | GetApiProfileMe409
-    | GetApiProfileMe500
-  >,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileMe>>, TError, TData>>
-  request?: SecondParameter<typeof orvalMutator>
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetApiProfileMeQueryKey()
+export const getGetApiProfileMeQueryOptions = <TData = Awaited<ReturnType<typeof getApiProfileMe>>, TError = ErrorType<GetApiProfileMe400 | GetApiProfileMe401 | GetApiProfileMe404 | GetApiProfileMe409 | GetApiProfileMe500>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileMe>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiProfileMe>>> = ({ signal }) =>
-    getApiProfileMe(requestOptions, signal)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getApiProfileMe>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  const queryKey =  queryOptions?.queryKey ?? getGetApiProfileMeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiProfileMe>>> = ({ signal }) => getApiProfileMe(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiProfileMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type GetApiProfileMeQueryResult = NonNullable<Awaited<ReturnType<typeof getApiProfileMe>>>
-export type GetApiProfileMeQueryError = ErrorType<
-  | GetApiProfileMe400
-  | GetApiProfileMe401
-  | GetApiProfileMe404
-  | GetApiProfileMe409
-  | GetApiProfileMe500
->
+export type GetApiProfileMeQueryError = ErrorType<GetApiProfileMe400 | GetApiProfileMe401 | GetApiProfileMe404 | GetApiProfileMe409 | GetApiProfileMe500>
 
-export function useGetApiProfileMe<
-  TData = Awaited<ReturnType<typeof getApiProfileMe>>,
-  TError = ErrorType<
-    | GetApiProfileMe400
-    | GetApiProfileMe401
-    | GetApiProfileMe404
-    | GetApiProfileMe409
-    | GetApiProfileMe500
-  >,
->(
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileMe>>, TError, TData>> &
-      Pick<
+
+export function useGetApiProfileMe<TData = Awaited<ReturnType<typeof getApiProfileMe>>, TError = ErrorType<GetApiProfileMe400 | GetApiProfileMe401 | GetApiProfileMe404 | GetApiProfileMe409 | GetApiProfileMe500>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileMe>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiProfileMe>>,
           TError,
           Awaited<ReturnType<typeof getApiProfileMe>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiProfileMe<
-  TData = Awaited<ReturnType<typeof getApiProfileMe>>,
-  TError = ErrorType<
-    | GetApiProfileMe400
-    | GetApiProfileMe401
-    | GetApiProfileMe404
-    | GetApiProfileMe409
-    | GetApiProfileMe500
-  >,
->(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileMe>>, TError, TData>> &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiProfileMe<TData = Awaited<ReturnType<typeof getApiProfileMe>>, TError = ErrorType<GetApiProfileMe400 | GetApiProfileMe401 | GetApiProfileMe404 | GetApiProfileMe409 | GetApiProfileMe500>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileMe>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiProfileMe>>,
           TError,
           Awaited<ReturnType<typeof getApiProfileMe>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiProfileMe<
-  TData = Awaited<ReturnType<typeof getApiProfileMe>>,
-  TError = ErrorType<
-    | GetApiProfileMe400
-    | GetApiProfileMe401
-    | GetApiProfileMe404
-    | GetApiProfileMe409
-    | GetApiProfileMe500
-  >,
->(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileMe>>, TError, TData>>
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiProfileMe<TData = Awaited<ReturnType<typeof getApiProfileMe>>, TError = ErrorType<GetApiProfileMe400 | GetApiProfileMe401 | GetApiProfileMe404 | GetApiProfileMe409 | GetApiProfileMe500>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileMe>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Current profile
  */
 
-export function useGetApiProfileMe<
-  TData = Awaited<ReturnType<typeof getApiProfileMe>>,
-  TError = ErrorType<
-    | GetApiProfileMe400
-    | GetApiProfileMe401
-    | GetApiProfileMe404
-    | GetApiProfileMe409
-    | GetApiProfileMe500
-  >,
->(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileMe>>, TError, TData>>
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetApiProfileMe<TData = Awaited<ReturnType<typeof getApiProfileMe>>, TError = ErrorType<GetApiProfileMe400 | GetApiProfileMe401 | GetApiProfileMe404 | GetApiProfileMe409 | GetApiProfileMe500>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileMe>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
   const queryOptions = getGetApiProfileMeQueryOptions(options)
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  return withQueryKey(query, queryOptions.queryKey)
+  return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
 
 /**
  * Updates display name, unique @username, avatar URL, and profile bio for the authenticated user.
  * @summary Update current profile
  */
 export const patchApiProfileMe = (
-  patchApiProfileMeBody:
-    | BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>
-    | PatchApiProfileMeBodyTwo
-    | PatchApiProfileMeBodyThree,
-  options?: SecondParameter<typeof orvalMutator>,
-  signal?: AbortSignal,
+    patchApiProfileMeBody: BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>| PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree,
+ options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
 ) => {
-  return orvalMutator<PatchApiProfileMe200>(
-    { url: `/api/profile/me`, method: 'PATCH', data: patchApiProfileMeBody, signal },
-    options,
-  )
-}
 
-export const getPatchApiProfileMeMutationOptions = <
-  TError = ErrorType<
-    | PatchApiProfileMe400
-    | PatchApiProfileMe401
-    | PatchApiProfileMe404
-    | PatchApiProfileMe409
-    | PatchApiProfileMe500
-  >,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof patchApiProfileMe>>,
-    TError,
-    {
-      data: BodyType<
-        PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree
-      >
+
+      return orvalMutator<PatchApiProfileMe200>(
+      {url: `/api/profile/me`, method: 'PATCH',
+      data: patchApiProfileMeBody, signal
     },
-    TContext
-  >
-  request?: SecondParameter<typeof orvalMutator>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof patchApiProfileMe>>,
-  TError,
-  {
-    data: BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>
-  },
-  TContext
-> => {
-  const mutationKey = ['patchApiProfileMe']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof patchApiProfileMe>>,
-    {
-      data: BodyType<
-        PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree
-      >
+      options);
     }
-  > = (props) => {
-    const { data } = props ?? {}
 
-    return patchApiProfileMe(data, requestOptions)
-  }
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type PatchApiProfileMeMutationResult = NonNullable<
-  Awaited<ReturnType<typeof patchApiProfileMe>>
->
-export type PatchApiProfileMeMutationBody = BodyType<
-  PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree
->
-export type PatchApiProfileMeMutationError = ErrorType<
-  | PatchApiProfileMe400
-  | PatchApiProfileMe401
-  | PatchApiProfileMe404
-  | PatchApiProfileMe409
-  | PatchApiProfileMe500
->
+export const getPatchApiProfileMeMutationOptions = <TError = ErrorType<PatchApiProfileMe400 | PatchApiProfileMe401 | PatchApiProfileMe404 | PatchApiProfileMe409 | PatchApiProfileMe500>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApiProfileMe>>, TError,{data: BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof patchApiProfileMe>>, TError,{data: BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>}, TContext> => {
 
-/**
+const mutationKey = ['patchApiProfileMe'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchApiProfileMe>>, {data: BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  patchApiProfileMe(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PatchApiProfileMeMutationResult = NonNullable<Awaited<ReturnType<typeof patchApiProfileMe>>>
+    export type PatchApiProfileMeMutationBody = BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>
+    export type PatchApiProfileMeMutationError = ErrorType<PatchApiProfileMe400 | PatchApiProfileMe401 | PatchApiProfileMe404 | PatchApiProfileMe409 | PatchApiProfileMe500>
+
+    /**
  * @summary Update current profile
  */
-export const usePatchApiProfileMe = <
-  TError = ErrorType<
-    | PatchApiProfileMe400
-    | PatchApiProfileMe401
-    | PatchApiProfileMe404
-    | PatchApiProfileMe409
-    | PatchApiProfileMe500
-  >,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof patchApiProfileMe>>,
-      TError,
-      {
-        data: BodyType<
-          PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree
-        >
-      },
-      TContext
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof patchApiProfileMe>>,
-  TError,
-  {
-    data: BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>
-  },
-  TContext
-> => {
-  return useMutation(getPatchApiProfileMeMutationOptions(options), queryClient)
-}
-/**
+export const usePatchApiProfileMe = <TError = ErrorType<PatchApiProfileMe400 | PatchApiProfileMe401 | PatchApiProfileMe404 | PatchApiProfileMe409 | PatchApiProfileMe500>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApiProfileMe>>, TError,{data: BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof patchApiProfileMe>>,
+        TError,
+        {data: BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>},
+        TContext
+      > => {
+      return useMutation(getPatchApiProfileMeMutationOptions(options), queryClient);
+    }
+    /**
  * Uploads a custom avatar image for the authenticated user and stores its public avatar URL on the profile.
  * @summary Upload current profile avatar
  */
 export const postApiProfileMeAvatar = (
-  postApiProfileMeAvatarBody:
-    | BodyType<
-        | PostApiProfileMeAvatarBodyOne
-        | PostApiProfileMeAvatarBodyTwo
-        | PostApiProfileMeAvatarBodyThree
-      >
-    | PostApiProfileMeAvatarBodyTwo
-    | PostApiProfileMeAvatarBodyThree,
-  options?: SecondParameter<typeof orvalMutator>,
-  signal?: AbortSignal,
+    postApiProfileMeAvatarBody: BodyType<PostApiProfileMeAvatarBodyOne | PostApiProfileMeAvatarBodyTwo | PostApiProfileMeAvatarBodyThree>| PostApiProfileMeAvatarBodyTwo | PostApiProfileMeAvatarBodyThree,
+ options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
 ) => {
-  return orvalMutator<PostApiProfileMeAvatar200>(
-    { url: `/api/profile/me/avatar`, method: 'POST', data: postApiProfileMeAvatarBody, signal },
-    options,
-  )
-}
 
-export const getPostApiProfileMeAvatarMutationOptions = <
-  TError = ErrorType<
-    | PostApiProfileMeAvatar400
-    | PostApiProfileMeAvatar401
-    | PostApiProfileMeAvatar404
-    | PostApiProfileMeAvatar409
-    | PostApiProfileMeAvatar500
-  >,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
-    TError,
-    {
-      data: BodyType<
-        | PostApiProfileMeAvatarBodyOne
-        | PostApiProfileMeAvatarBodyTwo
-        | PostApiProfileMeAvatarBodyThree
-      >
+
+      return orvalMutator<PostApiProfileMeAvatar200>(
+      {url: `/api/profile/me/avatar`, method: 'POST',
+      data: postApiProfileMeAvatarBody, signal
     },
-    TContext
-  >
-  request?: SecondParameter<typeof orvalMutator>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
-  TError,
-  {
-    data: BodyType<
-      | PostApiProfileMeAvatarBodyOne
-      | PostApiProfileMeAvatarBodyTwo
-      | PostApiProfileMeAvatarBodyThree
-    >
-  },
-  TContext
-> => {
-  const mutationKey = ['postApiProfileMeAvatar']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
-    {
-      data: BodyType<
-        | PostApiProfileMeAvatarBodyOne
-        | PostApiProfileMeAvatarBodyTwo
-        | PostApiProfileMeAvatarBodyThree
-      >
+      options);
     }
-  > = (props) => {
-    const { data } = props ?? {}
 
-    return postApiProfileMeAvatar(data, requestOptions)
-  }
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type PostApiProfileMeAvatarMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiProfileMeAvatar>>
->
-export type PostApiProfileMeAvatarMutationBody = BodyType<
-  PostApiProfileMeAvatarBodyOne | PostApiProfileMeAvatarBodyTwo | PostApiProfileMeAvatarBodyThree
->
-export type PostApiProfileMeAvatarMutationError = ErrorType<
-  | PostApiProfileMeAvatar400
-  | PostApiProfileMeAvatar401
-  | PostApiProfileMeAvatar404
-  | PostApiProfileMeAvatar409
-  | PostApiProfileMeAvatar500
->
+export const getPostApiProfileMeAvatarMutationOptions = <TError = ErrorType<PostApiProfileMeAvatar400 | PostApiProfileMeAvatar401 | PostApiProfileMeAvatar404 | PostApiProfileMeAvatar409 | PostApiProfileMeAvatar500>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiProfileMeAvatar>>, TError,{data: BodyType<PostApiProfileMeAvatarBodyOne | PostApiProfileMeAvatarBodyTwo | PostApiProfileMeAvatarBodyThree>}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApiProfileMeAvatar>>, TError,{data: BodyType<PostApiProfileMeAvatarBodyOne | PostApiProfileMeAvatarBodyTwo | PostApiProfileMeAvatarBodyThree>}, TContext> => {
 
-/**
+const mutationKey = ['postApiProfileMeAvatar'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiProfileMeAvatar>>, {data: BodyType<PostApiProfileMeAvatarBodyOne | PostApiProfileMeAvatarBodyTwo | PostApiProfileMeAvatarBodyThree>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postApiProfileMeAvatar(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiProfileMeAvatarMutationResult = NonNullable<Awaited<ReturnType<typeof postApiProfileMeAvatar>>>
+    export type PostApiProfileMeAvatarMutationBody = BodyType<PostApiProfileMeAvatarBodyOne | PostApiProfileMeAvatarBodyTwo | PostApiProfileMeAvatarBodyThree>
+    export type PostApiProfileMeAvatarMutationError = ErrorType<PostApiProfileMeAvatar400 | PostApiProfileMeAvatar401 | PostApiProfileMeAvatar404 | PostApiProfileMeAvatar409 | PostApiProfileMeAvatar500>
+
+    /**
  * @summary Upload current profile avatar
  */
-export const usePostApiProfileMeAvatar = <
-  TError = ErrorType<
-    | PostApiProfileMeAvatar400
-    | PostApiProfileMeAvatar401
-    | PostApiProfileMeAvatar404
-    | PostApiProfileMeAvatar409
-    | PostApiProfileMeAvatar500
-  >,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
-      TError,
-      {
-        data: BodyType<
-          | PostApiProfileMeAvatarBodyOne
-          | PostApiProfileMeAvatarBodyTwo
-          | PostApiProfileMeAvatarBodyThree
-        >
-      },
-      TContext
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
-  TError,
-  {
-    data: BodyType<
-      | PostApiProfileMeAvatarBodyOne
-      | PostApiProfileMeAvatarBodyTwo
-      | PostApiProfileMeAvatarBodyThree
-    >
-  },
-  TContext
-> => {
-  return useMutation(getPostApiProfileMeAvatarMutationOptions(options), queryClient)
-}
-/**
+export const usePostApiProfileMeAvatar = <TError = ErrorType<PostApiProfileMeAvatar400 | PostApiProfileMeAvatar401 | PostApiProfileMeAvatar404 | PostApiProfileMeAvatar409 | PostApiProfileMeAvatar500>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiProfileMeAvatar>>, TError,{data: BodyType<PostApiProfileMeAvatarBodyOne | PostApiProfileMeAvatarBodyTwo | PostApiProfileMeAvatarBodyThree>}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
+        TError,
+        {data: BodyType<PostApiProfileMeAvatarBodyOne | PostApiProfileMeAvatarBodyTwo | PostApiProfileMeAvatarBodyThree>},
+        TContext
+      > => {
+      return useMutation(getPostApiProfileMeAvatarMutationOptions(options), queryClient);
+    }
+    /**
  * Changes the authenticated user's password. Existing password users must provide the current password.
  * @summary Change current password
  */
 export const patchApiProfileMePassword = (
-  patchApiProfileMePasswordBody:
-    | BodyType<
-        | PatchApiProfileMePasswordBodyOne
-        | PatchApiProfileMePasswordBodyTwo
-        | PatchApiProfileMePasswordBodyThree
-      >
-    | PatchApiProfileMePasswordBodyTwo
-    | PatchApiProfileMePasswordBodyThree,
-  options?: SecondParameter<typeof orvalMutator>,
-  signal?: AbortSignal,
+    patchApiProfileMePasswordBody: BodyType<PatchApiProfileMePasswordBodyOne | PatchApiProfileMePasswordBodyTwo | PatchApiProfileMePasswordBodyThree>| PatchApiProfileMePasswordBodyTwo | PatchApiProfileMePasswordBodyThree,
+ options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
 ) => {
-  return orvalMutator<PatchApiProfileMePassword200>(
-    {
-      url: `/api/profile/me/password`,
-      method: 'PATCH',
-      data: patchApiProfileMePasswordBody,
-      signal,
-    },
-    options,
-  )
-}
 
-export const getPatchApiProfileMePasswordMutationOptions = <
-  TError = ErrorType<
-    | PatchApiProfileMePassword400
-    | PatchApiProfileMePassword401
-    | PatchApiProfileMePassword404
-    | PatchApiProfileMePassword409
-    | PatchApiProfileMePassword500
-  >,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof patchApiProfileMePassword>>,
-    TError,
-    {
-      data: BodyType<
-        | PatchApiProfileMePasswordBodyOne
-        | PatchApiProfileMePasswordBodyTwo
-        | PatchApiProfileMePasswordBodyThree
-      >
-    },
-    TContext
-  >
-  request?: SecondParameter<typeof orvalMutator>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof patchApiProfileMePassword>>,
-  TError,
-  {
-    data: BodyType<
-      | PatchApiProfileMePasswordBodyOne
-      | PatchApiProfileMePasswordBodyTwo
-      | PatchApiProfileMePasswordBodyThree
-    >
-  },
-  TContext
-> => {
-  const mutationKey = ['patchApiProfileMePassword']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof patchApiProfileMePassword>>,
-    {
-      data: BodyType<
-        | PatchApiProfileMePasswordBodyOne
-        | PatchApiProfileMePasswordBodyTwo
-        | PatchApiProfileMePasswordBodyThree
-      >
+      return orvalMutator<PatchApiProfileMePassword200>(
+      {url: `/api/profile/me/password`, method: 'PATCH',
+      data: patchApiProfileMePasswordBody, signal
+    },
+      options);
     }
-  > = (props) => {
-    const { data } = props ?? {}
 
-    return patchApiProfileMePassword(data, requestOptions)
-  }
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type PatchApiProfileMePasswordMutationResult = NonNullable<
-  Awaited<ReturnType<typeof patchApiProfileMePassword>>
->
-export type PatchApiProfileMePasswordMutationBody = BodyType<
-  | PatchApiProfileMePasswordBodyOne
-  | PatchApiProfileMePasswordBodyTwo
-  | PatchApiProfileMePasswordBodyThree
->
-export type PatchApiProfileMePasswordMutationError = ErrorType<
-  | PatchApiProfileMePassword400
-  | PatchApiProfileMePassword401
-  | PatchApiProfileMePassword404
-  | PatchApiProfileMePassword409
-  | PatchApiProfileMePassword500
->
+export const getPatchApiProfileMePasswordMutationOptions = <TError = ErrorType<PatchApiProfileMePassword400 | PatchApiProfileMePassword401 | PatchApiProfileMePassword404 | PatchApiProfileMePassword409 | PatchApiProfileMePassword500>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApiProfileMePassword>>, TError,{data: BodyType<PatchApiProfileMePasswordBodyOne | PatchApiProfileMePasswordBodyTwo | PatchApiProfileMePasswordBodyThree>}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof patchApiProfileMePassword>>, TError,{data: BodyType<PatchApiProfileMePasswordBodyOne | PatchApiProfileMePasswordBodyTwo | PatchApiProfileMePasswordBodyThree>}, TContext> => {
 
-/**
+const mutationKey = ['patchApiProfileMePassword'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchApiProfileMePassword>>, {data: BodyType<PatchApiProfileMePasswordBodyOne | PatchApiProfileMePasswordBodyTwo | PatchApiProfileMePasswordBodyThree>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  patchApiProfileMePassword(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PatchApiProfileMePasswordMutationResult = NonNullable<Awaited<ReturnType<typeof patchApiProfileMePassword>>>
+    export type PatchApiProfileMePasswordMutationBody = BodyType<PatchApiProfileMePasswordBodyOne | PatchApiProfileMePasswordBodyTwo | PatchApiProfileMePasswordBodyThree>
+    export type PatchApiProfileMePasswordMutationError = ErrorType<PatchApiProfileMePassword400 | PatchApiProfileMePassword401 | PatchApiProfileMePassword404 | PatchApiProfileMePassword409 | PatchApiProfileMePassword500>
+
+    /**
  * @summary Change current password
  */
-export const usePatchApiProfileMePassword = <
-  TError = ErrorType<
-    | PatchApiProfileMePassword400
-    | PatchApiProfileMePassword401
-    | PatchApiProfileMePassword404
-    | PatchApiProfileMePassword409
-    | PatchApiProfileMePassword500
-  >,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof patchApiProfileMePassword>>,
-      TError,
-      {
-        data: BodyType<
-          | PatchApiProfileMePasswordBodyOne
-          | PatchApiProfileMePasswordBodyTwo
-          | PatchApiProfileMePasswordBodyThree
-        >
-      },
-      TContext
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof patchApiProfileMePassword>>,
-  TError,
-  {
-    data: BodyType<
-      | PatchApiProfileMePasswordBodyOne
-      | PatchApiProfileMePasswordBodyTwo
-      | PatchApiProfileMePasswordBodyThree
-    >
-  },
-  TContext
-> => {
-  return useMutation(getPatchApiProfileMePasswordMutationOptions(options), queryClient)
-}
-/**
+export const usePatchApiProfileMePassword = <TError = ErrorType<PatchApiProfileMePassword400 | PatchApiProfileMePassword401 | PatchApiProfileMePassword404 | PatchApiProfileMePassword409 | PatchApiProfileMePassword500>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApiProfileMePassword>>, TError,{data: BodyType<PatchApiProfileMePasswordBodyOne | PatchApiProfileMePasswordBodyTwo | PatchApiProfileMePasswordBodyThree>}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof patchApiProfileMePassword>>,
+        TError,
+        {data: BodyType<PatchApiProfileMePasswordBodyOne | PatchApiProfileMePasswordBodyTwo | PatchApiProfileMePasswordBodyThree>},
+        TContext
+      > => {
+      return useMutation(getPatchApiProfileMePasswordMutationOptions(options), queryClient);
+    }
+    /**
  * Returns a public profile by unique @username. The authenticated owner also receives editable fields.
  * @summary Public profile by @username
  */
 export const getApiProfileByUsername = (
-  username: string,
-  options?: SecondParameter<typeof orvalMutator>,
-  signal?: AbortSignal,
+    username: string,
+ options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
 ) => {
-  return orvalMutator<GetApiProfileByUsername200>(
-    { url: `/api/profile/${username}`, method: 'GET', signal },
-    options,
-  )
-}
 
-export const getGetApiProfileByUsernameQueryKey = (username: string) => {
-  return [`/api/profile/${username}`] as const
-}
 
-export const getGetApiProfileByUsernameQueryOptions = <
-  TData = Awaited<ReturnType<typeof getApiProfileByUsername>>,
-  TError = ErrorType<
-    | GetApiProfileByUsername400
-    | GetApiProfileByUsername401
-    | GetApiProfileByUsername404
-    | GetApiProfileByUsername409
-    | GetApiProfileByUsername500
-  >,
->(
-  username: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiProfileByUsername>>, TError, TData>
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
+      return orvalMutator<GetApiProfileByUsername200>(
+      {url: `/api/profile/${username}`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getGetApiProfileByUsernameQueryKey = (username: string,) => {
+    return [
+    `/api/profile/${username}`
+    ] as const;
+    }
+
+
+export const getGetApiProfileByUsernameQueryOptions = <TData = Awaited<ReturnType<typeof getApiProfileByUsername>>, TError = ErrorType<GetApiProfileByUsername400 | GetApiProfileByUsername401 | GetApiProfileByUsername404 | GetApiProfileByUsername409 | GetApiProfileByUsername500>>(username: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileByUsername>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetApiProfileByUsernameQueryKey(username)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiProfileByUsername>>> = ({
-    signal,
-  }) => getApiProfileByUsername(username, requestOptions, signal)
+  const queryKey =  queryOptions?.queryKey ?? getGetApiProfileByUsernameQueryKey(username);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: username !== null && username !== undefined,
-    ...queryOptions,
-  } as UseQueryOptions<Awaited<ReturnType<typeof getApiProfileByUsername>>, TError, TData> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiProfileByUsername>>> = ({ signal }) => getApiProfileByUsername(username, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: username !== null && username !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiProfileByUsername>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetApiProfileByUsernameQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getApiProfileByUsername>>
->
-export type GetApiProfileByUsernameQueryError = ErrorType<
-  | GetApiProfileByUsername400
-  | GetApiProfileByUsername401
-  | GetApiProfileByUsername404
-  | GetApiProfileByUsername409
-  | GetApiProfileByUsername500
->
+export type GetApiProfileByUsernameQueryResult = NonNullable<Awaited<ReturnType<typeof getApiProfileByUsername>>>
+export type GetApiProfileByUsernameQueryError = ErrorType<GetApiProfileByUsername400 | GetApiProfileByUsername401 | GetApiProfileByUsername404 | GetApiProfileByUsername409 | GetApiProfileByUsername500>
 
-export function useGetApiProfileByUsername<
-  TData = Awaited<ReturnType<typeof getApiProfileByUsername>>,
-  TError = ErrorType<
-    | GetApiProfileByUsername400
-    | GetApiProfileByUsername401
-    | GetApiProfileByUsername404
-    | GetApiProfileByUsername409
-    | GetApiProfileByUsername500
-  >,
->(
-  username: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiProfileByUsername>>, TError, TData>
-    > &
-      Pick<
+
+export function useGetApiProfileByUsername<TData = Awaited<ReturnType<typeof getApiProfileByUsername>>, TError = ErrorType<GetApiProfileByUsername400 | GetApiProfileByUsername401 | GetApiProfileByUsername404 | GetApiProfileByUsername409 | GetApiProfileByUsername500>>(
+ username: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileByUsername>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiProfileByUsername>>,
           TError,
           Awaited<ReturnType<typeof getApiProfileByUsername>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiProfileByUsername<
-  TData = Awaited<ReturnType<typeof getApiProfileByUsername>>,
-  TError = ErrorType<
-    | GetApiProfileByUsername400
-    | GetApiProfileByUsername401
-    | GetApiProfileByUsername404
-    | GetApiProfileByUsername409
-    | GetApiProfileByUsername500
-  >,
->(
-  username: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiProfileByUsername>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiProfileByUsername<TData = Awaited<ReturnType<typeof getApiProfileByUsername>>, TError = ErrorType<GetApiProfileByUsername400 | GetApiProfileByUsername401 | GetApiProfileByUsername404 | GetApiProfileByUsername409 | GetApiProfileByUsername500>>(
+ username: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileByUsername>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiProfileByUsername>>,
           TError,
           Awaited<ReturnType<typeof getApiProfileByUsername>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiProfileByUsername<
-  TData = Awaited<ReturnType<typeof getApiProfileByUsername>>,
-  TError = ErrorType<
-    | GetApiProfileByUsername400
-    | GetApiProfileByUsername401
-    | GetApiProfileByUsername404
-    | GetApiProfileByUsername409
-    | GetApiProfileByUsername500
-  >,
->(
-  username: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiProfileByUsername>>, TError, TData>
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiProfileByUsername<TData = Awaited<ReturnType<typeof getApiProfileByUsername>>, TError = ErrorType<GetApiProfileByUsername400 | GetApiProfileByUsername401 | GetApiProfileByUsername404 | GetApiProfileByUsername409 | GetApiProfileByUsername500>>(
+ username: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileByUsername>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Public profile by @username
  */
 
-export function useGetApiProfileByUsername<
-  TData = Awaited<ReturnType<typeof getApiProfileByUsername>>,
-  TError = ErrorType<
-    | GetApiProfileByUsername400
-    | GetApiProfileByUsername401
-    | GetApiProfileByUsername404
-    | GetApiProfileByUsername409
-    | GetApiProfileByUsername500
-  >,
->(
-  username: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiProfileByUsername>>, TError, TData>
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetApiProfileByUsernameQueryOptions(username, options)
+export function useGetApiProfileByUsername<TData = Awaited<ReturnType<typeof getApiProfileByUsername>>, TError = ErrorType<GetApiProfileByUsername400 | GetApiProfileByUsername401 | GetApiProfileByUsername404 | GetApiProfileByUsername409 | GetApiProfileByUsername500>>(
+ username: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiProfileByUsername>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+  const queryOptions = getGetApiProfileByUsernameQueryOptions(username,options)
 
-  return withQueryKey(query, queryOptions.queryKey)
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
+

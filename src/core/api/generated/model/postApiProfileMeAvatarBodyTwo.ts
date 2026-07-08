@@ -7,5 +7,5 @@
  */
 
 export type PostApiProfileMeAvatarBodyTwo = {
-  file: string
-}
+  file: string;
+};

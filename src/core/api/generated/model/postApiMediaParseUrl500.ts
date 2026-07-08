@@ -5,8 +5,8 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
-import type { PostApiMediaParseUrl500Error } from './postApiMediaParseUrl500Error.ts'
+import type { PostApiMediaParseUrl500Error } from './postApiMediaParseUrl500Error.ts';
 
 export type PostApiMediaParseUrl500 = {
-  error: PostApiMediaParseUrl500Error
-}
+  error: PostApiMediaParseUrl500Error;
+};

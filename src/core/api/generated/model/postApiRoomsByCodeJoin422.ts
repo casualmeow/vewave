@@ -5,8 +5,8 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
-import type { PostApiRoomsByCodeJoin422Error } from './postApiRoomsByCodeJoin422Error.ts'
+import type { PostApiRoomsByCodeJoin422Error } from './postApiRoomsByCodeJoin422Error.ts';
 
 export type PostApiRoomsByCodeJoin422 = {
-  error: PostApiRoomsByCodeJoin422Error
-}
+  error: PostApiRoomsByCodeJoin422Error;
+};

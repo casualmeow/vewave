@@ -5,7 +5,10 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
-import { useMutation, useQuery } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -18,8 +21,8 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from '@tanstack/react-query'
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   DeleteApiServersByServerIdMembership200,
@@ -72,857 +75,495 @@ import type {
   PostApiServersByServerIdJoin404,
   PostApiServersByServerIdJoin409,
   PostApiServersByServerIdJoin422,
-  PostApiServersByServerIdJoin500,
-} from '../model'
+  PostApiServersByServerIdJoin500
+} from '../model';
 
-import { orvalMutator } from '../../http/orval-mutator.ts'
-import type { ErrorType, BodyType } from '../../http/orval-mutator.ts'
+import { orvalMutator } from '../../http/orval-mutator.ts';
+import type { ErrorType , BodyType } from '../../http/orval-mutator.ts';
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
-  const result = { queryKey } as T & { queryKey: K }
+  const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
     // The explicit queryKey always wins, matching the previous
     // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue
+    if (key === 'queryKey') continue;
     Object.defineProperty(result, key, {
       enumerable: true,
       configurable: true,
       get: () => (query as Record<string, unknown>)[key],
-    })
+    });
   }
-  return result
-}
+  return result;
+};
 
 /**
  * Returns servers the authenticated user has joined or created.
  * @summary List user servers
  */
 export const getApiServers = (
-  options?: SecondParameter<typeof orvalMutator>,
-  signal?: AbortSignal,
+
+ options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
 ) => {
-  return orvalMutator<GetApiServers200>({ url: `/api/servers/`, method: 'GET', signal }, options)
-}
+
+
+      return orvalMutator<GetApiServers200>(
+      {url: `/api/servers/`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
 
 export const getGetApiServersQueryKey = () => {
-  return [`/api/servers/`] as const
-}
+    return [
+    `/api/servers/`
+    ] as const;
+    }
 
-export const getGetApiServersQueryOptions = <
-  TData = Awaited<ReturnType<typeof getApiServers>>,
-  TError = ErrorType<
-    | GetApiServers400
-    | GetApiServers401
-    | GetApiServers403
-    | GetApiServers404
-    | GetApiServers409
-    | GetApiServers422
-    | GetApiServers500
-  >,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServers>>, TError, TData>>
-  request?: SecondParameter<typeof orvalMutator>
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetApiServersQueryKey()
+export const getGetApiServersQueryOptions = <TData = Awaited<ReturnType<typeof getApiServers>>, TError = ErrorType<GetApiServers400 | GetApiServers401 | GetApiServers403 | GetApiServers404 | GetApiServers409 | GetApiServers422 | GetApiServers500>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServers>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiServers>>> = ({ signal }) =>
-    getApiServers(requestOptions, signal)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getApiServers>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
+  const queryKey =  queryOptions?.queryKey ?? getGetApiServersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiServers>>> = ({ signal }) => getApiServers(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiServers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type GetApiServersQueryResult = NonNullable<Awaited<ReturnType<typeof getApiServers>>>
-export type GetApiServersQueryError = ErrorType<
-  | GetApiServers400
-  | GetApiServers401
-  | GetApiServers403
-  | GetApiServers404
-  | GetApiServers409
-  | GetApiServers422
-  | GetApiServers500
->
+export type GetApiServersQueryError = ErrorType<GetApiServers400 | GetApiServers401 | GetApiServers403 | GetApiServers404 | GetApiServers409 | GetApiServers422 | GetApiServers500>
 
-export function useGetApiServers<
-  TData = Awaited<ReturnType<typeof getApiServers>>,
-  TError = ErrorType<
-    | GetApiServers400
-    | GetApiServers401
-    | GetApiServers403
-    | GetApiServers404
-    | GetApiServers409
-    | GetApiServers422
-    | GetApiServers500
-  >,
->(
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServers>>, TError, TData>> &
-      Pick<
+
+export function useGetApiServers<TData = Awaited<ReturnType<typeof getApiServers>>, TError = ErrorType<GetApiServers400 | GetApiServers401 | GetApiServers403 | GetApiServers404 | GetApiServers409 | GetApiServers422 | GetApiServers500>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServers>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiServers>>,
           TError,
           Awaited<ReturnType<typeof getApiServers>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiServers<
-  TData = Awaited<ReturnType<typeof getApiServers>>,
-  TError = ErrorType<
-    | GetApiServers400
-    | GetApiServers401
-    | GetApiServers403
-    | GetApiServers404
-    | GetApiServers409
-    | GetApiServers422
-    | GetApiServers500
-  >,
->(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServers>>, TError, TData>> &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiServers<TData = Awaited<ReturnType<typeof getApiServers>>, TError = ErrorType<GetApiServers400 | GetApiServers401 | GetApiServers403 | GetApiServers404 | GetApiServers409 | GetApiServers422 | GetApiServers500>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServers>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiServers>>,
           TError,
           Awaited<ReturnType<typeof getApiServers>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiServers<
-  TData = Awaited<ReturnType<typeof getApiServers>>,
-  TError = ErrorType<
-    | GetApiServers400
-    | GetApiServers401
-    | GetApiServers403
-    | GetApiServers404
-    | GetApiServers409
-    | GetApiServers422
-    | GetApiServers500
-  >,
->(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServers>>, TError, TData>>
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiServers<TData = Awaited<ReturnType<typeof getApiServers>>, TError = ErrorType<GetApiServers400 | GetApiServers401 | GetApiServers403 | GetApiServers404 | GetApiServers409 | GetApiServers422 | GetApiServers500>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServers>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List user servers
  */
 
-export function useGetApiServers<
-  TData = Awaited<ReturnType<typeof getApiServers>>,
-  TError = ErrorType<
-    | GetApiServers400
-    | GetApiServers401
-    | GetApiServers403
-    | GetApiServers404
-    | GetApiServers409
-    | GetApiServers422
-    | GetApiServers500
-  >,
->(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServers>>, TError, TData>>
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetApiServers<TData = Awaited<ReturnType<typeof getApiServers>>, TError = ErrorType<GetApiServers400 | GetApiServers401 | GetApiServers403 | GetApiServers404 | GetApiServers409 | GetApiServers422 | GetApiServers500>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServers>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
   const queryOptions = getGetApiServersQueryOptions(options)
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  return withQueryKey(query, queryOptions.queryKey)
+  return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
 
 /**
  * Creates a watch server owned by the authenticated user.
  * @summary Create server
  */
 export const postApiServers = (
-  postApiServersBody:
-    | BodyType<PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree>
-    | PostApiServersBodyTwo
-    | PostApiServersBodyThree,
-  options?: SecondParameter<typeof orvalMutator>,
-  signal?: AbortSignal,
+    postApiServersBody: BodyType<PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree>| PostApiServersBodyTwo | PostApiServersBodyThree,
+ options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
 ) => {
-  return orvalMutator<PostApiServers200>(
-    { url: `/api/servers/`, method: 'POST', data: postApiServersBody, signal },
-    options,
-  )
-}
 
-export const getPostApiServersMutationOptions = <
-  TError = ErrorType<
-    | PostApiServers400
-    | PostApiServers401
-    | PostApiServers403
-    | PostApiServers404
-    | PostApiServers409
-    | PostApiServers422
-    | PostApiServers500
-  >,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiServers>>,
-    TError,
-    { data: BodyType<PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree> },
-    TContext
-  >
-  request?: SecondParameter<typeof orvalMutator>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiServers>>,
-  TError,
-  { data: BodyType<PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree> },
-  TContext
-> => {
-  const mutationKey = ['postApiServers']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiServers>>,
-    { data: BodyType<PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree> }
-  > = (props) => {
-    const { data } = props ?? {}
+      return orvalMutator<PostApiServers200>(
+      {url: `/api/servers/`, method: 'POST',
+      data: postApiServersBody, signal
+    },
+      options);
+    }
 
-    return postApiServers(data, requestOptions)
-  }
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type PostApiServersMutationResult = NonNullable<Awaited<ReturnType<typeof postApiServers>>>
-export type PostApiServersMutationBody = BodyType<
-  PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree
->
-export type PostApiServersMutationError = ErrorType<
-  | PostApiServers400
-  | PostApiServers401
-  | PostApiServers403
-  | PostApiServers404
-  | PostApiServers409
-  | PostApiServers422
-  | PostApiServers500
->
+export const getPostApiServersMutationOptions = <TError = ErrorType<PostApiServers400 | PostApiServers401 | PostApiServers403 | PostApiServers404 | PostApiServers409 | PostApiServers422 | PostApiServers500>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiServers>>, TError,{data: BodyType<PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree>}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApiServers>>, TError,{data: BodyType<PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree>}, TContext> => {
 
-/**
+const mutationKey = ['postApiServers'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiServers>>, {data: BodyType<PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postApiServers(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiServersMutationResult = NonNullable<Awaited<ReturnType<typeof postApiServers>>>
+    export type PostApiServersMutationBody = BodyType<PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree>
+    export type PostApiServersMutationError = ErrorType<PostApiServers400 | PostApiServers401 | PostApiServers403 | PostApiServers404 | PostApiServers409 | PostApiServers422 | PostApiServers500>
+
+    /**
  * @summary Create server
  */
-export const usePostApiServers = <
-  TError = ErrorType<
-    | PostApiServers400
-    | PostApiServers401
-    | PostApiServers403
-    | PostApiServers404
-    | PostApiServers409
-    | PostApiServers422
-    | PostApiServers500
-  >,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiServers>>,
-      TError,
-      { data: BodyType<PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree> },
-      TContext
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postApiServers>>,
-  TError,
-  { data: BodyType<PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree> },
-  TContext
-> => {
-  return useMutation(getPostApiServersMutationOptions(options), queryClient)
-}
-/**
+export const usePostApiServers = <TError = ErrorType<PostApiServers400 | PostApiServers401 | PostApiServers403 | PostApiServers404 | PostApiServers409 | PostApiServers422 | PostApiServers500>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiServers>>, TError,{data: BodyType<PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree>}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiServers>>,
+        TError,
+        {data: BodyType<PostApiServersBodyOne | PostApiServersBodyTwo | PostApiServersBodyThree>},
+        TContext
+      > => {
+      return useMutation(getPostApiServersMutationOptions(options), queryClient);
+    }
+    /**
  * Returns community-visible watch servers from the database.
  * @summary List community servers
  */
 export const getApiServersCommunity = (
-  options?: SecondParameter<typeof orvalMutator>,
-  signal?: AbortSignal,
+
+ options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
 ) => {
-  return orvalMutator<GetApiServersCommunity200>(
-    { url: `/api/servers/community`, method: 'GET', signal },
-    options,
-  )
-}
+
+
+      return orvalMutator<GetApiServersCommunity200>(
+      {url: `/api/servers/community`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
 
 export const getGetApiServersCommunityQueryKey = () => {
-  return [`/api/servers/community`] as const
+    return [
+    `/api/servers/community`
+    ] as const;
+    }
+
+
+export const getGetApiServersCommunityQueryOptions = <TData = Awaited<ReturnType<typeof getApiServersCommunity>>, TError = ErrorType<GetApiServersCommunity400 | GetApiServersCommunity401 | GetApiServersCommunity403 | GetApiServersCommunity404 | GetApiServersCommunity409 | GetApiServersCommunity422 | GetApiServersCommunity500>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServersCommunity>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiServersCommunityQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiServersCommunity>>> = ({ signal }) => getApiServersCommunity(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiServersCommunity>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export const getGetApiServersCommunityQueryOptions = <
-  TData = Awaited<ReturnType<typeof getApiServersCommunity>>,
-  TError = ErrorType<
-    | GetApiServersCommunity400
-    | GetApiServersCommunity401
-    | GetApiServersCommunity403
-    | GetApiServersCommunity404
-    | GetApiServersCommunity409
-    | GetApiServersCommunity422
-    | GetApiServersCommunity500
-  >,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getApiServersCommunity>>, TError, TData>
-  >
-  request?: SecondParameter<typeof orvalMutator>
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
+export type GetApiServersCommunityQueryResult = NonNullable<Awaited<ReturnType<typeof getApiServersCommunity>>>
+export type GetApiServersCommunityQueryError = ErrorType<GetApiServersCommunity400 | GetApiServersCommunity401 | GetApiServersCommunity403 | GetApiServersCommunity404 | GetApiServersCommunity409 | GetApiServersCommunity422 | GetApiServersCommunity500>
 
-  const queryKey = queryOptions?.queryKey ?? getGetApiServersCommunityQueryKey()
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiServersCommunity>>> = ({ signal }) =>
-    getApiServersCommunity(requestOptions, signal)
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getApiServersCommunity>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetApiServersCommunityQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getApiServersCommunity>>
->
-export type GetApiServersCommunityQueryError = ErrorType<
-  | GetApiServersCommunity400
-  | GetApiServersCommunity401
-  | GetApiServersCommunity403
-  | GetApiServersCommunity404
-  | GetApiServersCommunity409
-  | GetApiServersCommunity422
-  | GetApiServersCommunity500
->
-
-export function useGetApiServersCommunity<
-  TData = Awaited<ReturnType<typeof getApiServersCommunity>>,
-  TError = ErrorType<
-    | GetApiServersCommunity400
-    | GetApiServersCommunity401
-    | GetApiServersCommunity403
-    | GetApiServersCommunity404
-    | GetApiServersCommunity409
-    | GetApiServersCommunity422
-    | GetApiServersCommunity500
-  >,
->(
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiServersCommunity>>, TError, TData>
-    > &
-      Pick<
+export function useGetApiServersCommunity<TData = Awaited<ReturnType<typeof getApiServersCommunity>>, TError = ErrorType<GetApiServersCommunity400 | GetApiServersCommunity401 | GetApiServersCommunity403 | GetApiServersCommunity404 | GetApiServersCommunity409 | GetApiServersCommunity422 | GetApiServersCommunity500>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServersCommunity>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiServersCommunity>>,
           TError,
           Awaited<ReturnType<typeof getApiServersCommunity>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiServersCommunity<
-  TData = Awaited<ReturnType<typeof getApiServersCommunity>>,
-  TError = ErrorType<
-    | GetApiServersCommunity400
-    | GetApiServersCommunity401
-    | GetApiServersCommunity403
-    | GetApiServersCommunity404
-    | GetApiServersCommunity409
-    | GetApiServersCommunity422
-    | GetApiServersCommunity500
-  >,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiServersCommunity>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiServersCommunity<TData = Awaited<ReturnType<typeof getApiServersCommunity>>, TError = ErrorType<GetApiServersCommunity400 | GetApiServersCommunity401 | GetApiServersCommunity403 | GetApiServersCommunity404 | GetApiServersCommunity409 | GetApiServersCommunity422 | GetApiServersCommunity500>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServersCommunity>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiServersCommunity>>,
           TError,
           Awaited<ReturnType<typeof getApiServersCommunity>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiServersCommunity<
-  TData = Awaited<ReturnType<typeof getApiServersCommunity>>,
-  TError = ErrorType<
-    | GetApiServersCommunity400
-    | GetApiServersCommunity401
-    | GetApiServersCommunity403
-    | GetApiServersCommunity404
-    | GetApiServersCommunity409
-    | GetApiServersCommunity422
-    | GetApiServersCommunity500
-  >,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiServersCommunity>>, TError, TData>
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiServersCommunity<TData = Awaited<ReturnType<typeof getApiServersCommunity>>, TError = ErrorType<GetApiServersCommunity400 | GetApiServersCommunity401 | GetApiServersCommunity403 | GetApiServersCommunity404 | GetApiServersCommunity409 | GetApiServersCommunity422 | GetApiServersCommunity500>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServersCommunity>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List community servers
  */
 
-export function useGetApiServersCommunity<
-  TData = Awaited<ReturnType<typeof getApiServersCommunity>>,
-  TError = ErrorType<
-    | GetApiServersCommunity400
-    | GetApiServersCommunity401
-    | GetApiServersCommunity403
-    | GetApiServersCommunity404
-    | GetApiServersCommunity409
-    | GetApiServersCommunity422
-    | GetApiServersCommunity500
-  >,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiServersCommunity>>, TError, TData>
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetApiServersCommunity<TData = Awaited<ReturnType<typeof getApiServersCommunity>>, TError = ErrorType<GetApiServersCommunity400 | GetApiServersCommunity401 | GetApiServersCommunity403 | GetApiServersCommunity404 | GetApiServersCommunity409 | GetApiServersCommunity422 | GetApiServersCommunity500>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServersCommunity>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
   const queryOptions = getGetApiServersCommunityQueryOptions(options)
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  return withQueryKey(query, queryOptions.queryKey)
+  return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
 
 /**
  * Returns a server if the authenticated user can access it.
  * @summary Get server
  */
 export const getApiServersByServerId = (
-  serverId: string,
-  options?: SecondParameter<typeof orvalMutator>,
-  signal?: AbortSignal,
+    serverId: string,
+ options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
 ) => {
-  return orvalMutator<GetApiServersByServerId200>(
-    { url: `/api/servers/${serverId}`, method: 'GET', signal },
-    options,
-  )
-}
 
-export const getGetApiServersByServerIdQueryKey = (serverId: string) => {
-  return [`/api/servers/${serverId}`] as const
-}
 
-export const getGetApiServersByServerIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getApiServersByServerId>>,
-  TError = ErrorType<
-    | GetApiServersByServerId400
-    | GetApiServersByServerId401
-    | GetApiServersByServerId403
-    | GetApiServersByServerId404
-    | GetApiServersByServerId409
-    | GetApiServersByServerId422
-    | GetApiServersByServerId500
-  >,
->(
-  serverId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiServersByServerId>>, TError, TData>
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
+      return orvalMutator<GetApiServersByServerId200>(
+      {url: `/api/servers/${serverId}`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getGetApiServersByServerIdQueryKey = (serverId: string,) => {
+    return [
+    `/api/servers/${serverId}`
+    ] as const;
+    }
+
+
+export const getGetApiServersByServerIdQueryOptions = <TData = Awaited<ReturnType<typeof getApiServersByServerId>>, TError = ErrorType<GetApiServersByServerId400 | GetApiServersByServerId401 | GetApiServersByServerId403 | GetApiServersByServerId404 | GetApiServersByServerId409 | GetApiServersByServerId422 | GetApiServersByServerId500>>(serverId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServersByServerId>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-  const queryKey = queryOptions?.queryKey ?? getGetApiServersByServerIdQueryKey(serverId)
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiServersByServerId>>> = ({
-    signal,
-  }) => getApiServersByServerId(serverId, requestOptions, signal)
+  const queryKey =  queryOptions?.queryKey ?? getGetApiServersByServerIdQueryKey(serverId);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: serverId !== null && serverId !== undefined,
-    ...queryOptions,
-  } as UseQueryOptions<Awaited<ReturnType<typeof getApiServersByServerId>>, TError, TData> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiServersByServerId>>> = ({ signal }) => getApiServersByServerId(serverId, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: serverId !== null && serverId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiServersByServerId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetApiServersByServerIdQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getApiServersByServerId>>
->
-export type GetApiServersByServerIdQueryError = ErrorType<
-  | GetApiServersByServerId400
-  | GetApiServersByServerId401
-  | GetApiServersByServerId403
-  | GetApiServersByServerId404
-  | GetApiServersByServerId409
-  | GetApiServersByServerId422
-  | GetApiServersByServerId500
->
+export type GetApiServersByServerIdQueryResult = NonNullable<Awaited<ReturnType<typeof getApiServersByServerId>>>
+export type GetApiServersByServerIdQueryError = ErrorType<GetApiServersByServerId400 | GetApiServersByServerId401 | GetApiServersByServerId403 | GetApiServersByServerId404 | GetApiServersByServerId409 | GetApiServersByServerId422 | GetApiServersByServerId500>
 
-export function useGetApiServersByServerId<
-  TData = Awaited<ReturnType<typeof getApiServersByServerId>>,
-  TError = ErrorType<
-    | GetApiServersByServerId400
-    | GetApiServersByServerId401
-    | GetApiServersByServerId403
-    | GetApiServersByServerId404
-    | GetApiServersByServerId409
-    | GetApiServersByServerId422
-    | GetApiServersByServerId500
-  >,
->(
-  serverId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiServersByServerId>>, TError, TData>
-    > &
-      Pick<
+
+export function useGetApiServersByServerId<TData = Awaited<ReturnType<typeof getApiServersByServerId>>, TError = ErrorType<GetApiServersByServerId400 | GetApiServersByServerId401 | GetApiServersByServerId403 | GetApiServersByServerId404 | GetApiServersByServerId409 | GetApiServersByServerId422 | GetApiServersByServerId500>>(
+ serverId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServersByServerId>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiServersByServerId>>,
           TError,
           Awaited<ReturnType<typeof getApiServersByServerId>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiServersByServerId<
-  TData = Awaited<ReturnType<typeof getApiServersByServerId>>,
-  TError = ErrorType<
-    | GetApiServersByServerId400
-    | GetApiServersByServerId401
-    | GetApiServersByServerId403
-    | GetApiServersByServerId404
-    | GetApiServersByServerId409
-    | GetApiServersByServerId422
-    | GetApiServersByServerId500
-  >,
->(
-  serverId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiServersByServerId>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiServersByServerId<TData = Awaited<ReturnType<typeof getApiServersByServerId>>, TError = ErrorType<GetApiServersByServerId400 | GetApiServersByServerId401 | GetApiServersByServerId403 | GetApiServersByServerId404 | GetApiServersByServerId409 | GetApiServersByServerId422 | GetApiServersByServerId500>>(
+ serverId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServersByServerId>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiServersByServerId>>,
           TError,
           Awaited<ReturnType<typeof getApiServersByServerId>>
-        >,
-        'initialData'
-      >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiServersByServerId<
-  TData = Awaited<ReturnType<typeof getApiServersByServerId>>,
-  TError = ErrorType<
-    | GetApiServersByServerId400
-    | GetApiServersByServerId401
-    | GetApiServersByServerId403
-    | GetApiServersByServerId404
-    | GetApiServersByServerId409
-    | GetApiServersByServerId422
-    | GetApiServersByServerId500
-  >,
->(
-  serverId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiServersByServerId>>, TError, TData>
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiServersByServerId<TData = Awaited<ReturnType<typeof getApiServersByServerId>>, TError = ErrorType<GetApiServersByServerId400 | GetApiServersByServerId401 | GetApiServersByServerId403 | GetApiServersByServerId404 | GetApiServersByServerId409 | GetApiServersByServerId422 | GetApiServersByServerId500>>(
+ serverId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServersByServerId>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get server
  */
 
-export function useGetApiServersByServerId<
-  TData = Awaited<ReturnType<typeof getApiServersByServerId>>,
-  TError = ErrorType<
-    | GetApiServersByServerId400
-    | GetApiServersByServerId401
-    | GetApiServersByServerId403
-    | GetApiServersByServerId404
-    | GetApiServersByServerId409
-    | GetApiServersByServerId422
-    | GetApiServersByServerId500
-  >,
->(
-  serverId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiServersByServerId>>, TError, TData>
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetApiServersByServerIdQueryOptions(serverId, options)
+export function useGetApiServersByServerId<TData = Awaited<ReturnType<typeof getApiServersByServerId>>, TError = ErrorType<GetApiServersByServerId400 | GetApiServersByServerId401 | GetApiServersByServerId403 | GetApiServersByServerId404 | GetApiServersByServerId409 | GetApiServersByServerId422 | GetApiServersByServerId500>>(
+ serverId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiServersByServerId>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>
-  }
+  const queryOptions = getGetApiServersByServerIdQueryOptions(serverId,options)
 
-  return withQueryKey(query, queryOptions.queryKey)
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
 
 /**
  * Adds the authenticated user to an invite or community server.
  * @summary Join server
  */
 export const postApiServersByServerIdJoin = (
-  serverId: string,
-  options?: SecondParameter<typeof orvalMutator>,
-  signal?: AbortSignal,
+    serverId: string,
+ options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
 ) => {
-  return orvalMutator<PostApiServersByServerIdJoin200>(
-    { url: `/api/servers/${serverId}/join`, method: 'POST', signal },
-    options,
-  )
-}
 
-export const getPostApiServersByServerIdJoinMutationOptions = <
-  TError = ErrorType<
-    | PostApiServersByServerIdJoin400
-    | PostApiServersByServerIdJoin401
-    | PostApiServersByServerIdJoin403
-    | PostApiServersByServerIdJoin404
-    | PostApiServersByServerIdJoin409
-    | PostApiServersByServerIdJoin422
-    | PostApiServersByServerIdJoin500
-  >,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiServersByServerIdJoin>>,
-    TError,
-    { serverId: string },
-    TContext
-  >
-  request?: SecondParameter<typeof orvalMutator>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiServersByServerIdJoin>>,
-  TError,
-  { serverId: string },
-  TContext
-> => {
-  const mutationKey = ['postApiServersByServerIdJoin']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiServersByServerIdJoin>>,
-    { serverId: string }
-  > = (props) => {
-    const { serverId } = props ?? {}
+      return orvalMutator<PostApiServersByServerIdJoin200>(
+      {url: `/api/servers/${serverId}/join`, method: 'POST', signal
+    },
+      options);
+    }
 
-    return postApiServersByServerIdJoin(serverId, requestOptions)
-  }
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type PostApiServersByServerIdJoinMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiServersByServerIdJoin>>
->
+export const getPostApiServersByServerIdJoinMutationOptions = <TError = ErrorType<PostApiServersByServerIdJoin400 | PostApiServersByServerIdJoin401 | PostApiServersByServerIdJoin403 | PostApiServersByServerIdJoin404 | PostApiServersByServerIdJoin409 | PostApiServersByServerIdJoin422 | PostApiServersByServerIdJoin500>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiServersByServerIdJoin>>, TError,{serverId: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApiServersByServerIdJoin>>, TError,{serverId: string}, TContext> => {
 
-export type PostApiServersByServerIdJoinMutationError = ErrorType<
-  | PostApiServersByServerIdJoin400
-  | PostApiServersByServerIdJoin401
-  | PostApiServersByServerIdJoin403
-  | PostApiServersByServerIdJoin404
-  | PostApiServersByServerIdJoin409
-  | PostApiServersByServerIdJoin422
-  | PostApiServersByServerIdJoin500
->
+const mutationKey = ['postApiServersByServerIdJoin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-/**
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiServersByServerIdJoin>>, {serverId: string}> = (props) => {
+          const {serverId} = props ?? {};
+
+          return  postApiServersByServerIdJoin(serverId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiServersByServerIdJoinMutationResult = NonNullable<Awaited<ReturnType<typeof postApiServersByServerIdJoin>>>
+
+    export type PostApiServersByServerIdJoinMutationError = ErrorType<PostApiServersByServerIdJoin400 | PostApiServersByServerIdJoin401 | PostApiServersByServerIdJoin403 | PostApiServersByServerIdJoin404 | PostApiServersByServerIdJoin409 | PostApiServersByServerIdJoin422 | PostApiServersByServerIdJoin500>
+
+    /**
  * @summary Join server
  */
-export const usePostApiServersByServerIdJoin = <
-  TError = ErrorType<
-    | PostApiServersByServerIdJoin400
-    | PostApiServersByServerIdJoin401
-    | PostApiServersByServerIdJoin403
-    | PostApiServersByServerIdJoin404
-    | PostApiServersByServerIdJoin409
-    | PostApiServersByServerIdJoin422
-    | PostApiServersByServerIdJoin500
-  >,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiServersByServerIdJoin>>,
-      TError,
-      { serverId: string },
-      TContext
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postApiServersByServerIdJoin>>,
-  TError,
-  { serverId: string },
-  TContext
-> => {
-  return useMutation(getPostApiServersByServerIdJoinMutationOptions(options), queryClient)
-}
-/**
+export const usePostApiServersByServerIdJoin = <TError = ErrorType<PostApiServersByServerIdJoin400 | PostApiServersByServerIdJoin401 | PostApiServersByServerIdJoin403 | PostApiServersByServerIdJoin404 | PostApiServersByServerIdJoin409 | PostApiServersByServerIdJoin422 | PostApiServersByServerIdJoin500>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiServersByServerIdJoin>>, TError,{serverId: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiServersByServerIdJoin>>,
+        TError,
+        {serverId: string},
+        TContext
+      > => {
+      return useMutation(getPostApiServersByServerIdJoinMutationOptions(options), queryClient);
+    }
+    /**
  * Removes the authenticated user's server membership. Owner removal deletes the server.
  * @summary Leave server
  */
 export const deleteApiServersByServerIdMembership = (
-  serverId: string,
-  options?: SecondParameter<typeof orvalMutator>,
-  signal?: AbortSignal,
+    serverId: string,
+ options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
 ) => {
-  return orvalMutator<DeleteApiServersByServerIdMembership200>(
-    { url: `/api/servers/${serverId}/membership`, method: 'DELETE', signal },
-    options,
-  )
-}
 
-export const getDeleteApiServersByServerIdMembershipMutationOptions = <
-  TError = ErrorType<
-    | DeleteApiServersByServerIdMembership400
-    | DeleteApiServersByServerIdMembership401
-    | DeleteApiServersByServerIdMembership403
-    | DeleteApiServersByServerIdMembership404
-    | DeleteApiServersByServerIdMembership409
-    | DeleteApiServersByServerIdMembership422
-    | DeleteApiServersByServerIdMembership500
-  >,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteApiServersByServerIdMembership>>,
-    TError,
-    { serverId: string },
-    TContext
-  >
-  request?: SecondParameter<typeof orvalMutator>
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteApiServersByServerIdMembership>>,
-  TError,
-  { serverId: string },
-  TContext
-> => {
-  const mutationKey = ['deleteApiServersByServerIdMembership']
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined }
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteApiServersByServerIdMembership>>,
-    { serverId: string }
-  > = (props) => {
-    const { serverId } = props ?? {}
+      return orvalMutator<DeleteApiServersByServerIdMembership200>(
+      {url: `/api/servers/${serverId}/membership`, method: 'DELETE', signal
+    },
+      options);
+    }
 
-    return deleteApiServersByServerIdMembership(serverId, requestOptions)
-  }
 
-  return { mutationFn, ...mutationOptions }
-}
 
-export type DeleteApiServersByServerIdMembershipMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteApiServersByServerIdMembership>>
->
+export const getDeleteApiServersByServerIdMembershipMutationOptions = <TError = ErrorType<DeleteApiServersByServerIdMembership400 | DeleteApiServersByServerIdMembership401 | DeleteApiServersByServerIdMembership403 | DeleteApiServersByServerIdMembership404 | DeleteApiServersByServerIdMembership409 | DeleteApiServersByServerIdMembership422 | DeleteApiServersByServerIdMembership500>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiServersByServerIdMembership>>, TError,{serverId: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteApiServersByServerIdMembership>>, TError,{serverId: string}, TContext> => {
 
-export type DeleteApiServersByServerIdMembershipMutationError = ErrorType<
-  | DeleteApiServersByServerIdMembership400
-  | DeleteApiServersByServerIdMembership401
-  | DeleteApiServersByServerIdMembership403
-  | DeleteApiServersByServerIdMembership404
-  | DeleteApiServersByServerIdMembership409
-  | DeleteApiServersByServerIdMembership422
-  | DeleteApiServersByServerIdMembership500
->
+const mutationKey = ['deleteApiServersByServerIdMembership'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-/**
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteApiServersByServerIdMembership>>, {serverId: string}> = (props) => {
+          const {serverId} = props ?? {};
+
+          return  deleteApiServersByServerIdMembership(serverId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteApiServersByServerIdMembershipMutationResult = NonNullable<Awaited<ReturnType<typeof deleteApiServersByServerIdMembership>>>
+
+    export type DeleteApiServersByServerIdMembershipMutationError = ErrorType<DeleteApiServersByServerIdMembership400 | DeleteApiServersByServerIdMembership401 | DeleteApiServersByServerIdMembership403 | DeleteApiServersByServerIdMembership404 | DeleteApiServersByServerIdMembership409 | DeleteApiServersByServerIdMembership422 | DeleteApiServersByServerIdMembership500>
+
+    /**
  * @summary Leave server
  */
-export const useDeleteApiServersByServerIdMembership = <
-  TError = ErrorType<
-    | DeleteApiServersByServerIdMembership400
-    | DeleteApiServersByServerIdMembership401
-    | DeleteApiServersByServerIdMembership403
-    | DeleteApiServersByServerIdMembership404
-    | DeleteApiServersByServerIdMembership409
-    | DeleteApiServersByServerIdMembership422
-    | DeleteApiServersByServerIdMembership500
-  >,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof deleteApiServersByServerIdMembership>>,
-      TError,
-      { serverId: string },
-      TContext
-    >
-    request?: SecondParameter<typeof orvalMutator>
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof deleteApiServersByServerIdMembership>>,
-  TError,
-  { serverId: string },
-  TContext
-> => {
-  return useMutation(getDeleteApiServersByServerIdMembershipMutationOptions(options), queryClient)
-}
+export const useDeleteApiServersByServerIdMembership = <TError = ErrorType<DeleteApiServersByServerIdMembership400 | DeleteApiServersByServerIdMembership401 | DeleteApiServersByServerIdMembership403 | DeleteApiServersByServerIdMembership404 | DeleteApiServersByServerIdMembership409 | DeleteApiServersByServerIdMembership422 | DeleteApiServersByServerIdMembership500>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiServersByServerIdMembership>>, TError,{serverId: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteApiServersByServerIdMembership>>,
+        TError,
+        {serverId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteApiServersByServerIdMembershipMutationOptions(options), queryClient);
+    }

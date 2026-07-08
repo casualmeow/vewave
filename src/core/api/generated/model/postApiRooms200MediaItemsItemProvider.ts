@@ -6,12 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type PostApiRooms200MediaItemsItemProvider =
-  (typeof PostApiRooms200MediaItemsItemProvider)[keyof typeof PostApiRooms200MediaItemsItemProvider]
+export type PostApiRooms200MediaItemsItemProvider = typeof PostApiRooms200MediaItemsItemProvider[keyof typeof PostApiRooms200MediaItemsItemProvider];
+
 
 export const PostApiRooms200MediaItemsItemProvider = {
   youtube: 'youtube',
   vimeo: 'vimeo',
   tiktok: 'tiktok',
   unknown: 'unknown',
-} as const
+} as const;

@@ -6,10 +6,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type PostApiRoomsByCodeMedia200RoomStatus =
-  (typeof PostApiRoomsByCodeMedia200RoomStatus)[keyof typeof PostApiRoomsByCodeMedia200RoomStatus]
+export type PostApiRoomsByCodeMedia200RoomStatus = typeof PostApiRoomsByCodeMedia200RoomStatus[keyof typeof PostApiRoomsByCodeMedia200RoomStatus];
+
 
 export const PostApiRoomsByCodeMedia200RoomStatus = {
   active: 'active',
   ended: 'ended',
-} as const
+} as const;

@@ -1,0 +1,5 @@
+export * from './account-settings-section'
+export * from './appearance-settings-section'
+export * from './history-settings-section'
+export * from './pinned-settings-section'
+export * from './settings-primitives'

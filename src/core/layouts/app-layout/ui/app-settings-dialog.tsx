@@ -1,72 +1,99 @@
-import { Palette, Settings2, SlidersHorizontal } from 'lucide-react'
+import { History, Palette, PanelLeft, UserRound } from 'lucide-react'
+import { useState } from 'react'
 
-import { AppearanceSettingsEntry } from '@/modules/appearance'
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/shared/ui'
+  AccountSettingsSection,
+  AppearanceSettingsSection,
+  HistorySettingsSection,
+  PinnedSettingsSection,
+} from './settings'
+import { cn } from '@/shared/lib/utils'
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui'
 
-const workspaceSettings = [
-  ['History retention', 'Keep recent room visits visible in the app sidebar.'],
-  ['Room defaults', 'New rooms start private until you share the invite code.'],
-  ['Server preference', 'Use the closest sync relay unless a room requires another hub.'],
+const settingsSections = [
+  {
+    id: 'appearance',
+    label: 'Appearance',
+    icon: Palette,
+    description: 'Mode, theme presets, surface details, and the theme studio tools.',
+    Section: AppearanceSettingsSection,
+  },
+  {
+    id: 'pinned',
+    label: 'Pinned items',
+    icon: PanelLeft,
+    description: 'Rooms and servers pinned to the top of the app sidebar.',
+    Section: PinnedSettingsSection,
+  },
+  {
+    id: 'history',
+    label: 'Watch history',
+    icon: History,
+    description: 'Rooms remembered on this device from recent sessions.',
+    Section: HistorySettingsSection,
+  },
+  {
+    id: 'account',
+    label: 'Account',
+    icon: UserRound,
+    description: 'Your profile, session, and sign-out controls.',
+    Section: AccountSettingsSection,
+  },
 ] as const
 
+type SettingsSectionId = (typeof settingsSections)[number]['id']
+
 export function AppSettingsDialog() {
+  const [activeSectionId, setActiveSectionId] = useState<SettingsSectionId>('appearance')
+  const activeSection =
+    settingsSections.find((section) => section.id === activeSectionId) ?? settingsSections[0]
+
   return (
-    <DialogContent className="max-h-[calc(100svh-2rem)] overflow-hidden p-0 sm:max-w-[min(72rem,calc(100vw-2rem))]">
-      <DialogHeader className="px-6 pt-6">
-        <DialogTitle>Dashboard settings</DialogTitle>
-        <DialogDescription>
-          Configure workspace behavior and the visual system used across Vewave.
-        </DialogDescription>
-      </DialogHeader>
-
-      <Tabs defaultValue="theme" className="min-h-0 gap-0 px-6 pb-6">
-        <TabsList className="grid w-full grid-cols-2 sm:w-fit">
-          <TabsTrigger value="workspace">
-            <Settings2 className="size-4" />
-            Workspace
-          </TabsTrigger>
-          <TabsTrigger value="theme">
-            <Palette className="size-4" />
-            Theme Studio
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent
-          value="workspace"
-          className="mt-4 max-h-[min(70svh,42rem)] overflow-y-auto pr-1"
+    <DialogContent className="flex h-[min(85svh,42rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-[min(58rem,calc(100vw-2rem))] md:flex-row">
+      <div className="flex shrink-0 flex-col border-b border-border bg-muted/30 md:w-56 md:border-b-0 md:border-r">
+        <DialogHeader className="px-5 pb-2 pt-5 text-left md:pb-3">
+          <DialogTitle>Settings</DialogTitle>
+          <DialogDescription className="sr-only">
+            Configure appearance, pinned sidebar items, watch history, and your account.
+          </DialogDescription>
+        </DialogHeader>
+        <nav
+          aria-label="Settings sections"
+          className="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col md:overflow-visible md:pb-4"
         >
-          <div className="grid gap-4 md:grid-cols-3">
-            {workspaceSettings.map(([title, description]) => (
-              <Card key={title}>
-                <CardHeader>
-                  <SlidersHorizontal className="size-5 text-primary" />
-                  <CardTitle className="text-base">{title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm leading-6 text-muted-foreground">{description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
+          {settingsSections.map((section) => {
+            const active = section.id === activeSectionId
 
-        <TabsContent value="theme" className="mt-4 max-h-[min(70svh,42rem)] overflow-y-auto pr-1">
-          <AppearanceSettingsEntry closeOnNavigate />
-        </TabsContent>
-      </Tabs>
+            return (
+              <button
+                key={section.id}
+                type="button"
+                aria-current={active ? 'true' : undefined}
+                onClick={() => setActiveSectionId(section.id)}
+                className={cn(
+                  'flex shrink-0 items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50',
+                  active
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:bg-background/60 hover:text-foreground',
+                )}
+              >
+                <section.icon className="size-4" />
+                {section.label}
+              </button>
+            )
+          })}
+        </nav>
+      </div>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="border-b border-border/70 px-6 py-4 pr-14">
+          <h2 className="text-base font-semibold text-foreground">{activeSection.label}</h2>
+          <p className="text-sm text-muted-foreground">{activeSection.description}</p>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+          <activeSection.Section />
+        </div>
+      </div>
     </DialogContent>
   )
 }

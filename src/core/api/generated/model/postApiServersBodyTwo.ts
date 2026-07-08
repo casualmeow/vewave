@@ -5,15 +5,15 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
-import type { PostApiServersBodyTwoVisibility } from './postApiServersBodyTwoVisibility.ts'
+import type { PostApiServersBodyTwoVisibility } from './postApiServersBodyTwoVisibility.ts';
 
 export type PostApiServersBodyTwo = {
   /**
-   * @minLength 1
-   * @maxLength 120
-   */
-  name: string
+     * @minLength 1
+     * @maxLength 120
+     */
+  name: string;
   /** @maxLength 280 */
-  description?: string
-  visibility?: PostApiServersBodyTwoVisibility
-}
+  description?: string;
+  visibility?: PostApiServersBodyTwoVisibility;
+};

@@ -5,8 +5,8 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
-import type { PostApiProfileMeAvatar400Error } from './postApiProfileMeAvatar400Error.ts'
+import type { PostApiProfileMeAvatar400Error } from './postApiProfileMeAvatar400Error.ts';
 
 export type PostApiProfileMeAvatar400 = {
-  error: PostApiProfileMeAvatar400Error
-}
+  error: PostApiProfileMeAvatar400Error;
+};

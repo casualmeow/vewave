@@ -5,21 +5,21 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
-import type { PostApiRoomsByCodeJoin200PlaybackStatus } from './postApiRoomsByCodeJoin200PlaybackStatus.ts'
+import type { PostApiRoomsByCodeJoin200PlaybackStatus } from './postApiRoomsByCodeJoin200PlaybackStatus.ts';
 
 export type PostApiRoomsByCodeJoin200Playback = {
-  status: PostApiRoomsByCodeJoin200PlaybackStatus
+  status: PostApiRoomsByCodeJoin200PlaybackStatus;
   /** @minimum 0 */
-  positionMs: number
+  positionMs: number;
   /** @minimum 0 */
-  effectivePositionMs: number
+  effectivePositionMs: number;
   /**
-   * @minimum 0.25
-   * @maximum 2
-   */
-  playbackRate: number
+     * @minimum 0.25
+     * @maximum 2
+     */
+  playbackRate: number;
   /** @minimum 0 */
-  version: number
-  updatedAt: string
-  serverTimeMs: number
-}
+  version: number;
+  updatedAt: string;
+  serverTimeMs: number;
+};

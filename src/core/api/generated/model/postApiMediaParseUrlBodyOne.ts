@@ -8,8 +8,8 @@
 
 export type PostApiMediaParseUrlBodyOne = {
   /**
-   * @minLength 1
-   * @maxLength 2048
-   */
-  url: string
-}
+     * @minLength 1
+     * @maxLength 2048
+     */
+  url: string;
+};
