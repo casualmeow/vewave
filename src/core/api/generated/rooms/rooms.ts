@@ -5,10 +5,7 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query'
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,8 +18,8 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from '@tanstack/react-query'
 
 import type {
   GetApiRoomsByCode200,
@@ -33,6 +30,34 @@ import type {
   GetApiRoomsByCode409,
   GetApiRoomsByCode422,
   GetApiRoomsByCode500,
+  GetApiRoomsByCodeChat200,
+  GetApiRoomsByCodeChat400,
+  GetApiRoomsByCodeChat401,
+  GetApiRoomsByCodeChat403,
+  GetApiRoomsByCodeChat404,
+  GetApiRoomsByCodeChat409,
+  GetApiRoomsByCodeChat422,
+  GetApiRoomsByCodeChat500,
+  GetApiRoomsByCodeChatParams,
+  GetApiRoomsByCodeHistory200,
+  GetApiRoomsByCodeHistory400,
+  GetApiRoomsByCodeHistory401,
+  GetApiRoomsByCodeHistory403,
+  GetApiRoomsByCodeHistory404,
+  GetApiRoomsByCodeHistory409,
+  GetApiRoomsByCodeHistory422,
+  GetApiRoomsByCodeHistory500,
+  PatchApiRoomsByCode200,
+  PatchApiRoomsByCode400,
+  PatchApiRoomsByCode401,
+  PatchApiRoomsByCode403,
+  PatchApiRoomsByCode404,
+  PatchApiRoomsByCode409,
+  PatchApiRoomsByCode422,
+  PatchApiRoomsByCode500,
+  PatchApiRoomsByCodeBodyOne,
+  PatchApiRoomsByCodeBodyThree,
+  PatchApiRoomsByCodeBodyTwo,
   PostApiRooms200,
   PostApiRooms400,
   PostApiRooms401,
@@ -62,311 +87,1077 @@ import type {
   PostApiRoomsByCodeMedia500,
   PostApiRoomsByCodeMediaBodyOne,
   PostApiRoomsByCodeMediaBodyThree,
-  PostApiRoomsByCodeMediaBodyTwo
-} from '../model';
+  PostApiRoomsByCodeMediaBodyTwo,
+} from '../model'
 
-import { orvalMutator } from '../../http/orval-mutator.ts';
-import type { ErrorType , BodyType } from '../../http/orval-mutator.ts';
+import { orvalMutator } from '../../http/orval-mutator.ts'
+import type { ErrorType, BodyType } from '../../http/orval-mutator.ts'
 
-
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
-
-
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
-  const result = { queryKey } as T & { queryKey: K };
+  const result = { queryKey } as T & { queryKey: K }
   for (const key of Object.keys(query)) {
     // The explicit queryKey always wins, matching the previous
     // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue;
+    if (key === 'queryKey') continue
     Object.defineProperty(result, key, {
       enumerable: true,
       configurable: true,
       get: () => (query as Record<string, unknown>)[key],
-    });
+    })
   }
-  return result;
-};
+  return result
+}
 
 /**
  * Creates a watch room from one or more supported external video URLs. Authenticated creators become owner and host; guests can create local rooms without signing in.
  * @summary Create room
  */
 export const postApiRooms = (
-    postApiRoomsBody: BodyType<PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree>| PostApiRoomsBodyTwo | PostApiRoomsBodyThree,
- options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
+  postApiRoomsBody:
+    | BodyType<PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree>
+    | PostApiRoomsBodyTwo
+    | PostApiRoomsBodyThree,
+  options?: SecondParameter<typeof orvalMutator>,
+  signal?: AbortSignal,
 ) => {
+  return orvalMutator<PostApiRooms200>(
+    { url: `/api/rooms/`, method: 'POST', data: postApiRoomsBody, signal },
+    options,
+  )
+}
 
+export const getPostApiRoomsMutationOptions = <
+  TError = ErrorType<
+    | PostApiRooms400
+    | PostApiRooms401
+    | PostApiRooms403
+    | PostApiRooms404
+    | PostApiRooms409
+    | PostApiRooms422
+    | PostApiRooms500
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiRooms>>,
+    TError,
+    { data: BodyType<PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree> },
+    TContext
+  >
+  request?: SecondParameter<typeof orvalMutator>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiRooms>>,
+  TError,
+  { data: BodyType<PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree> },
+  TContext
+> => {
+  const mutationKey = ['postApiRooms']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
 
-      return orvalMutator<PostApiRooms200>(
-      {url: `/api/rooms/`, method: 'POST',
-      data: postApiRoomsBody, signal
-    },
-      options);
-    }
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiRooms>>,
+    { data: BodyType<PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree> }
+  > = (props) => {
+    const { data } = props ?? {}
 
+    return postApiRooms(data, requestOptions)
+  }
 
+  return { mutationFn, ...mutationOptions }
+}
 
-export const getPostApiRoomsMutationOptions = <TError = ErrorType<PostApiRooms400 | PostApiRooms401 | PostApiRooms403 | PostApiRooms404 | PostApiRooms409 | PostApiRooms422 | PostApiRooms500>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiRooms>>, TError,{data: BodyType<PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree>}, TContext>, request?: SecondParameter<typeof orvalMutator>}
-): UseMutationOptions<Awaited<ReturnType<typeof postApiRooms>>, TError,{data: BodyType<PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree>}, TContext> => {
+export type PostApiRoomsMutationResult = NonNullable<Awaited<ReturnType<typeof postApiRooms>>>
+export type PostApiRoomsMutationBody = BodyType<
+  PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree
+>
+export type PostApiRoomsMutationError = ErrorType<
+  | PostApiRooms400
+  | PostApiRooms401
+  | PostApiRooms403
+  | PostApiRooms404
+  | PostApiRooms409
+  | PostApiRooms422
+  | PostApiRooms500
+>
 
-const mutationKey = ['postApiRooms'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiRooms>>, {data: BodyType<PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  postApiRooms(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PostApiRoomsMutationResult = NonNullable<Awaited<ReturnType<typeof postApiRooms>>>
-    export type PostApiRoomsMutationBody = BodyType<PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree>
-    export type PostApiRoomsMutationError = ErrorType<PostApiRooms400 | PostApiRooms401 | PostApiRooms403 | PostApiRooms404 | PostApiRooms409 | PostApiRooms422 | PostApiRooms500>
-
-    /**
+/**
  * @summary Create room
  */
-export const usePostApiRooms = <TError = ErrorType<PostApiRooms400 | PostApiRooms401 | PostApiRooms403 | PostApiRooms404 | PostApiRooms409 | PostApiRooms422 | PostApiRooms500>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiRooms>>, TError,{data: BodyType<PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree>}, TContext>, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postApiRooms>>,
-        TError,
-        {data: BodyType<PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree>},
-        TContext
-      > => {
-      return useMutation(getPostApiRoomsMutationOptions(options), queryClient);
-    }
-    /**
+export const usePostApiRooms = <
+  TError = ErrorType<
+    | PostApiRooms400
+    | PostApiRooms401
+    | PostApiRooms403
+    | PostApiRooms404
+    | PostApiRooms409
+    | PostApiRooms422
+    | PostApiRooms500
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiRooms>>,
+      TError,
+      { data: BodyType<PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree> },
+      TContext
+    >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiRooms>>,
+  TError,
+  { data: BodyType<PostApiRoomsBodyOne | PostApiRoomsBodyTwo | PostApiRoomsBodyThree> },
+  TContext
+> => {
+  return useMutation(getPostApiRoomsMutationOptions(options), queryClient)
+}
+/**
  * Returns public room, current media, playlist media items, server-authoritative playback state, and permissions for the current user if authenticated.
  * @summary Get room snapshot
  */
 export const getApiRoomsByCode = (
-    code: string,
- options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
+  code: string,
+  options?: SecondParameter<typeof orvalMutator>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return orvalMutator<GetApiRoomsByCode200>(
-      {url: `/api/rooms/${code}`, method: 'GET', signal
-    },
-      options);
-    }
-
-
-
-
-export const getGetApiRoomsByCodeQueryKey = (code: string,) => {
-    return [
-    `/api/rooms/${code}`
-    ] as const;
-    }
-
-
-export const getGetApiRoomsByCodeQueryOptions = <TData = Awaited<ReturnType<typeof getApiRoomsByCode>>, TError = ErrorType<GetApiRoomsByCode400 | GetApiRoomsByCode401 | GetApiRoomsByCode403 | GetApiRoomsByCode404 | GetApiRoomsByCode409 | GetApiRoomsByCode422 | GetApiRoomsByCode500>>(code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCode>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetApiRoomsByCodeQueryKey(code);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiRoomsByCode>>> = ({ signal }) => getApiRoomsByCode(code, requestOptions, signal);
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: code !== null && code !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCode>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+  return orvalMutator<GetApiRoomsByCode200>(
+    { url: `/api/rooms/${code}`, method: 'GET', signal },
+    options,
+  )
 }
 
-export type GetApiRoomsByCodeQueryResult = NonNullable<Awaited<ReturnType<typeof getApiRoomsByCode>>>
-export type GetApiRoomsByCodeQueryError = ErrorType<GetApiRoomsByCode400 | GetApiRoomsByCode401 | GetApiRoomsByCode403 | GetApiRoomsByCode404 | GetApiRoomsByCode409 | GetApiRoomsByCode422 | GetApiRoomsByCode500>
+export const getGetApiRoomsByCodeQueryKey = (code: string) => {
+  return [`/api/rooms/${code}`] as const
+}
 
+export const getGetApiRoomsByCodeQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiRoomsByCode>>,
+  TError = ErrorType<
+    | GetApiRoomsByCode400
+    | GetApiRoomsByCode401
+    | GetApiRoomsByCode403
+    | GetApiRoomsByCode404
+    | GetApiRoomsByCode409
+    | GetApiRoomsByCode422
+    | GetApiRoomsByCode500
+  >,
+>(
+  code: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCode>>, TError, TData>>
+    request?: SecondParameter<typeof orvalMutator>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
 
-export function useGetApiRoomsByCode<TData = Awaited<ReturnType<typeof getApiRoomsByCode>>, TError = ErrorType<GetApiRoomsByCode400 | GetApiRoomsByCode401 | GetApiRoomsByCode403 | GetApiRoomsByCode404 | GetApiRoomsByCode409 | GetApiRoomsByCode422 | GetApiRoomsByCode500>>(
- code: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCode>>, TError, TData>> & Pick<
+  const queryKey = queryOptions?.queryKey ?? getGetApiRoomsByCodeQueryKey(code)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiRoomsByCode>>> = ({ signal }) =>
+    getApiRoomsByCode(code, requestOptions, signal)
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: code !== null && code !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCode>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+}
+
+export type GetApiRoomsByCodeQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiRoomsByCode>>
+>
+export type GetApiRoomsByCodeQueryError = ErrorType<
+  | GetApiRoomsByCode400
+  | GetApiRoomsByCode401
+  | GetApiRoomsByCode403
+  | GetApiRoomsByCode404
+  | GetApiRoomsByCode409
+  | GetApiRoomsByCode422
+  | GetApiRoomsByCode500
+>
+
+export function useGetApiRoomsByCode<
+  TData = Awaited<ReturnType<typeof getApiRoomsByCode>>,
+  TError = ErrorType<
+    | GetApiRoomsByCode400
+    | GetApiRoomsByCode401
+    | GetApiRoomsByCode403
+    | GetApiRoomsByCode404
+    | GetApiRoomsByCode409
+    | GetApiRoomsByCode422
+    | GetApiRoomsByCode500
+  >,
+>(
+  code: string,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCode>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiRoomsByCode>>,
           TError,
           Awaited<ReturnType<typeof getApiRoomsByCode>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiRoomsByCode<TData = Awaited<ReturnType<typeof getApiRoomsByCode>>, TError = ErrorType<GetApiRoomsByCode400 | GetApiRoomsByCode401 | GetApiRoomsByCode403 | GetApiRoomsByCode404 | GetApiRoomsByCode409 | GetApiRoomsByCode422 | GetApiRoomsByCode500>>(
- code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCode>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiRoomsByCode<
+  TData = Awaited<ReturnType<typeof getApiRoomsByCode>>,
+  TError = ErrorType<
+    | GetApiRoomsByCode400
+    | GetApiRoomsByCode401
+    | GetApiRoomsByCode403
+    | GetApiRoomsByCode404
+    | GetApiRoomsByCode409
+    | GetApiRoomsByCode422
+    | GetApiRoomsByCode500
+  >,
+>(
+  code: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCode>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiRoomsByCode>>,
           TError,
           Awaited<ReturnType<typeof getApiRoomsByCode>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiRoomsByCode<TData = Awaited<ReturnType<typeof getApiRoomsByCode>>, TError = ErrorType<GetApiRoomsByCode400 | GetApiRoomsByCode401 | GetApiRoomsByCode403 | GetApiRoomsByCode404 | GetApiRoomsByCode409 | GetApiRoomsByCode422 | GetApiRoomsByCode500>>(
- code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCode>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiRoomsByCode<
+  TData = Awaited<ReturnType<typeof getApiRoomsByCode>>,
+  TError = ErrorType<
+    | GetApiRoomsByCode400
+    | GetApiRoomsByCode401
+    | GetApiRoomsByCode403
+    | GetApiRoomsByCode404
+    | GetApiRoomsByCode409
+    | GetApiRoomsByCode422
+    | GetApiRoomsByCode500
+  >,
+>(
+  code: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCode>>, TError, TData>>
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get room snapshot
  */
 
-export function useGetApiRoomsByCode<TData = Awaited<ReturnType<typeof getApiRoomsByCode>>, TError = ErrorType<GetApiRoomsByCode400 | GetApiRoomsByCode401 | GetApiRoomsByCode403 | GetApiRoomsByCode404 | GetApiRoomsByCode409 | GetApiRoomsByCode422 | GetApiRoomsByCode500>>(
- code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCode>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetApiRoomsByCode<
+  TData = Awaited<ReturnType<typeof getApiRoomsByCode>>,
+  TError = ErrorType<
+    | GetApiRoomsByCode400
+    | GetApiRoomsByCode401
+    | GetApiRoomsByCode403
+    | GetApiRoomsByCode404
+    | GetApiRoomsByCode409
+    | GetApiRoomsByCode422
+    | GetApiRoomsByCode500
+  >,
+>(
+  code: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCode>>, TError, TData>>
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetApiRoomsByCodeQueryOptions(code, options)
 
-  const queryOptions = getGetApiRoomsByCodeQueryOptions(code,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+  return withQueryKey(query, queryOptions.queryKey)
 }
 
+/**
+ * Allows the room owner or a host to update the persistent title, visibility, or lifecycle status, including reactivating an ended room.
+ * @summary Update room settings
+ */
+export const patchApiRoomsByCode = (
+  code: string,
+  patchApiRoomsByCodeBody:
+    | BodyType<
+        PatchApiRoomsByCodeBodyOne | PatchApiRoomsByCodeBodyTwo | PatchApiRoomsByCodeBodyThree
+      >
+    | PatchApiRoomsByCodeBodyTwo
+    | PatchApiRoomsByCodeBodyThree,
+  options?: SecondParameter<typeof orvalMutator>,
+  signal?: AbortSignal,
+) => {
+  return orvalMutator<PatchApiRoomsByCode200>(
+    { url: `/api/rooms/${code}`, method: 'PATCH', data: patchApiRoomsByCodeBody, signal },
+    options,
+  )
+}
 
+export const getPatchApiRoomsByCodeMutationOptions = <
+  TError = ErrorType<
+    | PatchApiRoomsByCode400
+    | PatchApiRoomsByCode401
+    | PatchApiRoomsByCode403
+    | PatchApiRoomsByCode404
+    | PatchApiRoomsByCode409
+    | PatchApiRoomsByCode422
+    | PatchApiRoomsByCode500
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof patchApiRoomsByCode>>,
+    TError,
+    {
+      code: string
+      data: BodyType<
+        PatchApiRoomsByCodeBodyOne | PatchApiRoomsByCodeBodyTwo | PatchApiRoomsByCodeBodyThree
+      >
+    },
+    TContext
+  >
+  request?: SecondParameter<typeof orvalMutator>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof patchApiRoomsByCode>>,
+  TError,
+  {
+    code: string
+    data: BodyType<
+      PatchApiRoomsByCodeBodyOne | PatchApiRoomsByCodeBodyTwo | PatchApiRoomsByCodeBodyThree
+    >
+  },
+  TContext
+> => {
+  const mutationKey = ['patchApiRoomsByCode']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof patchApiRoomsByCode>>,
+    {
+      code: string
+      data: BodyType<
+        PatchApiRoomsByCodeBodyOne | PatchApiRoomsByCodeBodyTwo | PatchApiRoomsByCodeBodyThree
+      >
+    }
+  > = (props) => {
+    const { code, data } = props ?? {}
 
+    return patchApiRoomsByCode(code, data, requestOptions)
+  }
 
+  return { mutationFn, ...mutationOptions }
+}
 
+export type PatchApiRoomsByCodeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchApiRoomsByCode>>
+>
+export type PatchApiRoomsByCodeMutationBody = BodyType<
+  PatchApiRoomsByCodeBodyOne | PatchApiRoomsByCodeBodyTwo | PatchApiRoomsByCodeBodyThree
+>
+export type PatchApiRoomsByCodeMutationError = ErrorType<
+  | PatchApiRoomsByCode400
+  | PatchApiRoomsByCode401
+  | PatchApiRoomsByCode403
+  | PatchApiRoomsByCode404
+  | PatchApiRoomsByCode409
+  | PatchApiRoomsByCode422
+  | PatchApiRoomsByCode500
+>
+
+/**
+ * @summary Update room settings
+ */
+export const usePatchApiRoomsByCode = <
+  TError = ErrorType<
+    | PatchApiRoomsByCode400
+    | PatchApiRoomsByCode401
+    | PatchApiRoomsByCode403
+    | PatchApiRoomsByCode404
+    | PatchApiRoomsByCode409
+    | PatchApiRoomsByCode422
+    | PatchApiRoomsByCode500
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof patchApiRoomsByCode>>,
+      TError,
+      {
+        code: string
+        data: BodyType<
+          PatchApiRoomsByCodeBodyOne | PatchApiRoomsByCodeBodyTwo | PatchApiRoomsByCodeBodyThree
+        >
+      },
+      TContext
+    >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof patchApiRoomsByCode>>,
+  TError,
+  {
+    code: string
+    data: BodyType<
+      PatchApiRoomsByCodeBodyOne | PatchApiRoomsByCodeBodyTwo | PatchApiRoomsByCodeBodyThree
+    >
+  },
+  TContext
+> => {
+  return useMutation(getPatchApiRoomsByCodeMutationOptions(options), queryClient)
+}
 /**
  * Adds one or more supported external video URLs to an active room playlist and returns the updated snapshot.
  * @summary Add room video
  */
 export const postApiRoomsByCodeMedia = (
-    code: string,
-    postApiRoomsByCodeMediaBody: BodyType<PostApiRoomsByCodeMediaBodyOne | PostApiRoomsByCodeMediaBodyTwo | PostApiRoomsByCodeMediaBodyThree>| PostApiRoomsByCodeMediaBodyTwo | PostApiRoomsByCodeMediaBodyThree,
- options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
+  code: string,
+  postApiRoomsByCodeMediaBody:
+    | BodyType<
+        | PostApiRoomsByCodeMediaBodyOne
+        | PostApiRoomsByCodeMediaBodyTwo
+        | PostApiRoomsByCodeMediaBodyThree
+      >
+    | PostApiRoomsByCodeMediaBodyTwo
+    | PostApiRoomsByCodeMediaBodyThree,
+  options?: SecondParameter<typeof orvalMutator>,
+  signal?: AbortSignal,
 ) => {
+  return orvalMutator<PostApiRoomsByCodeMedia200>(
+    { url: `/api/rooms/${code}/media`, method: 'POST', data: postApiRoomsByCodeMediaBody, signal },
+    options,
+  )
+}
 
-
-      return orvalMutator<PostApiRoomsByCodeMedia200>(
-      {url: `/api/rooms/${code}/media`, method: 'POST',
-      data: postApiRoomsByCodeMediaBody, signal
+export const getPostApiRoomsByCodeMediaMutationOptions = <
+  TError = ErrorType<
+    | PostApiRoomsByCodeMedia400
+    | PostApiRoomsByCodeMedia401
+    | PostApiRoomsByCodeMedia403
+    | PostApiRoomsByCodeMedia404
+    | PostApiRoomsByCodeMedia409
+    | PostApiRoomsByCodeMedia422
+    | PostApiRoomsByCodeMedia500
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>,
+    TError,
+    {
+      code: string
+      data: BodyType<
+        | PostApiRoomsByCodeMediaBodyOne
+        | PostApiRoomsByCodeMediaBodyTwo
+        | PostApiRoomsByCodeMediaBodyThree
+      >
     },
-      options);
+    TContext
+  >
+  request?: SecondParameter<typeof orvalMutator>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>,
+  TError,
+  {
+    code: string
+    data: BodyType<
+      | PostApiRoomsByCodeMediaBodyOne
+      | PostApiRoomsByCodeMediaBodyTwo
+      | PostApiRoomsByCodeMediaBodyThree
+    >
+  },
+  TContext
+> => {
+  const mutationKey = ['postApiRoomsByCodeMedia']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>,
+    {
+      code: string
+      data: BodyType<
+        | PostApiRoomsByCodeMediaBodyOne
+        | PostApiRoomsByCodeMediaBodyTwo
+        | PostApiRoomsByCodeMediaBodyThree
+      >
     }
+  > = (props) => {
+    const { code, data } = props ?? {}
 
+    return postApiRoomsByCodeMedia(code, data, requestOptions)
+  }
 
+  return { mutationFn, ...mutationOptions }
+}
 
-export const getPostApiRoomsByCodeMediaMutationOptions = <TError = ErrorType<PostApiRoomsByCodeMedia400 | PostApiRoomsByCodeMedia401 | PostApiRoomsByCodeMedia403 | PostApiRoomsByCodeMedia404 | PostApiRoomsByCodeMedia409 | PostApiRoomsByCodeMedia422 | PostApiRoomsByCodeMedia500>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>, TError,{code: string;data: BodyType<PostApiRoomsByCodeMediaBodyOne | PostApiRoomsByCodeMediaBodyTwo | PostApiRoomsByCodeMediaBodyThree>}, TContext>, request?: SecondParameter<typeof orvalMutator>}
-): UseMutationOptions<Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>, TError,{code: string;data: BodyType<PostApiRoomsByCodeMediaBodyOne | PostApiRoomsByCodeMediaBodyTwo | PostApiRoomsByCodeMediaBodyThree>}, TContext> => {
+export type PostApiRoomsByCodeMediaMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>
+>
+export type PostApiRoomsByCodeMediaMutationBody = BodyType<
+  PostApiRoomsByCodeMediaBodyOne | PostApiRoomsByCodeMediaBodyTwo | PostApiRoomsByCodeMediaBodyThree
+>
+export type PostApiRoomsByCodeMediaMutationError = ErrorType<
+  | PostApiRoomsByCodeMedia400
+  | PostApiRoomsByCodeMedia401
+  | PostApiRoomsByCodeMedia403
+  | PostApiRoomsByCodeMedia404
+  | PostApiRoomsByCodeMedia409
+  | PostApiRoomsByCodeMedia422
+  | PostApiRoomsByCodeMedia500
+>
 
-const mutationKey = ['postApiRoomsByCodeMedia'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>, {code: string;data: BodyType<PostApiRoomsByCodeMediaBodyOne | PostApiRoomsByCodeMediaBodyTwo | PostApiRoomsByCodeMediaBodyThree>}> = (props) => {
-          const {code,data} = props ?? {};
-
-          return  postApiRoomsByCodeMedia(code,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PostApiRoomsByCodeMediaMutationResult = NonNullable<Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>>
-    export type PostApiRoomsByCodeMediaMutationBody = BodyType<PostApiRoomsByCodeMediaBodyOne | PostApiRoomsByCodeMediaBodyTwo | PostApiRoomsByCodeMediaBodyThree>
-    export type PostApiRoomsByCodeMediaMutationError = ErrorType<PostApiRoomsByCodeMedia400 | PostApiRoomsByCodeMedia401 | PostApiRoomsByCodeMedia403 | PostApiRoomsByCodeMedia404 | PostApiRoomsByCodeMedia409 | PostApiRoomsByCodeMedia422 | PostApiRoomsByCodeMedia500>
-
-    /**
+/**
  * @summary Add room video
  */
-export const usePostApiRoomsByCodeMedia = <TError = ErrorType<PostApiRoomsByCodeMedia400 | PostApiRoomsByCodeMedia401 | PostApiRoomsByCodeMedia403 | PostApiRoomsByCodeMedia404 | PostApiRoomsByCodeMedia409 | PostApiRoomsByCodeMedia422 | PostApiRoomsByCodeMedia500>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>, TError,{code: string;data: BodyType<PostApiRoomsByCodeMediaBodyOne | PostApiRoomsByCodeMediaBodyTwo | PostApiRoomsByCodeMediaBodyThree>}, TContext>, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>,
-        TError,
-        {code: string;data: BodyType<PostApiRoomsByCodeMediaBodyOne | PostApiRoomsByCodeMediaBodyTwo | PostApiRoomsByCodeMediaBodyThree>},
-        TContext
-      > => {
-      return useMutation(getPostApiRoomsByCodeMediaMutationOptions(options), queryClient);
-    }
-    /**
+export const usePostApiRoomsByCodeMedia = <
+  TError = ErrorType<
+    | PostApiRoomsByCodeMedia400
+    | PostApiRoomsByCodeMedia401
+    | PostApiRoomsByCodeMedia403
+    | PostApiRoomsByCodeMedia404
+    | PostApiRoomsByCodeMedia409
+    | PostApiRoomsByCodeMedia422
+    | PostApiRoomsByCodeMedia500
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>,
+      TError,
+      {
+        code: string
+        data: BodyType<
+          | PostApiRoomsByCodeMediaBodyOne
+          | PostApiRoomsByCodeMediaBodyTwo
+          | PostApiRoomsByCodeMediaBodyThree
+        >
+      },
+      TContext
+    >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiRoomsByCodeMedia>>,
+  TError,
+  {
+    code: string
+    data: BodyType<
+      | PostApiRoomsByCodeMediaBodyOne
+      | PostApiRoomsByCodeMediaBodyTwo
+      | PostApiRoomsByCodeMediaBodyThree
+    >
+  },
+  TContext
+> => {
+  return useMutation(getPostApiRoomsByCodeMediaMutationOptions(options), queryClient)
+}
+/**
+ * Returns recent chat messages for the room, oldest first, with cursor-based pagination via `before`.
+ * @summary Get room chat history
+ */
+export const getApiRoomsByCodeChat = (
+  code: string,
+  params?: GetApiRoomsByCodeChatParams,
+  options?: SecondParameter<typeof orvalMutator>,
+  signal?: AbortSignal,
+) => {
+  return orvalMutator<GetApiRoomsByCodeChat200>(
+    { url: `/api/rooms/${code}/chat`, method: 'GET', params, signal },
+    options,
+  )
+}
+
+export const getGetApiRoomsByCodeChatQueryKey = (
+  code: string,
+  params?: GetApiRoomsByCodeChatParams,
+) => {
+  return [`/api/rooms/${code}/chat`, ...(params ? [params] : [])] as const
+}
+
+export const getGetApiRoomsByCodeChatQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiRoomsByCodeChat>>,
+  TError = ErrorType<
+    | GetApiRoomsByCodeChat400
+    | GetApiRoomsByCodeChat401
+    | GetApiRoomsByCodeChat403
+    | GetApiRoomsByCodeChat404
+    | GetApiRoomsByCodeChat409
+    | GetApiRoomsByCodeChat422
+    | GetApiRoomsByCodeChat500
+  >,
+>(
+  code: string,
+  params?: GetApiRoomsByCodeChatParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCodeChat>>, TError, TData>
+    >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = queryOptions?.queryKey ?? getGetApiRoomsByCodeChatQueryKey(code, params)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiRoomsByCodeChat>>> = ({ signal }) =>
+    getApiRoomsByCodeChat(code, params, requestOptions, signal)
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: code !== null && code !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCodeChat>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+}
+
+export type GetApiRoomsByCodeChatQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiRoomsByCodeChat>>
+>
+export type GetApiRoomsByCodeChatQueryError = ErrorType<
+  | GetApiRoomsByCodeChat400
+  | GetApiRoomsByCodeChat401
+  | GetApiRoomsByCodeChat403
+  | GetApiRoomsByCodeChat404
+  | GetApiRoomsByCodeChat409
+  | GetApiRoomsByCodeChat422
+  | GetApiRoomsByCodeChat500
+>
+
+export function useGetApiRoomsByCodeChat<
+  TData = Awaited<ReturnType<typeof getApiRoomsByCodeChat>>,
+  TError = ErrorType<
+    | GetApiRoomsByCodeChat400
+    | GetApiRoomsByCodeChat401
+    | GetApiRoomsByCodeChat403
+    | GetApiRoomsByCodeChat404
+    | GetApiRoomsByCodeChat409
+    | GetApiRoomsByCodeChat422
+    | GetApiRoomsByCodeChat500
+  >,
+>(
+  code: string,
+  params: undefined | GetApiRoomsByCodeChatParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCodeChat>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiRoomsByCodeChat>>,
+          TError,
+          Awaited<ReturnType<typeof getApiRoomsByCodeChat>>
+        >,
+        'initialData'
+      >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiRoomsByCodeChat<
+  TData = Awaited<ReturnType<typeof getApiRoomsByCodeChat>>,
+  TError = ErrorType<
+    | GetApiRoomsByCodeChat400
+    | GetApiRoomsByCodeChat401
+    | GetApiRoomsByCodeChat403
+    | GetApiRoomsByCodeChat404
+    | GetApiRoomsByCodeChat409
+    | GetApiRoomsByCodeChat422
+    | GetApiRoomsByCodeChat500
+  >,
+>(
+  code: string,
+  params?: GetApiRoomsByCodeChatParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCodeChat>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiRoomsByCodeChat>>,
+          TError,
+          Awaited<ReturnType<typeof getApiRoomsByCodeChat>>
+        >,
+        'initialData'
+      >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiRoomsByCodeChat<
+  TData = Awaited<ReturnType<typeof getApiRoomsByCodeChat>>,
+  TError = ErrorType<
+    | GetApiRoomsByCodeChat400
+    | GetApiRoomsByCodeChat401
+    | GetApiRoomsByCodeChat403
+    | GetApiRoomsByCodeChat404
+    | GetApiRoomsByCodeChat409
+    | GetApiRoomsByCodeChat422
+    | GetApiRoomsByCodeChat500
+  >,
+>(
+  code: string,
+  params?: GetApiRoomsByCodeChatParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCodeChat>>, TError, TData>
+    >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get room chat history
+ */
+
+export function useGetApiRoomsByCodeChat<
+  TData = Awaited<ReturnType<typeof getApiRoomsByCodeChat>>,
+  TError = ErrorType<
+    | GetApiRoomsByCodeChat400
+    | GetApiRoomsByCodeChat401
+    | GetApiRoomsByCodeChat403
+    | GetApiRoomsByCodeChat404
+    | GetApiRoomsByCodeChat409
+    | GetApiRoomsByCodeChat422
+    | GetApiRoomsByCodeChat500
+  >,
+>(
+  code: string,
+  params?: GetApiRoomsByCodeChatParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCodeChat>>, TError, TData>
+    >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetApiRoomsByCodeChatQueryOptions(code, params, options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  return withQueryKey(query, queryOptions.queryKey)
+}
+
+/**
+ * Returns the most recently played videos in the room, most recent first.
+ * @summary Get room watch history
+ */
+export const getApiRoomsByCodeHistory = (
+  code: string,
+  options?: SecondParameter<typeof orvalMutator>,
+  signal?: AbortSignal,
+) => {
+  return orvalMutator<GetApiRoomsByCodeHistory200>(
+    { url: `/api/rooms/${code}/history`, method: 'GET', signal },
+    options,
+  )
+}
+
+export const getGetApiRoomsByCodeHistoryQueryKey = (code: string) => {
+  return [`/api/rooms/${code}/history`] as const
+}
+
+export const getGetApiRoomsByCodeHistoryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>,
+  TError = ErrorType<
+    | GetApiRoomsByCodeHistory400
+    | GetApiRoomsByCodeHistory401
+    | GetApiRoomsByCodeHistory403
+    | GetApiRoomsByCodeHistory404
+    | GetApiRoomsByCodeHistory409
+    | GetApiRoomsByCodeHistory422
+    | GetApiRoomsByCodeHistory500
+  >,
+>(
+  code: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>, TError, TData>
+    >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = queryOptions?.queryKey ?? getGetApiRoomsByCodeHistoryQueryKey(code)
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>> = ({
+    signal,
+  }) => getApiRoomsByCodeHistory(code, requestOptions, signal)
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: code !== null && code !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+}
+
+export type GetApiRoomsByCodeHistoryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>
+>
+export type GetApiRoomsByCodeHistoryQueryError = ErrorType<
+  | GetApiRoomsByCodeHistory400
+  | GetApiRoomsByCodeHistory401
+  | GetApiRoomsByCodeHistory403
+  | GetApiRoomsByCodeHistory404
+  | GetApiRoomsByCodeHistory409
+  | GetApiRoomsByCodeHistory422
+  | GetApiRoomsByCodeHistory500
+>
+
+export function useGetApiRoomsByCodeHistory<
+  TData = Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>,
+  TError = ErrorType<
+    | GetApiRoomsByCodeHistory400
+    | GetApiRoomsByCodeHistory401
+    | GetApiRoomsByCodeHistory403
+    | GetApiRoomsByCodeHistory404
+    | GetApiRoomsByCodeHistory409
+    | GetApiRoomsByCodeHistory422
+    | GetApiRoomsByCodeHistory500
+  >,
+>(
+  code: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>,
+          TError,
+          Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>
+        >,
+        'initialData'
+      >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiRoomsByCodeHistory<
+  TData = Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>,
+  TError = ErrorType<
+    | GetApiRoomsByCodeHistory400
+    | GetApiRoomsByCodeHistory401
+    | GetApiRoomsByCodeHistory403
+    | GetApiRoomsByCodeHistory404
+    | GetApiRoomsByCodeHistory409
+    | GetApiRoomsByCodeHistory422
+    | GetApiRoomsByCodeHistory500
+  >,
+>(
+  code: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>,
+          TError,
+          Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>
+        >,
+        'initialData'
+      >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiRoomsByCodeHistory<
+  TData = Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>,
+  TError = ErrorType<
+    | GetApiRoomsByCodeHistory400
+    | GetApiRoomsByCodeHistory401
+    | GetApiRoomsByCodeHistory403
+    | GetApiRoomsByCodeHistory404
+    | GetApiRoomsByCodeHistory409
+    | GetApiRoomsByCodeHistory422
+    | GetApiRoomsByCodeHistory500
+  >,
+>(
+  code: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>, TError, TData>
+    >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get room watch history
+ */
+
+export function useGetApiRoomsByCodeHistory<
+  TData = Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>,
+  TError = ErrorType<
+    | GetApiRoomsByCodeHistory400
+    | GetApiRoomsByCodeHistory401
+    | GetApiRoomsByCodeHistory403
+    | GetApiRoomsByCodeHistory404
+    | GetApiRoomsByCodeHistory409
+    | GetApiRoomsByCodeHistory422
+    | GetApiRoomsByCodeHistory500
+  >,
+>(
+  code: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getApiRoomsByCodeHistory>>, TError, TData>
+    >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetApiRoomsByCodeHistoryQueryOptions(code, options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  return withQueryKey(query, queryOptions.queryKey)
+}
+
+/**
  * Hydrates membership for authenticated users and returns the same room snapshot used by the room route.
  * @summary Join room
  */
 export const postApiRoomsByCodeJoin = (
-    code: string,
- options?: SecondParameter<typeof orvalMutator>,signal?: AbortSignal
+  code: string,
+  options?: SecondParameter<typeof orvalMutator>,
+  signal?: AbortSignal,
 ) => {
+  return orvalMutator<PostApiRoomsByCodeJoin200>(
+    { url: `/api/rooms/${code}/join`, method: 'POST', signal },
+    options,
+  )
+}
 
+export const getPostApiRoomsByCodeJoinMutationOptions = <
+  TError = ErrorType<
+    | PostApiRoomsByCodeJoin400
+    | PostApiRoomsByCodeJoin401
+    | PostApiRoomsByCodeJoin403
+    | PostApiRoomsByCodeJoin404
+    | PostApiRoomsByCodeJoin409
+    | PostApiRoomsByCodeJoin422
+    | PostApiRoomsByCodeJoin500
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiRoomsByCodeJoin>>,
+    TError,
+    { code: string },
+    TContext
+  >
+  request?: SecondParameter<typeof orvalMutator>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiRoomsByCodeJoin>>,
+  TError,
+  { code: string },
+  TContext
+> => {
+  const mutationKey = ['postApiRoomsByCodeJoin']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
 
-      return orvalMutator<PostApiRoomsByCodeJoin200>(
-      {url: `/api/rooms/${code}/join`, method: 'POST', signal
-    },
-      options);
-    }
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiRoomsByCodeJoin>>,
+    { code: string }
+  > = (props) => {
+    const { code } = props ?? {}
 
+    return postApiRoomsByCodeJoin(code, requestOptions)
+  }
 
+  return { mutationFn, ...mutationOptions }
+}
 
-export const getPostApiRoomsByCodeJoinMutationOptions = <TError = ErrorType<PostApiRoomsByCodeJoin400 | PostApiRoomsByCodeJoin401 | PostApiRoomsByCodeJoin403 | PostApiRoomsByCodeJoin404 | PostApiRoomsByCodeJoin409 | PostApiRoomsByCodeJoin422 | PostApiRoomsByCodeJoin500>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiRoomsByCodeJoin>>, TError,{code: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
-): UseMutationOptions<Awaited<ReturnType<typeof postApiRoomsByCodeJoin>>, TError,{code: string}, TContext> => {
+export type PostApiRoomsByCodeJoinMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiRoomsByCodeJoin>>
+>
 
-const mutationKey = ['postApiRoomsByCodeJoin'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type PostApiRoomsByCodeJoinMutationError = ErrorType<
+  | PostApiRoomsByCodeJoin400
+  | PostApiRoomsByCodeJoin401
+  | PostApiRoomsByCodeJoin403
+  | PostApiRoomsByCodeJoin404
+  | PostApiRoomsByCodeJoin409
+  | PostApiRoomsByCodeJoin422
+  | PostApiRoomsByCodeJoin500
+>
 
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiRoomsByCodeJoin>>, {code: string}> = (props) => {
-          const {code} = props ?? {};
-
-          return  postApiRoomsByCodeJoin(code,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PostApiRoomsByCodeJoinMutationResult = NonNullable<Awaited<ReturnType<typeof postApiRoomsByCodeJoin>>>
-
-    export type PostApiRoomsByCodeJoinMutationError = ErrorType<PostApiRoomsByCodeJoin400 | PostApiRoomsByCodeJoin401 | PostApiRoomsByCodeJoin403 | PostApiRoomsByCodeJoin404 | PostApiRoomsByCodeJoin409 | PostApiRoomsByCodeJoin422 | PostApiRoomsByCodeJoin500>
-
-    /**
+/**
  * @summary Join room
  */
-export const usePostApiRoomsByCodeJoin = <TError = ErrorType<PostApiRoomsByCodeJoin400 | PostApiRoomsByCodeJoin401 | PostApiRoomsByCodeJoin403 | PostApiRoomsByCodeJoin404 | PostApiRoomsByCodeJoin409 | PostApiRoomsByCodeJoin422 | PostApiRoomsByCodeJoin500>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiRoomsByCodeJoin>>, TError,{code: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postApiRoomsByCodeJoin>>,
-        TError,
-        {code: string},
-        TContext
-      > => {
-      return useMutation(getPostApiRoomsByCodeJoinMutationOptions(options), queryClient);
-    }
+export const usePostApiRoomsByCodeJoin = <
+  TError = ErrorType<
+    | PostApiRoomsByCodeJoin400
+    | PostApiRoomsByCodeJoin401
+    | PostApiRoomsByCodeJoin403
+    | PostApiRoomsByCodeJoin404
+    | PostApiRoomsByCodeJoin409
+    | PostApiRoomsByCodeJoin422
+    | PostApiRoomsByCodeJoin500
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiRoomsByCodeJoin>>,
+      TError,
+      { code: string },
+      TContext
+    >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiRoomsByCodeJoin>>,
+  TError,
+  { code: string },
+  TContext
+> => {
+  return useMutation(getPostApiRoomsByCodeJoinMutationOptions(options), queryClient)
+}

@@ -4,12 +4,12 @@ import { useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { CATEGORIES, CATEGORY_META, isForumCategory, type ForumCategory } from './forum-shared'
 import { cn } from '@/shared/lib/utils'
 import {
   getGetApiForumThreadsQueryKey,
   usePostApiForumThreads,
 } from '@/core/api/generated/forum/forum'
-import { CATEGORIES, CATEGORY_META, isForumCategory, type ForumCategory } from './forum-shared'
 
 export function ForumNewThreadPage({ initialCategory }: { initialCategory?: string }) {
   const navigate = useNavigate()

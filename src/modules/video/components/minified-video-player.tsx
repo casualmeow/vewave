@@ -12,7 +12,9 @@ import {
   DropdownMenuItem,
 } from '@/shared/ui/dropdown-menu'
 import { cn } from '@/shared/lib/utils'
+import { useAppearance } from '@/shared/theme'
 import { Button } from '@/shared/ui'
+import { glassSurfaceVariants } from '@/shared/ui/glass-surface'
 import { Slider } from '@/shared/ui/slider'
 
 interface VideoPlayerProps {
@@ -47,6 +49,8 @@ export const MinifiedVideoPlayer = memo(function ({
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(false)
   const [autoPlayEnabled, setAutoPlayEnabled] = useState(autoPlay)
   const [loopEnabled, setLoopEnabled] = useState(loop)
+  const { settings } = useAppearance()
+  const glassChrome = settings.surfaceStyle === 'glass'
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -218,11 +222,21 @@ export const MinifiedVideoPlayer = memo(function ({
 
       <div
         className={cn(
-          'absolute inset-x-0 bottom-0 bg-gradient-to-t from-media-background/80 via-media-background/40 to-transparent transition-opacity duration-300',
+          'absolute inset-x-0 bottom-0 transition-opacity duration-300',
+          glassChrome
+            ? cn(
+                'm-2 rounded-lg border',
+                glassSurfaceVariants({
+                  role: 'media',
+                  thickness: 'thin',
+                  elevation: 'embedded',
+                }),
+              )
+            : 'bg-gradient-to-t from-media-background/80 via-media-background/40 to-transparent',
           showControls ? 'opacity-100' : 'opacity-0',
         )}
       >
-        <div className="px-4 pb-2">
+        <div className={cn('px-4 pb-2', glassChrome && 'pt-2')}>
           <Slider
             value={[progress]}
             onValueChange={handleSeek}

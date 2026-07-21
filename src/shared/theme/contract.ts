@@ -1,15 +1,36 @@
 export const appearanceModes = ['light', 'dark', 'system'] as const
 export const resolvedAppearanceModes = ['light', 'dark'] as const
-export const appearancePresetIds = ['default', 'vewave'] as const
+export const appearancePresetIds = [
+  'default',
+  'vewave',
+  'heatwave',
+  'coldwave',
+  'darkwave',
+] as const
 export const logoStrategies = ['auto', 'light', 'dark', 'mono'] as const
 export const glassIntensities = ['subtle', 'balanced', 'strong'] as const
+export const surfaceStyles = ['solid', 'glass'] as const
 export const appearanceConfigVersion = 1
+
+// Glass material contract — every glass surface must declare what it is
+// instead of tuning raw blur values. Consumed by glassSurfaceVariants and
+// the .glass-surface layers in styles.css.
+export const glassThicknesses = ['thin', 'regular', 'thick'] as const
+export const glassElevations = ['embedded', 'raised', 'floating'] as const
+export const glassBackdropTones = ['auto', 'light', 'dark', 'media'] as const
+export const glassInteractions = ['static', 'control'] as const
+
+export type GlassThickness = (typeof glassThicknesses)[number]
+export type GlassElevation = (typeof glassElevations)[number]
+export type GlassBackdropTone = (typeof glassBackdropTones)[number]
+export type GlassInteraction = (typeof glassInteractions)[number]
 
 export type AppearanceMode = (typeof appearanceModes)[number]
 export type ResolvedAppearanceMode = (typeof resolvedAppearanceModes)[number]
 export type AppearancePresetId = (typeof appearancePresetIds)[number]
 export type LogoStrategy = (typeof logoStrategies)[number]
 export type GlassIntensity = (typeof glassIntensities)[number]
+export type SurfaceStyle = (typeof surfaceStyles)[number]
 
 export type ThemeTokenName =
   | 'radius'
@@ -146,6 +167,8 @@ export type AppearanceSettings = {
   preset: AppearancePresetId
   logoStrategy: LogoStrategy
   glassIntensity: GlassIntensity
+  surfaceStyle: SurfaceStyle
+  experimentalRefraction: boolean
   customTheme: CustomThemeSettings
 }
 

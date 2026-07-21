@@ -103,7 +103,7 @@ export const sidebarRootVariants = cva(
       design: {
         solid: 'border-sidebar-border bg-sidebar shadow-sm',
         glass:
-          'border-[color:var(--glass-border)] bg-[var(--glass-background)] shadow-[0_18px_48px_color-mix(in_srgb,var(--foreground)_10%,transparent)] backdrop-blur-xl',
+          'border-[color:var(--glass-border)] bg-[var(--glass-background)] shadow-[0_18px_48px_color-mix(in_srgb,var(--foreground)_10%,transparent)] backdrop-blur-[var(--glass-blur-base,16px)]',
         liquidGlass: [
           'border-[color:var(--glass-border)] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--glass-highlight)_72%,transparent),var(--glass-background)_46%,color-mix(in_srgb,var(--accent)_24%,transparent)_100%)]',
           'shadow-[0_34px_96px_color-mix(in_srgb,var(--foreground)_22%,transparent),0_12px_36px_color-mix(in_srgb,var(--accent)_14%,transparent),inset_0_1px_0_var(--glass-highlight)]',

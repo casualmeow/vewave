@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight, Code2, Layers3, PanelLeft, PanelTop, StretchHorizontal } from 'lucide-react'
 import { motion } from 'motion/react'
 
+import { FluidGlassShowcase } from './fluid-glass-showcase'
 import { Button } from '@/shared/ui'
 
 const componentPlaygrounds = [
@@ -35,6 +36,7 @@ export function UiShowcasePage() {
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_18%_8%,color-mix(in_oklab,var(--primary)_18%,transparent),transparent_26rem),radial-gradient(circle_at_82%_0%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_24rem),linear-gradient(135deg,var(--background),var(--secondary))] text-foreground">
       <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center gap-8 px-4 py-10 sm:px-6 lg:px-8">
+        <FluidGlassShowcase />
         <motion.section
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}

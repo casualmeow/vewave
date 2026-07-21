@@ -214,6 +214,75 @@ code {
 }
 
 @layer components {
+  .fluid-glass-css-environment {
+    background-color: var(--sidebar);
+    background-image:
+      linear-gradient(135deg, color-mix(in srgb, var(--primary) 7%, transparent), transparent 42%),
+      linear-gradient(315deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent 48%);
+    background-position: center;
+    background-size: cover;
+  }
+
+  .fluid-glass-css-environment[data-pattern='grid'] {
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--foreground) 10%, transparent) 1px, transparent 1px),
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--foreground) 10%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(135deg, color-mix(in srgb, var(--primary) 12%, transparent), transparent 48%);
+    background-size:
+      22px 22px,
+      22px 22px,
+      cover;
+  }
+
+  .fluid-glass-css-environment[data-tone='light'] {
+    --sidebar: #eaf0f1;
+    --foreground: #172124;
+  }
+
+  .fluid-glass-css-environment[data-tone='dark'] {
+    --sidebar: #0e1318;
+    --foreground: #edf5f6;
+  }
+
+  [data-fluid-glass-target] {
+    isolation: isolate;
+  }
+
+  [data-fluid-glass-tone='light'] [data-fluid-glass-content] {
+    color: #172124;
+  }
+
+  [data-fluid-glass-tone='dark'] [data-fluid-glass-content] {
+    color: #edf5f6;
+  }
+
+  [data-fluid-glass-group][data-reduced-motion='true'] [data-fluid-glass-target] {
+    transition-duration: 0ms !important;
+  }
+
+  [data-app-sidebar-mode] [data-fluid-glass-backend='sdf'] [data-fluid-glass-target],
+  [data-app-sidebar-mode] [data-fluid-glass-backend='transmission'] [data-fluid-glass-target] {
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  [data-app-sidebar-mode] [data-fluid-glass-backend='sdf'] [data-sidebar-active-indicator],
+  [data-app-sidebar-mode]
+    [data-fluid-glass-backend='transmission']
+    [data-sidebar-active-indicator] {
+    display: none;
+  }
+
+  .fluid-glass-settings-nav[data-fluid-glass-backend='sdf'] [data-fluid-glass-target],
+  .fluid-glass-settings-nav[data-fluid-glass-backend='transmission'] [data-fluid-glass-target] {
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     [data-sidebar-root='liquidGlass'] {
       --sidebar-glass-border: var(--glass-border);
@@ -242,5 +311,464 @@ code {
     [data-sidebar-root='glass'] * {
       scroll-behavior: auto !important;
     }
+  }
+
+  /* Glass material for floating layers (dialogs, sheets, menus).
+
+     Layered like a physical material rather than one flat blur:
+       1. scattering  — ::before backdrop blur+saturate; amount = thickness × intensity
+       2. tint        — --glass-background fill + faint top sheen from --glass-highlight
+       3. highlight   — directional inset rim (lit from top-left, near-invisible
+                        bottom-right); never a full uniform outline
+       4. shadow      — owned here, deeper for thicker glass
+     Stable glass intentionally does not claim refraction. Spatial displacement
+     belongs only to the experimental liquid-glass backend.
+     Content stays sharp: children are never processed by the material.
+
+     Semantic API lives in shared/ui/glass-surface.tsx (glassSurfaceVariants):
+       thickness  thin | regular | thick   — pane size → scattering amount
+       elevation  embedded | raised | floating — float height → shadow depth
+       tone       neutral | media          — chrome vs. over-video surfaces
+       interaction static | control        — pressable panes get press feedback
+     The appearance "glass intensity" setting scales both the token alphas
+     (resolver) and the scattering below (root data attribute). */
+  :root {
+    --glass-blur-base: 16px;
+    /* Semantic control fills for small interactive elements on chrome
+       (nav pills, segmented options, close buttons). Solid style maps to the
+       conventional tokens; glass style maps to translucent washes. Callers
+       use .glass-control instead of local alpha fills. */
+    --glass-control-track: var(--muted);
+    --glass-control-hover: var(--accent);
+    --glass-control-active: var(--background);
+    --material-scrim: color-mix(in srgb, var(--foreground) 46%, transparent);
+  }
+
+  :root[data-surface-style='glass'] {
+    --glass-control-track: color-mix(in srgb, var(--foreground) 5%, transparent);
+    --glass-control-hover: color-mix(in srgb, var(--background) 24%, transparent);
+    --glass-control-active: color-mix(in srgb, var(--background) 44%, transparent);
+    --material-scrim: color-mix(in srgb, var(--foreground) 32%, transparent);
+  }
+
+  :root[data-glass-intensity='subtle'] {
+    --glass-blur-base: 12px;
+  }
+
+  :root[data-glass-intensity='strong'] {
+    --glass-blur-base: 22px;
+  }
+
+  .glass-surface {
+    --glass-thickness: 1;
+    --glass-saturate: 150%;
+    --glass-drop-shadow: 0 12px 32px color-mix(in srgb, var(--foreground) 12%, transparent);
+    --glass-material-fill: var(--glass-background);
+    --glass-material-image: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--glass-highlight) 12%, transparent),
+      transparent 34%
+    );
+    --glass-backdrop-filter: var(
+      --glass-experimental-filter,
+      blur(calc(var(--glass-blur-base) * var(--glass-thickness))) saturate(var(--glass-saturate))
+    );
+    position: relative;
+    isolation: isolate;
+    border-color: var(--glass-border);
+    background: transparent;
+    box-shadow:
+      inset 1px 1px 0 color-mix(in srgb, var(--glass-highlight) 60%, transparent),
+      inset -1px -1px 0 color-mix(in srgb, var(--glass-highlight) 14%, transparent),
+      var(--glass-drop-shadow);
+  }
+
+  /* The material is processed behind foreground content. This is the stable
+     DOM backend: backdrop scattering/tint live here; text and icons remain in
+     the parent stacking context and never enter the filter pipeline. */
+  .glass-surface::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background-color: var(--glass-material-fill);
+    background-image: var(--glass-material-image);
+    -webkit-backdrop-filter: var(--glass-backdrop-filter);
+    backdrop-filter: var(--glass-backdrop-filter);
+    pointer-events: none;
+  }
+
+  .glass-surface-thick {
+    --glass-thickness: 1.4;
+  }
+
+  .glass-surface-thin {
+    --glass-thickness: 0.7;
+    --glass-saturate: 135%;
+    --glass-drop-shadow: 0 8px 24px color-mix(in srgb, var(--foreground) 10%, transparent);
+  }
+
+  /* Elevation: shadow depth is how far the pane floats, independent of thickness. */
+  .glass-surface-embedded {
+    --glass-drop-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 7%, transparent);
+  }
+
+  .glass-surface-floating {
+    --glass-drop-shadow: 0 28px 64px color-mix(in srgb, var(--foreground) 18%, transparent);
+  }
+
+  /* Backdrop tone: explicit context for what sits behind the pane. Auto (the
+     default) follows the theme tokens; light/dark fix tint and foreground for
+     a known backdrop; media is chrome over video. No automatic DOM luminance
+     analysis is claimed — callers declare the context. */
+  .glass-surface-tone-light {
+    --glass-material-fill: rgba(255, 255, 255, 0.52);
+    border-color: rgba(255, 255, 255, 0.55);
+    color: #1c1b20;
+  }
+
+  .glass-surface-tone-dark {
+    --glass-material-fill: rgba(12, 14, 20, 0.52);
+    border-color: rgba(255, 255, 255, 0.14);
+    color: #f2f4f8;
+  }
+
+  .glass-surface-media {
+    --glass-material-fill: color-mix(in srgb, var(--media-background) 58%, transparent);
+    --glass-material-image: none;
+    border-color: rgba(255, 255, 255, 0.14);
+    color: var(--media-foreground);
+  }
+
+  /* Role: the semantic recipe of a pane — which conventional token it falls
+     back to when it resolves solid, and role-specific material adjustments. */
+  .glass-role-shell {
+    --glass-solid-fill: var(--card);
+    /* The shell sits over the static environment layer only; blurring a
+       near-monochrome gradient is pure GPU cost and nests a filter under the
+       header's. The shell keeps tint, rim, and shadow — no scattering. */
+    --glass-backdrop-filter: none;
+  }
+
+  .glass-role-dialog,
+  .glass-role-sheet {
+    --glass-solid-fill: var(--popover);
+  }
+
+  .glass-role-menu {
+    --glass-solid-fill: var(--popover);
+  }
+
+  .glass-role-control {
+    --glass-solid-fill: var(--secondary);
+  }
+
+  /* Surface resolution: `surface="auto"` follows the global appearance
+     surfaceStyle — material under the glass style, conventional opaque layer
+     under solid. `surface="solid"` is always opaque. The solid fill comes
+     from the pane's role; elevation still drives the shadow; rims, sheen,
+     and the edge ring belong to the material only. */
+  .glass-surface-opaque,
+  :root[data-surface-style='solid'] .glass-surface-auto {
+    --glass-material-fill: var(--glass-solid-fill, var(--popover));
+    --glass-material-image: none;
+    --glass-backdrop-filter: none;
+    border-color: var(--border);
+    box-shadow: var(--glass-drop-shadow);
+  }
+
+  .glass-surface-opaque.glass-surface-media,
+  :root[data-surface-style='solid'] .glass-surface-auto.glass-surface-media {
+    --glass-material-fill: color-mix(in srgb, var(--media-background) 88%, var(--media-foreground));
+    border-color: rgba(255, 255, 255, 0.14);
+    color: var(--media-foreground);
+  }
+
+  /* Interaction: pressable glass responds with light, not movement. */
+  .glass-surface-control {
+    transition:
+      transform 150ms cubic-bezier(0.23, 1, 0.32, 1),
+      box-shadow 150ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .glass-surface-control:hover {
+      box-shadow:
+        inset 1px 1px 0 color-mix(in srgb, var(--glass-highlight) 72%, transparent),
+        var(--glass-drop-shadow);
+    }
+  }
+
+  .glass-surface-control:active:not(:focus-visible) {
+    transform: scale(0.98);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass-surface-control {
+      transition: none;
+    }
+  }
+
+  :root[data-glass-intensity='subtle'] .glass-surface {
+    --glass-saturate: 125%;
+  }
+
+  :root[data-glass-intensity='strong'] .glass-surface {
+    --glass-saturate: 175%;
+  }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass-surface {
+      --glass-material-fill: var(--glass-solid-fill, var(--popover));
+      --glass-material-image: none;
+      --glass-backdrop-filter: none;
+    }
+
+    .glass-surface-tone-light {
+      --glass-material-fill: #f6f6f8;
+    }
+
+    .glass-surface-tone-dark,
+    .glass-surface-media {
+      --glass-material-fill: #101218;
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-surface {
+      --glass-material-fill: var(--glass-solid-fill, var(--popover));
+      --glass-material-image: none;
+      --glass-backdrop-filter: none;
+    }
+
+    .glass-surface-tone-light {
+      --glass-material-fill: #f6f6f8;
+    }
+
+    .glass-surface-tone-dark,
+    .glass-surface-media {
+      --glass-material-fill: #101218;
+    }
+  }
+
+  /* Deterministic capability fallback used by diagnostics and by hosts that
+     know backdrop processing is unreliable despite positive CSS parsing.
+     Role-specific solid fills remain authoritative. */
+  :root[data-glass-capability='fallback'] .glass-surface {
+    --glass-material-fill: var(--glass-solid-fill, var(--popover));
+    --glass-material-image: none;
+    --glass-backdrop-filter: none;
+  }
+
+  :root[data-glass-capability='fallback'] .glass-surface-tone-light {
+    --glass-material-fill: #f6f6f8;
+  }
+
+  :root[data-glass-capability='fallback'] .glass-surface-tone-dark,
+  :root[data-glass-capability='fallback'] .glass-surface-media {
+    --glass-material-fill: #101218;
+  }
+
+  /* Environment layer behind the glass shell: nearly monochrome, derived from
+     theme tokens with minimal luminance variation so the material has
+     something to scatter. Exists only while the surface style is glass. */
+  [data-glass-environment] {
+    display: none;
+    pointer-events: none;
+  }
+
+  :root[data-surface-style='glass'] [data-glass-environment] {
+    position: fixed;
+    inset: 0;
+    display: block;
+    /* Near-monochrome luminance ramp only. The glass must stay convincing
+       over real app content; it may not depend on decorative color fields. */
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--foreground) 4%, var(--background)),
+      var(--background) 42%,
+      color-mix(in srgb, var(--foreground) 2%, var(--background))
+    );
+  }
+
+  :root[data-glass-capability='fallback'] [data-glass-environment] {
+    display: none;
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    :root[data-surface-style='glass'] [data-glass-environment] {
+      display: none;
+    }
+  }
+
+  /* Glass shell header: in glass style the header lifts into a thin glass bar
+     and content scrolls underneath it — that is where the scattering becomes
+     visible. Solid style keeps the header in normal flow, untouched. */
+  :root[data-surface-style='glass'] [data-glass-shell-header] {
+    --glass-shell-material-fill: color-mix(in srgb, var(--header) 45%, transparent);
+    --glass-shell-material-image: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--glass-highlight) 12%, transparent),
+      transparent
+    );
+    --glass-backdrop-filter: var(
+      --glass-experimental-filter,
+      blur(calc(var(--glass-blur-base, 16px) * 0.7)) saturate(140%)
+    );
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    z-index: 10;
+    isolation: isolate;
+    border-bottom-color: var(--glass-border);
+    background: transparent;
+  }
+
+  :root[data-surface-style='glass'] [data-glass-shell-header]::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--glass-shell-material-fill);
+    background-image: var(--glass-shell-material-image);
+    -webkit-backdrop-filter: var(--glass-backdrop-filter);
+    backdrop-filter: var(--glass-backdrop-filter);
+    pointer-events: none;
+  }
+
+  :root[data-surface-style='glass'] [data-glass-shell-main] {
+    padding-top: 4rem;
+  }
+
+  /* Interactive control fill for small elements living on chrome. Resolves
+     through the semantic --glass-control-* tokens per surface style. */
+  .glass-control {
+    transition:
+      background-color 150ms ease,
+      color 150ms ease,
+      transform 150ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .glass-control-track {
+    background-color: var(--glass-control-track);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .glass-control:hover {
+      background-color: var(--glass-control-hover);
+    }
+  }
+
+  .glass-control[data-active='true'],
+  .glass-control[aria-pressed='true'] {
+    background-color: var(--glass-control-active);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--glass-highlight) 45%, transparent),
+      0 1px 2px color-mix(in srgb, var(--foreground) 8%, transparent);
+  }
+
+  .glass-control:active:not(:focus-visible) {
+    transform: scale(0.97);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass-control {
+      transition: none;
+    }
+  }
+
+  /* liquidGlass material backend: pointer-aware, shape-following rim
+     highlight and a material press response. Applied per surface (opt-in),
+     paired with the displacement filter from useLiquidGlassRefraction.
+     Never a full uniform stroke, never whole-surface brightness. */
+  .glass-material-liquid {
+    transition:
+      transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+      box-shadow 160ms ease;
+  }
+
+  .glass-material-liquid::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    pointer-events: none;
+    background: radial-gradient(
+      140px circle at var(--glass-pointer-x, 50%) var(--glass-pointer-y, 0%),
+      var(--glass-highlight),
+      transparent 72%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .glass-material-liquid:hover::after {
+      opacity: 1;
+    }
+  }
+
+  /* Press: displacement strength rises in the filter (hook side); the pane
+     settles slightly with a tighter shadow and more highlight energy.
+     Foreground content rides along unprocessed. */
+  .glass-material-liquid[data-glass-pressed='true'] {
+    transform: scale(0.998);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--foreground) 10%, transparent);
+  }
+
+  .glass-material-liquid[data-glass-pressed='true']::after {
+    opacity: 1;
+    background: radial-gradient(
+      190px circle at var(--glass-pointer-x, 50%) var(--glass-pointer-y, 0%),
+      var(--glass-highlight),
+      transparent 78%
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass-material-liquid,
+    .glass-material-liquid::after {
+      transition: none;
+    }
+
+    .glass-material-liquid[data-glass-pressed='true'] {
+      transform: none;
+    }
+  }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    :root[data-surface-style='glass'] [data-glass-shell-header] {
+      --glass-shell-material-fill: var(--header);
+      --glass-shell-material-image: none;
+      --glass-backdrop-filter: none;
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-material-liquid::after {
+      display: none;
+    }
+
+    :root[data-surface-style='glass'] [data-glass-shell-header] {
+      --glass-shell-material-fill: var(--header);
+      --glass-shell-material-image: none;
+      --glass-backdrop-filter: none;
+    }
+  }
+
+  :root[data-glass-capability='fallback'] [data-glass-shell-header] {
+    --glass-shell-material-fill: var(--header);
+    --glass-shell-material-image: none;
+    --glass-backdrop-filter: none;
   }
 }

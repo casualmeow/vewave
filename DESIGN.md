@@ -94,6 +94,70 @@ Rules:
 - Avoid animated glow fields in selected navigation states.
 - Avoid shadow values that make cards look like detached marketing tiles in dense product areas.
 
+### Glass Material System
+
+Glass is a user-selectable surface style (`Appearance → Surface style: Solid | Glass`), not a
+default decoration. The material is defined once in `src/styles.css` (`.glass-surface` layers) and
+consumed through the semantic API in `src/shared/ui/glass-surface.tsx` (`glassSurfaceVariants`).
+Never hand-tune blur values on a component; declare what the surface is:
+
+- `surface: auto | solid | glass` — whether the pane is material at all: `auto` (default)
+  resolves from the user's `surfaceStyle`; `glass`/`solid` force one. Resolution is CSS-level
+  via `data-surface-style`, so flipping the setting restyles every auto surface at once.
+- `role: shell | dialog | sheet | menu | control | media` — the semantic recipe: the
+  conventional token the pane falls back to when solid (shell → card, dialog/sheet/menu →
+  popover, control → control fill, media → media chrome) plus role adjustments (the shell skips
+  scattering — it sits over the static environment only, keeping one filtered layer under the
+  header).
+- `material: glass | liquidGlass` — the rendering backend: `glass` is the stable production
+  frost; `liquidGlass` opts into the pointer-aware rim highlight, press response, and (behind
+  the experimental flag) edge displacement. Small controls on chrome use `.glass-control`,
+  which resolves through `--glass-control-*` tokens — never local alpha fills.
+- `thickness: thin | regular | thick` — pane size drives scattering (menus are thin, bars and
+  docks regular, dialogs/sheets/app shell thick).
+- `elevation: embedded | raised | floating` — float height drives shadow depth.
+- `tone: neutral | media` — media tone is for chrome over video: dark fill, light foreground,
+  independent of the app theme.
+- `interaction: static | control` — pressable glass responds with light, never movement.
+- `backdropTone: auto | light | dark | media` — callers declare what sits behind the pane; no
+  automatic DOM luminance analysis is claimed.
+
+An experimental Chromium-only refraction backend (`src/shared/lib/liquid-glass.ts` +
+`useLiquidGlassRefraction`) replaces blur-only scattering with SDF-derived edge displacement on
+selected surfaces, behind feature detection and the "Edge refraction" appearance flag. The CSS
+material stays the production backend; verify optical distortion with
+`node scripts/glass-verify.mjs`.
+
+Surface assignment (glass style):
+
+| Surface                       | Material                | Notes                          |
+| ----------------------------- | ----------------------- | ------------------------------ |
+| App background                | Environment layer       | near-monochrome token wash     |
+| App content shell             | thick / embedded        | via `data-glass-shell-*` hooks |
+| Shell header                  | thin bar                | content scrolls underneath it  |
+| Sidebar, mobile dock          | existing glass variants | token-driven                   |
+| Dialogs, sheets               | thick / floating        | materialize on open            |
+| Dropdowns, selects            | thin / raised           |                                |
+| Player chrome                 | thin / media tone       |                                |
+| Cards, tables, inputs, toasts | solid — always          | reading surfaces stay opaque   |
+| Video/media content           | never processed         |                                |
+
+Hard rules:
+
+- Reading surfaces stay solid in both styles; glass is chrome, not content.
+- No nested glass-on-glass beyond one overlay above the shell.
+- Every glass surface must survive three fallbacks unchanged in meaning: no `backdrop-filter`
+  support, `prefers-reduced-transparency`, and `prefers-reduced-motion`.
+- The appearance "glass intensity" setting is the only blur/alpha tuning knob; per-component
+  overrides are a regression.
+- Component-level `design: glass | liquidGlass` variants (sidebar, mobile dock) are
+  implementations of the same material family: they read the shared `--glass-*` tokens and
+  `--glass-blur-base`, so intensity reaches them too. `liquidGlass` is an expressive showcase
+  variant only — never a production shell.
+- Inside a glass pane, panels must tint with translucent washes (`bg-foreground/[0.04]`,
+  `bg-background/75`), never opaque `bg-muted`/`bg-card` fills that mask the material. Dense
+  `bg-card` stays correct for actual reading/input rows.
+
 ## Imagery
 
 Primary marketing imagery should show real product state. Screenshots should be captured at useful

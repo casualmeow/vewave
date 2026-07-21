@@ -118,6 +118,9 @@ const loadedRoom: GetApiRoomsByCode200 = {
   permissions: {
     role: 'viewer',
     canControlPlayback: false,
+    canAddMedia: false,
+    canChat: true,
+    canModerate: false,
   },
 }
 

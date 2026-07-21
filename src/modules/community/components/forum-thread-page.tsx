@@ -4,9 +4,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, Flag, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { AuthorAvatar, AuthorLink, CategoryBadge, categoryMeta, timeAgo } from './forum-shared'
+import type { GetApiForumThreadsByThreadId200ThreadRepliesItem } from '@/core/api/generated/model'
 import { cn } from '@/shared/lib/utils'
 import { useAuthStore } from '@/modules/auth/model'
-import type { GetApiForumThreadsByThreadId200ThreadRepliesItem } from '@/core/api/generated/model'
 import {
   getGetApiForumThreadsByThreadIdQueryKey,
   getGetApiForumThreadsQueryKey,
@@ -14,21 +15,8 @@ import {
   usePostApiForumThreadsByThreadIdReplies,
   usePostApiForumThreadsByThreadIdReport,
 } from '@/core/api/generated/forum/forum'
-import {
-  AuthorAvatar,
-  AuthorLink,
-  CategoryBadge,
-  categoryMeta,
-  timeAgo,
-} from './forum-shared'
 
-export function ForumThreadPage({
-  category,
-  threadId,
-}: {
-  category: string
-  threadId: string
-}) {
+export function ForumThreadPage({ category, threadId }: { category: string; threadId: string }) {
   const queryClient = useQueryClient()
   const user = useAuthStore((state) => state.user)
   const threadQuery = useGetApiForumThreadsByThreadId(threadId)
@@ -245,11 +233,7 @@ function ThreadReport({ threadId }: { threadId: string }) {
   )
 }
 
-function ReplyItem({
-  reply,
-}: {
-  reply: GetApiForumThreadsByThreadId200ThreadRepliesItem
-}) {
+function ReplyItem({ reply }: { reply: GetApiForumThreadsByThreadId200ThreadRepliesItem }) {
   return (
     <li className="flex items-start gap-3">
       <AuthorAvatar author={reply.author} className="size-8" />
@@ -257,7 +241,9 @@ function ReplyItem({
         <p className="text-xs text-background/50">
           <AuthorLink author={reply.author} /> · {timeAgo(reply.createdAt)}
         </p>
-        <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-background/85">{reply.body}</p>
+        <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-background/85">
+          {reply.body}
+        </p>
       </div>
     </li>
   )

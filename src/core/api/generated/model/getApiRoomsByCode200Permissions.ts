@@ -10,4 +10,7 @@ import type { GetApiRoomsByCode200PermissionsRole } from './getApiRoomsByCode200
 export type GetApiRoomsByCode200Permissions = {
   role: GetApiRoomsByCode200PermissionsRole
   canControlPlayback: boolean
+  canAddMedia: boolean
+  canChat: boolean
+  canModerate: boolean
 }

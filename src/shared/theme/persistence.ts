@@ -5,6 +5,7 @@ import {
   editableThemeTokenNames,
   glassIntensities,
   logoStrategies,
+  surfaceStyles,
   type AppearanceMode,
   type AppearanceSettings,
   type ResolvedAppearanceMode,
@@ -83,6 +84,15 @@ export function sanitizeAppearanceSettings(value: unknown): AppearanceSettings {
       glassIntensities.includes(value.glassIntensity as AppearanceSettings['glassIntensity'])
         ? (value.glassIntensity as AppearanceSettings['glassIntensity'])
         : defaultAppearanceSettings.glassIntensity,
+    surfaceStyle:
+      typeof value.surfaceStyle === 'string' &&
+      surfaceStyles.includes(value.surfaceStyle as AppearanceSettings['surfaceStyle'])
+        ? (value.surfaceStyle as AppearanceSettings['surfaceStyle'])
+        : defaultAppearanceSettings.surfaceStyle,
+    experimentalRefraction:
+      typeof value.experimentalRefraction === 'boolean'
+        ? value.experimentalRefraction
+        : defaultAppearanceSettings.experimentalRefraction,
     customTheme: {
       enabled:
         typeof customTheme.enabled === 'boolean'

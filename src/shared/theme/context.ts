@@ -8,6 +8,7 @@ import type {
   GlassIntensity,
   LogoStrategy,
   ResolvedAppearanceMode,
+  SurfaceStyle,
 } from './contract'
 import type { resolveThemeTokens } from './resolver'
 
@@ -27,8 +28,10 @@ export type AppearanceContextValue = {
   ) => void
   setGlassIntensity: (glassIntensity: GlassIntensity) => void
   setLogoStrategy: (logoStrategy: LogoStrategy) => void
+  setExperimentalRefraction: (enabled: boolean) => void
   setMode: (mode: AppearanceMode) => void
   setPreset: (preset: AppearancePresetId) => void
+  setSurfaceStyle: (surfaceStyle: SurfaceStyle) => void
   settings: AppearanceSettings
   tokens: ReturnType<typeof resolveThemeTokens>
 }

@@ -82,9 +82,7 @@ export function AppSidebarIdentity({
           aria-label="Open profile"
           className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
         >
-          <Avatar
-            className={cn('border border-[color:var(--glass-border)] shadow-sm', visualSize)}
-          >
+          <Avatar className={cn('border border-[color:var(--glass-border)] shadow-sm', visualSize)}>
             <AvatarImage src={user.avatarUrl ?? undefined} alt={user.name ?? 'User avatar'} />
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>

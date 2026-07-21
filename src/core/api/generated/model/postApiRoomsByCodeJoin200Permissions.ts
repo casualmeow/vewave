@@ -5,9 +5,12 @@
  * Backend API for Vewave watch-together rooms and playback synchronization.
  * OpenAPI spec version: 1.0.0
  */
-import type { PostApiRoomsByCodeJoin200PermissionsRole } from './postApiRoomsByCodeJoin200PermissionsRole.ts';
+import type { PostApiRoomsByCodeJoin200PermissionsRole } from './postApiRoomsByCodeJoin200PermissionsRole.ts'
 
 export type PostApiRoomsByCodeJoin200Permissions = {
-  role: PostApiRoomsByCodeJoin200PermissionsRole;
-  canControlPlayback: boolean;
-};
+  role: PostApiRoomsByCodeJoin200PermissionsRole
+  canControlPlayback: boolean
+  canAddMedia: boolean
+  canChat: boolean
+  canModerate: boolean
+}

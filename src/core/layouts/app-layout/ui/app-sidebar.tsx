@@ -23,6 +23,7 @@ import {
   SidebarItemLabel,
   SidebarSection,
 } from '@/components/sidebar'
+import { FluidGlassGroup } from '@/components/fluid-glass'
 import { useLogout } from '@/modules/auth'
 import { cn } from '@/shared/lib/utils'
 
@@ -147,7 +148,15 @@ export function AppSidebar({
         className,
       )}
     >
-      {sidebarContent}
+      <FluidGlassGroup
+        environment={{ type: 'theme', pattern: 'calm' }}
+        quality="auto"
+        activation="appearance"
+        className="flex min-h-0 flex-1 flex-col rounded-[inherit]"
+        contentClassName="flex min-h-0 flex-1 flex-col"
+      >
+        {sidebarContent}
+      </FluidGlassGroup>
     </Sidebar>
   )
 

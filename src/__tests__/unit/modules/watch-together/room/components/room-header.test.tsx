@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { GetApiRoomsByCode200 } from '@/core/api/generated/model'
 import { RoomHeader } from '@/modules/watch-together/room/components/room-header'
+import roomPageSource from '@/modules/watch-together/room/components/room-page.tsx?raw'
 
 vi.mock('sonner', () => ({
   toast: {
@@ -50,6 +51,9 @@ const snapshot: GetApiRoomsByCode200 = {
   permissions: {
     role: 'host',
     canControlPlayback: true,
+    canAddMedia: true,
+    canChat: true,
+    canModerate: true,
   },
 }
 
@@ -70,22 +74,51 @@ describe('RoomHeader', () => {
     })
   })
 
-  it('copies the current room link from the share action', async () => {
-    render(<RoomHeader snapshot={snapshot} connectionStatus="closed" />)
+  function renderHeader() {
+    return render(
+      <RoomHeader
+        snapshot={snapshot}
+        participantCount={2}
+        viewMode="workspace"
+        onViewModeChange={vi.fn()}
+        onOpenSettings={vi.fn()}
+        onOpenPeople={vi.fn()}
+      />,
+    )
+  }
 
-    fireEvent.click(screen.getByRole('button', { name: /share room/i }))
+  it('opens the invite popover and copies the room link', async () => {
+    renderHeader()
+
+    fireEvent.click(screen.getByRole('button', { name: /invite/i }))
+
+    const copyButton = await screen.findByRole('button', { name: /copy link/i })
+    fireEvent.click(copyButton)
+
+    const expectedUrl = `${window.location.origin}/room/${snapshot.room.code}`
 
     await waitFor(() => {
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(window.location.href)
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(expectedUrl)
     })
     expect(toast.success).toHaveBeenCalledWith('Room link copied')
   })
 
-  it('keeps the source video link available', () => {
-    render(<RoomHeader snapshot={snapshot} connectionStatus="closed" />)
+  it('keeps the source video link available in the room menu', async () => {
+    renderHeader()
 
-    expect(screen.getByRole('link', { name: /source video/i }).getAttribute('href')).toBe(
-      snapshot.media.canonicalUrl,
-    )
+    fireEvent.keyDown(screen.getByRole('button', { name: /room menu/i }), { key: 'Enter' })
+
+    const link = await screen.findByRole('menuitem', { name: /source video/i })
+    expect(link.getAttribute('href')).toBe(snapshot.media.canonicalUrl)
+  })
+
+  it('keeps playback and synchronization status out of room identity overlays', () => {
+    renderHeader()
+
+    expect(screen.queryByText('Friday room')).toBeNull()
+    expect(screen.queryByRole('status')).toBeNull()
+    expect(screen.queryByText(/paused|playing|syncing/i)).toBeNull()
+    expect(roomPageSource).not.toContain('RoomSyncBadge')
+    expect(roomPageSource).not.toContain('const title = snapshot.room.title')
   })
 })

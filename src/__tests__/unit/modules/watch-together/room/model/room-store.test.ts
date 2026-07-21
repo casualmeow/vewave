@@ -40,6 +40,9 @@ const snapshot: GetApiRoomsByCode200 = {
   permissions: {
     role: 'host',
     canControlPlayback: true,
+    canAddMedia: true,
+    canChat: true,
+    canModerate: true,
   },
 }
 
@@ -88,6 +91,7 @@ describe('room store', () => {
               userId: 'user-1',
               name: 'Jane',
               role: 'owner',
+              status: 'watching',
             },
           ],
         },
@@ -106,6 +110,7 @@ describe('room store', () => {
       userId: 'user-1',
       name: 'Jane',
       role: 'owner',
+      status: 'watching' as const,
     }
     const sam = {
       connectionId: 'conn-2',
@@ -113,6 +118,7 @@ describe('room store', () => {
       userId: 'user-2',
       name: 'Sam',
       role: 'viewer',
+      status: 'watching' as const,
     }
 
     useRoomStore.getState().applyServerEvent({

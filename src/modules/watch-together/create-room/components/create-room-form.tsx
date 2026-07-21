@@ -187,9 +187,9 @@ export function CreateRoomForm({ onCreated, variant = 'card' }: CreateRoomFormPr
             }
           >
             {parseMutation.isPending
-              ? 'Validating link...'
+              ? 'Validating link…'
               : createMutation.isPending
-                ? 'Creating room...'
+                ? 'Creating room…'
                 : 'Create and open room'}
           </Button>
           {compact ? null : (
@@ -233,7 +233,7 @@ type VideoLinkDescriptionProps = {
 
 function VideoLinkDescription({ isValidating, media }: VideoLinkDescriptionProps) {
   if (isValidating) {
-    return <FormDescription>Validating link...</FormDescription>
+    return <FormDescription>Validating link…</FormDescription>
   }
 
   if (media.length > 1) {

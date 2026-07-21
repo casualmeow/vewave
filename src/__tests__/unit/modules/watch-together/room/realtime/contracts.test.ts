@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   createMediaAddCommand,
+  createMediaRemoveCommand,
+  createMediaRenameCommand,
   createMediaSelectCommand,
   createPlaybackCommand,
   parseServerRoomEvent,
@@ -127,7 +129,7 @@ describe('room realtime contracts', () => {
     expect(parseServerRoomEvent({ type: 'unknown', payload: {} })).toBeNull()
   })
 
-  it('creates media select and add commands', () => {
+  it('creates media queue commands', () => {
     expect(createMediaSelectCommand('item-1')).toEqual({
       type: 'media.select',
       payload: { mediaItemId: 'item-1' },
@@ -135,6 +137,14 @@ describe('room realtime contracts', () => {
     expect(createMediaAddCommand('https://youtu.be/oHg5SJYRHA0')).toEqual({
       type: 'media.add',
       payload: { url: 'https://youtu.be/oHg5SJYRHA0' },
+    })
+    expect(createMediaRenameCommand('item-1', 'Friday mix')).toEqual({
+      type: 'media.rename',
+      payload: { mediaItemId: 'item-1', title: 'Friday mix' },
+    })
+    expect(createMediaRemoveCommand('item-1')).toEqual({
+      type: 'media.remove',
+      payload: { mediaItemId: 'item-1' },
     })
   })
 

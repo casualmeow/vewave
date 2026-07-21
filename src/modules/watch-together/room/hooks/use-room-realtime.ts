@@ -3,12 +3,17 @@ import { toast } from 'sonner'
 import { rememberRoomSnapshot, useRoomStore } from '../model'
 import {
   buildRoomRealtimeUrl,
+  createChatMessageCommand,
   createMediaAddCommand,
+  createMediaRemoveCommand,
+  createMediaRenameCommand,
   createMediaSelectCommand,
   createPlaybackCommand,
+  createPresenceStatusCommand,
   parseServerRoomEvent,
   serializeClientRoomEvent,
   type PlaybackCommandAction,
+  type RoomPresenceStatus,
 } from '../realtime'
 import { useAuthStore } from '@/modules/auth'
 
@@ -166,10 +171,58 @@ export function useRoomRealtime(code: string) {
     return true
   }, [])
 
+  const sendMediaRename = useCallback((mediaItemId: string, title: string) => {
+    const socket = socketRef.current
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      return false
+    }
+
+    socket.send(serializeClientRoomEvent(createMediaRenameCommand(mediaItemId, title)))
+    return true
+  }, [])
+
+  const sendMediaRemove = useCallback((mediaItemId: string) => {
+    const socket = socketRef.current
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      return false
+    }
+
+    socket.send(serializeClientRoomEvent(createMediaRemoveCommand(mediaItemId)))
+    return true
+  }, [])
+
+  const sendChatMessage = useCallback((body: string) => {
+    const socket = socketRef.current
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      return false
+    }
+
+    socket.send(serializeClientRoomEvent(createChatMessageCommand(body)))
+    return true
+  }, [])
+
+  const sendPresenceStatus = useCallback((status: RoomPresenceStatus) => {
+    const socket = socketRef.current
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      return false
+    }
+
+    socket.send(serializeClientRoomEvent(createPresenceStatusCommand(status)))
+    return true
+  }, [])
+
   return {
     connectionStatus,
+    sendChatMessage,
     sendMediaAdd,
+    sendMediaRemove,
+    sendMediaRename,
     sendMediaSelect,
     sendPlaybackCommand,
+    sendPresenceStatus,
   }
 }

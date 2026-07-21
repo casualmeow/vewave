@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react'
 import { Link } from '@tanstack/react-router'
 import { formatDistanceToNow } from 'date-fns'
+import type { ReactNode } from 'react'
 
-import { cn } from '@/shared/lib/utils'
 import type { GetApiForumThreadsByThreadId200ThreadAuthor } from '@/core/api/generated/model'
+import { cn } from '@/shared/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui'
 
 export type ForumAuthor = GetApiForumThreadsByThreadId200ThreadAuthor
@@ -15,7 +15,11 @@ export const CATEGORIES: Array<{
   description: string
 }> = [
   { value: 'general', label: 'General', description: 'Open discussion and introductions.' },
-  { value: 'bugs', label: 'Bugs & Errors', description: 'Report problems and unexpected behavior.' },
+  {
+    value: 'bugs',
+    label: 'Bugs & Errors',
+    description: 'Report problems and unexpected behavior.',
+  },
   {
     value: 'features',
     label: 'Feature Requests',

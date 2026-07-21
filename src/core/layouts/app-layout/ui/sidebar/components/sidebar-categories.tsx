@@ -30,6 +30,7 @@ export function SidebarCategories({
   const renderRoomRow = (room: AppSidebarRoomItem, keyPrefix: string) => (
     <SidebarRoomListItem
       key={`${keyPrefix}-${room.code}`}
+      glassId={`${keyPrefix}-${room.code}`}
       active={pathname === `/room/${room.code}`}
       pinned={isRoomPinned(pins, room.code)}
       room={room}
@@ -41,6 +42,7 @@ export function SidebarCategories({
   const renderServerRow = (server: AppSidebarServerItem, keyPrefix: string) => (
     <SidebarServerListItem
       key={`${keyPrefix}-${server.id}`}
+      glassId={`${keyPrefix}-${server.id}`}
       active={pathname === `/servers/${server.id}`}
       pinned={pins.serverIds.includes(server.id)}
       server={server}

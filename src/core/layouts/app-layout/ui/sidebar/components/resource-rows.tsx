@@ -2,6 +2,8 @@ import { Link } from '@tanstack/react-router'
 import { MoreHorizontal, Pin, PinOff, Server, Trash2, type LucideIcon } from 'lucide-react'
 import { getRoomIcon, type AppSidebarRoomItem } from '../../../app-sidebar-items'
 import type { GetApiServers200ServersItem } from '@/core/api/generated/model'
+import { FluidGlassTarget } from '@/components/fluid-glass'
+import { useSidebarContext } from '@/components/sidebar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -194,30 +196,42 @@ export function PanelRouteLink({
 
 export function SidebarRoomListItem({
   active,
+  glassId,
   onRemove,
   onTogglePin,
   pinned,
   room,
 }: {
   active: boolean
+  glassId: string
   onRemove: () => void
   onTogglePin: () => void
   pinned: boolean
   room: AppSidebarRoomItem
 }) {
   const Icon = getRoomIcon(room)
+  const { scopeId } = useSidebarContext()
 
   return (
     <div className="group/resource-row relative">
-      <Link
-        to="/room/$code"
-        params={{ code: room.code }}
-        aria-current={active ? 'page' : undefined}
-        className={sidebarInlineRowClassName(active)}
+      <FluidGlassTarget
+        id={glassId}
+        scopeId={`sidebar:${scopeId}`}
+        active={active}
+        shape="rounded-rect"
+        radius="inherit"
+        asChild
       >
-        <Icon className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden />
-        <span className="min-w-0 flex-1 truncate">{room.label}</span>
-      </Link>
+        <Link
+          to="/room/$code"
+          params={{ code: room.code }}
+          aria-current={active ? 'page' : undefined}
+          className={sidebarInlineRowClassName(active)}
+        >
+          <Icon className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden />
+          <span className="min-w-0 flex-1 truncate">{room.label}</span>
+        </Link>
+      </FluidGlassTarget>
       <ResourceActionMenu
         label={room.label}
         pinned={pinned}
@@ -230,28 +244,41 @@ export function SidebarRoomListItem({
 
 export function SidebarServerListItem({
   active,
+  glassId,
   onRemove,
   onTogglePin,
   pinned,
   server,
 }: {
   active: boolean
+  glassId: string
   onRemove: () => void
   onTogglePin: () => void
   pinned: boolean
   server: AppSidebarServerItem
 }) {
+  const { scopeId } = useSidebarContext()
+
   return (
     <div className="group/resource-row relative">
-      <Link
-        to="/servers/$serverId"
-        params={{ serverId: server.id }}
-        aria-current={active ? 'page' : undefined}
-        className={sidebarInlineRowClassName(active)}
+      <FluidGlassTarget
+        id={glassId}
+        scopeId={`sidebar:${scopeId}`}
+        active={active}
+        shape="rounded-rect"
+        radius="inherit"
+        asChild
       >
-        <Server className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden />
-        <span className="min-w-0 flex-1 truncate">{server.name}</span>
-      </Link>
+        <Link
+          to="/servers/$serverId"
+          params={{ serverId: server.id }}
+          aria-current={active ? 'page' : undefined}
+          className={sidebarInlineRowClassName(active)}
+        >
+          <Server className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden />
+          <span className="min-w-0 flex-1 truncate">{server.name}</span>
+        </Link>
+      </FluidGlassTarget>
       <ResourceActionMenu
         label={server.name}
         pinned={pinned}

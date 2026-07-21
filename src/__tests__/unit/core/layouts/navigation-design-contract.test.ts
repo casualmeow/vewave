@@ -170,9 +170,8 @@ describe('production navigation design contract', () => {
       'drag={showLiquidEffects ? toMotionDragMode(resolvedDragMode) : false}',
     )
     expect(sidebarItemSource).toContain('showLiquidEffects && (isHovered || isDragging)')
-    expect(sidebarItemSource).toContain(
-      '<span aria-hidden="true" className={sidebarActiveIndicatorVariants({ design })}>',
-    )
+    expect(sidebarItemSource).toContain('data-sidebar-active-indicator')
+    expect(sidebarItemSource).toContain('className={sidebarActiveIndicatorVariants({ design })}')
     expect(sidebarItemSource).toContain("'data-slot': 'sidebar-item'")
     expect(sidebarItemSource).not.toContain("design === 'liquidGlass'")
     expect(sidebarItemSource).not.toContain('data-slot="liquid-sidebar-item"')

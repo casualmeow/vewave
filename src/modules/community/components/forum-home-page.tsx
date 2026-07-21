@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router'
 import { ChevronRight, Folder, MessageSquare, Plus, ScrollText } from 'lucide-react'
 
+import { CATEGORIES, CATEGORY_META } from './forum-shared'
 import { cn } from '@/shared/lib/utils'
 import { useAuthStore } from '@/modules/auth/model'
 import { useGetApiForumThreads } from '@/core/api/generated/forum/forum'
-import { CATEGORIES, CATEGORY_META } from './forum-shared'
 
 export function ForumHomePage() {
   const user = useAuthStore((state) => state.user)
@@ -90,7 +90,9 @@ export function ForumHomePage() {
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-background">Community rules</p>
-            <p className="mt-0.5 truncate text-xs text-background/50">Guidelines for posting here.</p>
+            <p className="mt-0.5 truncate text-xs text-background/50">
+              Guidelines for posting here.
+            </p>
           </div>
           <ChevronRight className="size-4 shrink-0 text-background/30 transition-transform group-hover:translate-x-0.5" />
         </Link>

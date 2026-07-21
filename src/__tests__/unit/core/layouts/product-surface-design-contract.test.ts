@@ -17,15 +17,13 @@ import roomRouteSource from '@/routes/_app/room/$code/index.tsx?raw'
 import projectCardContentSource from '@/modules/projects/components/project-card-content.tsx?raw'
 import projectsPageSource from '@/modules/projects/components/projects-page.tsx?raw'
 import createRoomFormSource from '@/modules/watch-together/create-room/components/create-room-form.tsx?raw'
+import roomControlBarSource from '@/modules/watch-together/room/components/room-control-bar.tsx?raw'
 import roomPageSource from '@/modules/watch-together/room/components/room-page.tsx?raw'
+import roomSidePanelSource from '@/modules/watch-together/room/components/room-side-panel.tsx?raw'
 import roomVideoListSource from '@/modules/watch-together/room/components/room-video-list.tsx?raw'
 import useRoomRealtimeSource from '@/modules/watch-together/room/hooks/use-room-realtime.ts?raw'
 
 const workflowSurfaces = [
-  {
-    name: 'app layout',
-    source: appLayoutSource,
-  },
   {
     name: 'projects page',
     source: projectsPageSource,
@@ -52,6 +50,16 @@ describe('product surface design contract', () => {
     expect(appLayoutSource).toContain('md:h-[calc(100vh-2rem)]')
     expect(appLayoutSource).toContain('overflow-auto')
     expect(appLayoutSource).not.toContain('md:min-h-[calc(100vh-2rem)]')
+  })
+
+  it('room shell keeps the established outer spacing without restoring its header', () => {
+    expect(appLayoutSource).toContain('gap-3 p-3 md:p-4')
+    expect(appLayoutSource).not.toContain("inRoom ? 'gap-0 p-0'")
+    expect(appLayoutSource).toContain('{inRoom ? null : (')
+    expect(appLayoutSource).toContain("inRoom ? 'p-0'")
+    expect(appLayoutSource).toContain("'rounded-[2rem] border border-[color:var(--glass-border)]'")
+    expect(roomPageSource).not.toContain('h-full min-h-0 overflow-hidden rounded-[2rem]')
+    expect(roomPageSource).toContain('rounded-[2rem] focus-visible:ring-inset')
   })
 
   it('app pages align content to the shell instead of centering with mx-auto', () => {
@@ -87,20 +95,31 @@ describe('product surface design contract', () => {
   })
 
   it('room page exposes the playlist and add-video controls in the right rail', () => {
-    expect(roomPageSource).toContain('<RoomVideoList')
+    expect(roomPageSource).toContain('<RoomSidePanel')
     expect(roomPageSource).toContain('sendMediaAdd={sendMediaAdd}')
-    expect(roomPageSource).toContain('<RoomPresence')
-    expect(roomVideoListSource).toContain('Video list')
+    expect(roomSidePanelSource).toContain('<RoomVideoList')
+    expect(roomSidePanelSource).toContain('<RoomPresence')
+    expect(roomVideoListSource).toContain('Queue')
     expect(roomVideoListSource).toContain('Paste video link')
     expect(roomVideoListSource).toContain('Add video')
     expect(roomVideoListSource).toContain('snapshot.mediaItems.map')
     expect(useRoomRealtimeSource).toContain('createMediaAddCommand')
+    expect(useRoomRealtimeSource).toContain('createMediaRenameCommand')
+    expect(useRoomRealtimeSource).toContain('createMediaRemoveCommand')
     expect(useRoomRealtimeSource).toContain('sendMediaAdd')
+    expect(roomVideoListSource).toContain('Rename')
+    expect(roomVideoListSource).toContain('Remove from queue')
+  })
+
+  it('room chrome omits redundant identity and playback-status labels', () => {
+    expect(roomPageSource).not.toContain('const title = snapshot.room.title')
+    expect(roomControlBarSource).not.toContain('syncStatus.label')
+    expect(roomControlBarSource).not.toContain('role="status"')
   })
 
   it('room creation form keeps one primary action without a permanent check-link step', () => {
     expect(createRoomFormSource).toContain('Create and open room')
-    expect(createRoomFormSource).toContain('Validating link...')
+    expect(createRoomFormSource).toContain('Validating link…')
     expect(createRoomFormSource).toContain('Video found:')
     expect(createRoomFormSource).toContain('This name will be shown to invited viewers.')
     expect(createRoomFormSource).toContain(

@@ -52,6 +52,8 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
     root.dataset.preset = settings.preset
     root.dataset.glassIntensity = settings.glassIntensity
     root.dataset.logoStrategy = settings.logoStrategy
+    root.dataset.surfaceStyle = settings.surfaceStyle
+    root.dataset.glassRefraction = settings.experimentalRefraction ? 'on' : 'off'
     applyThemeTokens(tokens, root)
 
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', tokens.background)
@@ -70,9 +72,20 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
       delete root.dataset.preset
       delete root.dataset.glassIntensity
       delete root.dataset.logoStrategy
+      delete root.dataset.surfaceStyle
+      delete root.dataset.glassRefraction
       root.style.removeProperty('color-scheme')
     }
-  }, [mode, resolvedMode, settings.glassIntensity, settings.logoStrategy, settings.preset, tokens])
+  }, [
+    mode,
+    resolvedMode,
+    settings.experimentalRefraction,
+    settings.glassIntensity,
+    settings.logoStrategy,
+    settings.preset,
+    settings.surfaceStyle,
+    tokens,
+  ])
 
   const updateSettings = useCallback(
     (updater: (current: AppearanceSettings) => AppearanceSettings) => {
@@ -176,6 +189,12 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
       },
       setPreset: (preset) => {
         updateSettings((current) => ({ ...current, preset }))
+      },
+      setSurfaceStyle: (surfaceStyle) => {
+        updateSettings((current) => ({ ...current, surfaceStyle }))
+      },
+      setExperimentalRefraction: (enabled) => {
+        updateSettings((current) => ({ ...current, experimentalRefraction: enabled }))
       },
     }),
     [mode, resolvedMode, settings, tokens, updateSettings],

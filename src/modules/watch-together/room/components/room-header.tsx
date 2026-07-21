@@ -1,82 +1,160 @@
-import { ExternalLink, Share2, Wifi } from 'lucide-react'
+import {
+  Copy,
+  ExternalLink,
+  LayoutPanelLeft,
+  MonitorPlay,
+  MoreVertical,
+  Settings2,
+  Users,
+} from 'lucide-react'
 import { toast } from 'sonner'
+import { RoomInvite } from './room-invite'
+import { RoomSidebarToggle } from './room-sidebar-toggle'
+import type { RoomViewMode } from '../model'
 import type { GetApiRoomsByCode200 } from '@/core/api/generated/model'
-import type { RoomConnectionStatus } from '../model'
-import { Button } from '@/shared/ui'
+import { cn } from '@/shared/lib/utils'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/shared/ui'
 
-type RoomHeaderProps = {
-  snapshot: GetApiRoomsByCode200
-  connectionStatus: RoomConnectionStatus
+const mediaChromeButton = 'text-media-foreground hover:bg-media-control hover:text-media-foreground'
+
+type RoomChromeVariant = 'default' | 'media'
+
+export function RoomParticipantsButton({
+  count,
+  onClick,
+  variant = 'default',
+}: {
+  count: number
+  onClick: () => void
+  variant?: RoomChromeVariant
+}) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      className={cn(variant === 'media' ? mediaChromeButton : 'text-muted-foreground')}
+      aria-label={`${count} participant${count === 1 ? '' : 's'} — open people panel`}
+      onClick={onClick}
+    >
+      <Users className="size-4" />
+      {count}
+    </Button>
+  )
 }
 
-export function RoomHeader({ snapshot, connectionStatus }: RoomHeaderProps) {
-  const title = snapshot.room.title ?? snapshot.media.title ?? 'Room'
-
-  async function shareRoomLink() {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    const url = window.location.href
-
+export function RoomMenu({
+  snapshot,
+  viewMode,
+  onViewModeChange,
+  onOpenSettings,
+  variant = 'default',
+  onOpenChange,
+}: {
+  snapshot: GetApiRoomsByCode200
+  viewMode: RoomViewMode
+  onViewModeChange: (mode: RoomViewMode) => void
+  onOpenSettings: () => void
+  variant?: RoomChromeVariant
+  onOpenChange?: (open: boolean) => void
+}) {
+  async function copyCode() {
     try {
-      if (navigator.share) {
-        await navigator.share({
-          title,
-          text: `Join room ${snapshot.room.code} on Vewave.`,
-          url,
-        })
-        toast.success('Room link shared')
-        return
-      }
-
-      await navigator.clipboard.writeText(url)
-      toast.success('Room link copied')
-    } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') {
-        return
-      }
-
-      toast.error('Unable to share room link')
+      await navigator.clipboard.writeText(snapshot.room.code)
+      toast.success('Room code copied')
+    } catch {
+      toast.error('Unable to copy room code')
     }
   }
 
   return (
-    <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-      <div>
-        <p className="text-sm font-medium text-muted-foreground">Room {snapshot.room.code}</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">{title}</h1>
-        <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-          <span className="capitalize">{snapshot.media.provider}</span>
-          <span>
-            {snapshot.mediaItems.length} video{snapshot.mediaItems.length === 1 ? '' : 's'}
-          </span>
-          <span>{snapshot.permissions.role}</span>
-          <span className="inline-flex items-center gap-1">
-            <Wifi className="size-4" />
-            {connectionStatus}
-          </span>
-        </div>
-      </div>
-      <div className="flex flex-wrap items-center gap-2">
+    <DropdownMenu onOpenChange={onOpenChange}>
+      <DropdownMenuTrigger asChild>
         <Button
           type="button"
-          variant="outline"
-          className="rounded-md"
-          onClick={() => void shareRoomLink()}
+          variant="ghost"
+          size="icon"
+          className={cn(
+            'size-8',
+            variant === 'media' ? mediaChromeButton : 'text-muted-foreground',
+          )}
+          aria-label="Room menu"
         >
-          <Share2 className="size-4" />
-          Share room
+          <MoreVertical className="size-4" />
         </Button>
-        <a
-          href={snapshot.media.canonicalUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium text-primary underline-offset-4 hover:underline"
-        >
-          Source video
-          <ExternalLink className="size-4" />
-        </a>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        {viewMode === 'immersive' ? (
+          <DropdownMenuItem onClick={() => onViewModeChange('workspace')}>
+            <LayoutPanelLeft className="size-4" />
+            Switch to Workspace view
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem onClick={() => onViewModeChange('immersive')}>
+            <MonitorPlay className="size-4" />
+            Switch to Immersive view
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem onClick={onOpenSettings}>
+          <Settings2 className="size-4" />
+          Room settings…
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => void copyCode()}>
+          <Copy className="size-4" />
+          Copy room code
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <a href={snapshot.media.canonicalUrl} target="_blank" rel="noreferrer">
+            <ExternalLink className="size-4" />
+            Source video
+          </a>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+type RoomHeaderProps = {
+  snapshot: GetApiRoomsByCode200
+  participantCount: number
+  viewMode: RoomViewMode
+  onViewModeChange: (mode: RoomViewMode) => void
+  onOpenSettings: () => void
+  onOpenPeople: () => void
+}
+
+/**
+ * Permanent room header reduced to essentials: identity, participants, one
+ * Invite action, and an overflow menu. Secondary metadata lives in settings.
+ */
+export function RoomHeader({
+  snapshot,
+  participantCount,
+  viewMode,
+  onViewModeChange,
+  onOpenSettings,
+  onOpenPeople,
+}: RoomHeaderProps) {
+  return (
+    <header className="flex h-12 shrink-0 items-center justify-between gap-3 px-1">
+      <RoomSidebarToggle />
+      <div className="flex shrink-0 items-center gap-1.5">
+        <RoomParticipantsButton count={participantCount} onClick={onOpenPeople} />
+        <RoomInvite snapshot={snapshot} />
+        <RoomMenu
+          snapshot={snapshot}
+          viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
+          onOpenSettings={onOpenSettings}
+        />
       </div>
     </header>
   )

@@ -1,8 +1,8 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowLeft, ScrollText } from 'lucide-react'
 
-import { useGetApiForumRules } from '@/core/api/generated/forum/forum'
 import { StateNote } from './forum-shared'
+import { useGetApiForumRules } from '@/core/api/generated/forum/forum'
 
 export function ForumRulesPage() {
   const rulesQuery = useGetApiForumRules()

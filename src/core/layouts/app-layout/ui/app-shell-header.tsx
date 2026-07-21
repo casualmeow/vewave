@@ -3,7 +3,9 @@ import { getNextAppSidebarMode, type AppSidebarMode } from '../app-sidebar-mode'
 import type { ReactNode } from 'react'
 
 import type { AppShellSurfaceRenderer } from './app-shell-surfaces'
+import { useLiquidGlassRefraction } from '@/shared/hooks'
 import { cn } from '@/shared/lib/utils'
+import { useAppearance } from '@/shared/theme'
 
 type AppShellHeaderProps = {
   actions?: ReactNode
@@ -36,9 +38,29 @@ export function AppShellHeader({
 }: AppShellHeaderProps) {
   const wrapSurface = (surface: Parameters<AppShellSurfaceRenderer>[0], children: ReactNode) =>
     renderSurface ? renderSurface(surface, children) : children
+  const { settings } = useAppearance()
+  const glassShell = settings.surfaceStyle === 'glass'
+  const refraction = useLiquidGlassRefraction({
+    enabled: glassShell && settings.experimentalRefraction,
+    radius: 0,
+    edgeWidth: 16,
+    refraction: 18,
+    scattering: 6,
+  })
 
   return (
-    <header className="flex min-h-16 shrink-0 items-center justify-between gap-4 border-b border-border/70 px-5">
+    <header
+      ref={refraction.ref}
+      data-glass-shell-header
+      data-liquid-glass-active={refraction.active || undefined}
+      style={refraction.style}
+      {...(refraction.active ? refraction.handlers : {})}
+      className={cn(
+        'flex min-h-16 shrink-0 items-center justify-between gap-4 border-b border-border/70 px-5',
+        refraction.active && 'glass-material-liquid',
+      )}
+    >
+      {refraction.filterNode}
       <div className="flex min-w-0 items-center gap-3">
         {sidebarMode && onSidebarModeChange
           ? wrapSurface(

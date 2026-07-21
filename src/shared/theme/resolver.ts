@@ -2,6 +2,7 @@ import {
   cssVariableByToken,
   type AppearanceSettings,
   type EditableThemeTokenName,
+  type GlassIntensity,
   type ResolvedAppearanceMode,
   type ThemeTokenOverrides,
   type ThemeTokens,
@@ -49,7 +50,47 @@ export function resolveThemeTokens(
     }
   }
 
+  applyGlassIntensity(tokens, settings.glassIntensity)
+
   return tokens
+}
+
+// Glass surfaces (sidebar, docks) read --glass-* variables; presets ship the
+// "balanced" alphas, so subtle/strong scale translucency from those values.
+const glassIntensityAlphaFactors: Record<
+  GlassIntensity,
+  { background: number; border: number; highlight: number } | null
+> = {
+  subtle: { background: 1.35, border: 0.85, highlight: 0.55 },
+  balanced: null,
+  strong: { background: 0.55, border: 1.25, highlight: 1.6 },
+}
+
+function applyGlassIntensity(tokens: ThemeTokens, intensity: GlassIntensity) {
+  const factors = glassIntensityAlphaFactors[intensity]
+
+  if (!factors) {
+    return
+  }
+
+  tokens.glassBackground = scaleColorAlpha(tokens.glassBackground, factors.background)
+  tokens.glassBorder = scaleColorAlpha(tokens.glassBorder, factors.border)
+  tokens.glassHighlight = scaleColorAlpha(tokens.glassHighlight, factors.highlight)
+}
+
+function scaleColorAlpha(color: string, factor: number) {
+  const match = color.match(
+    /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)$/,
+  )
+
+  if (!match) {
+    return color
+  }
+
+  const alpha = match[4] === undefined ? 1 : Number.parseFloat(match[4])
+  const nextAlpha = Math.min(0.98, Math.max(0.04, alpha * factor))
+
+  return `rgba(${match[1]}, ${match[2]}, ${match[3]}, ${Number(nextAlpha.toFixed(3))})`
 }
 
 function linkDerivedToken(

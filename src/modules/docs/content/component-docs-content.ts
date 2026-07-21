@@ -94,7 +94,12 @@ const glassImportSnippet = `import {
   useResolvedGlassFluidConfig,
   type GlassFluidPreset,
   type GlassFluidInteractionProps,
-} from '@/components/glass'`
+} from '@/components/glass'
+
+import {
+  FluidGlassGroup,
+  FluidGlassTarget,
+} from '@/components/fluid-glass'`
 
 const glassUsageSnippet = `function LiquidItem(props: GlassFluidInteractionProps & { active?: boolean }) {
   const config = useResolvedGlassFluidConfig({
@@ -113,6 +118,24 @@ const glassUsageSnippet = `function LiquidItem(props: GlassFluidInteractionProps
     >
       Liquid control
     </motion.button>
+  )
+}
+
+function SharedSelectionLens({ activeId }: { activeId: string }) {
+  return (
+    <FluidGlassGroup environment={{ type: 'theme' }} quality="auto">
+      {['rooms', 'servers'].map((id) => (
+        <FluidGlassTarget
+          key={id}
+          id={id}
+          scopeId="navigation"
+          active={activeId === id}
+          asChild
+        >
+          <button className="rounded-lg px-3 py-2">{id}</button>
+        </FluidGlassTarget>
+      ))}
+    </FluidGlassGroup>
   )
 }`
 
@@ -242,12 +265,42 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
     title: 'Glass',
     eyebrow: 'Motion / liquid interaction foundation',
     description:
-      'Shared glass-interaction utilities used by Header, Sidebar, and Tabs for fluid presets, magnetic pointer motion, drag behavior, and reduced-motion-aware animation tuning.',
+      'Shared glass-interaction utilities plus the controlled-environment WebGL2 material used by Sidebar and settings navigation for real edge refraction with sharp DOM foregrounds.',
     to: '/admin/docs/ui/components/glass',
     icon: Sparkles,
     importSnippet: glassImportSnippet,
     usageSnippet: glassUsageSnippet,
     apiRows: [
+      {
+        name: 'FluidGlassGroup',
+        type: 'environment, quality, activation, renderer, material, transmissionMaterial, forceFallback',
+        description:
+          'Owns one demand-driven SDF canvas by default, plus the explicitly selected transmission experiment, target registry, shared spring lens, and semantic CSS fallback.',
+      },
+      {
+        name: 'FluidGlassTarget',
+        type: 'id, scopeId, active, shape, radius, behaviors, draggable, asChild',
+        description:
+          'Keeps the original DOM control sharp while registering geometry and selected membership inside an explicit shared-lens scope.',
+      },
+      {
+        name: 'FluidGlassQuality',
+        type: "'low' | 'medium' | 'high' | 'auto'",
+        description:
+          'Controls SDF render resolution and sampling. Auto and high remain on SDF unless the lab opts into the experimental transmission renderer.',
+      },
+      {
+        name: 'FluidGlassRendererSelection',
+        type: "'auto' | 'transmission-experimental'",
+        description:
+          'Keeps production on SDF and exposes the Drei transmission volume only as an explicit calibration-lab selection.',
+      },
+      {
+        name: 'FluidTransmissionMaterial',
+        type: 'ior, thickness, roughness, anisotropy, chromaticAberration, distortion, distortionScale, temporalDistortion, attenuationDistance, attenuationColor',
+        description:
+          'Restrained Drei transmission controls passed directly to the shared procedural volume; it adds no custom rim, tint, or RGB overlay.',
+      },
       {
         name: 'GlassFluidPreset',
         type: "'subtle' | 'balanced' | 'expressive' | 'extreme'",

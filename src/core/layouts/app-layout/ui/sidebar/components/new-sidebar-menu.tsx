@@ -42,7 +42,7 @@ export function NewSidebarMenu({
           align="start"
           side="right"
           sideOffset={12}
-          className="w-44 rounded-xl border-sidebar-border bg-popover p-1.5 shadow-lg"
+          className="w-44 rounded-xl border-sidebar-border p-1.5"
         >
           <DropdownMenuItem
             onSelect={() => chooseKind('room')}

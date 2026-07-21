@@ -57,7 +57,7 @@ export function SegmentedControl<T extends string>({
     <div
       role="group"
       aria-label={ariaLabel}
-      className="flex w-fit flex-wrap gap-1 rounded-lg border border-border bg-muted/40 p-1"
+      className="glass-control-track flex w-fit flex-wrap gap-1 rounded-lg border border-border/70 p-1"
     >
       {options.map((option) => {
         const active = option.value === value
@@ -69,10 +69,8 @@ export function SegmentedControl<T extends string>({
             aria-pressed={active}
             onClick={() => onChange(option.value)}
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50',
-              active
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground',
+              'glass-control inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+              active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
             )}
           >
             {option.icon ? <option.icon className="size-4" /> : null}

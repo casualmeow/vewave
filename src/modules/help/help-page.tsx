@@ -2,12 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, MessagesSquare, Search } from 'lucide-react'
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/shared/ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/shared/ui'
 
 interface FaqItem {
   question: string
@@ -89,8 +84,7 @@ export function HelpPage() {
         ...group,
         items: group.items.filter(
           (item) =>
-            item.question.toLowerCase().includes(term) ||
-            item.answer.toLowerCase().includes(term),
+            item.question.toLowerCase().includes(term) || item.answer.toLowerCase().includes(term),
         ),
       }))
       .filter((group) => group.items.length > 0)

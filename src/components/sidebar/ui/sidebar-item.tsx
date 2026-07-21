@@ -13,6 +13,7 @@ import { getPointerProgress, toMotionDragMode } from '../helpers'
 import type { MotionStyle } from 'motion/react'
 import type { FocusEvent as ReactFocusEvent, PointerEvent as ReactPointerEvent, Ref } from 'react'
 import type { SidebarItemPartProps, SidebarItemProps } from '../types'
+import { FluidGlassTarget } from '@/components/fluid-glass'
 import { cn } from '@/shared/lib/utils'
 
 type ItemShellStyle = MotionStyle & Record<`--${string}`, string | number>
@@ -203,169 +204,185 @@ export function SidebarItem({
   )
 
   return (
-    <motion.div
-      data-slot="sidebar-item-shell"
-      data-focused={effectiveFocusedItemKey === interactionKey ? 'true' : 'false'}
-      data-deemphasized={hasFocusedSibling ? 'true' : 'false'}
-      className="group/sidebar-item-shell relative isolate [--item-pointer-glow:0] [--item-pointer-x:50%] [--item-pointer-y:50%]"
-      style={itemStyle}
-      animate={
-        canAnimate
-          ? {
-              filter: hasFocusedSibling
-                ? `blur(${resolvedFocusBlurAmount}px) saturate(0.76) contrast(0.92)`
-                : 'blur(0px) saturate(1) contrast(1)',
-              opacity: hasFocusedSibling ? deemphasizedOpacity : 1,
-            }
-          : undefined
-      }
-      drag={showLiquidEffects ? toMotionDragMode(resolvedDragMode) : false}
-      dragConstraints={{
-        left: -resolvedHoverSize,
-        right: resolvedHoverSize,
-        top: -Math.max(6, resolvedHoverSize * 0.65),
-        bottom: Math.max(6, resolvedHoverSize * 0.65),
-      }}
-      dragElastic={0.42}
-      dragMomentum={false}
-      dragSnapToOrigin
-      whileHover={
-        canAnimate && !disabled
-          ? { scale: active ? resolvedActiveHoverScale : resolvedHoverScale }
-          : undefined
-      }
-      whileTap={canAnimate && !disabled ? { scale: 0.95 } : undefined}
-      whileDrag={
-        showLiquidEffects && canAnimate && !disabled
-          ? { scale: resolvedDragScale, zIndex: 50 }
-          : undefined
-      }
-      transition={transition}
-      onPointerMove={handlePointerMove}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-      onFocusCapture={handleFocusCapture}
-      onBlurCapture={handleBlurCapture}
-      onDragStart={() => {
-        if (!showLiquidEffects) return
-        setIsDragging(true)
-        setFocusedItemKey(interactionKey)
-      }}
-      onDragEnd={() => {
-        setIsDragging(false)
-        resetFluidTransform()
-      }}
+    <FluidGlassTarget
+      id={`${scopeId}-${itemKey}`}
+      scopeId={`sidebar:${scopeId}`}
+      active={active}
+      shape="rounded-rect"
+      radius="inherit"
+      asChild
     >
-      {showLiquidEffects ? (
-        <motion.span
-          aria-hidden="true"
-          className="pointer-events-none absolute rounded-[1.6rem] border border-transparent bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),var(--glass-highlight),color-mix(in_srgb,var(--glass-highlight)_34%,transparent)_35%,transparent_64%),linear-gradient(135deg,color-mix(in_srgb,var(--glass-highlight)_28%,transparent),transparent)] opacity-[calc(var(--item-pointer-glow)*0.95)] shadow-[inset_0_1px_0_var(--glass-highlight)] backdrop-blur-sm transition-[opacity,border-color] duration-150 group-hover/sidebar-item-shell:border-[color:var(--glass-border)]"
-          style={{ filter: canFluid ? `url(#${filterIds.refraction})` : undefined }}
-          animate={{
-            top: liquidInset,
-            right: liquidInset,
-            bottom: liquidInset,
-            left: liquidInset,
-          }}
-          transition={transition}
-        />
-      ) : null}
-
-      <AnimatePresence initial={false}>
-        {showLiquidEffects && (isHovered || isDragging) ? (
+      <motion.div
+        data-slot="sidebar-item-shell"
+        data-focused={effectiveFocusedItemKey === interactionKey ? 'true' : 'false'}
+        data-deemphasized={hasFocusedSibling ? 'true' : 'false'}
+        className="group/sidebar-item-shell relative isolate [--item-pointer-glow:0] [--item-pointer-x:50%] [--item-pointer-y:50%]"
+        style={itemStyle}
+        animate={
+          canAnimate
+            ? {
+                filter: hasFocusedSibling
+                  ? `blur(${resolvedFocusBlurAmount}px) saturate(0.76) contrast(0.92)`
+                  : 'blur(0px) saturate(1) contrast(1)',
+                opacity: hasFocusedSibling ? deemphasizedOpacity : 1,
+              }
+            : undefined
+        }
+        drag={showLiquidEffects ? toMotionDragMode(resolvedDragMode) : false}
+        dragConstraints={{
+          left: -resolvedHoverSize,
+          right: resolvedHoverSize,
+          top: -Math.max(6, resolvedHoverSize * 0.65),
+          bottom: Math.max(6, resolvedHoverSize * 0.65),
+        }}
+        dragElastic={0.42}
+        dragMomentum={false}
+        dragSnapToOrigin
+        whileHover={
+          canAnimate && !disabled
+            ? { scale: active ? resolvedActiveHoverScale : resolvedHoverScale }
+            : undefined
+        }
+        whileTap={canAnimate && !disabled ? { scale: 0.95 } : undefined}
+        whileDrag={
+          showLiquidEffects && canAnimate && !disabled
+            ? { scale: resolvedDragScale, zIndex: 50 }
+            : undefined
+        }
+        transition={transition}
+        onPointerMove={handlePointerMove}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
+        onFocusCapture={handleFocusCapture}
+        onBlurCapture={handleBlurCapture}
+        onDragStart={() => {
+          if (!showLiquidEffects) return
+          setIsDragging(true)
+          setFocusedItemKey(interactionKey)
+        }}
+        onDragEnd={() => {
+          setIsDragging(false)
+          resetFluidTransform()
+        }}
+      >
+        {showLiquidEffects ? (
           <motion.span
-            key="fluid-field"
             aria-hidden="true"
-            className="pointer-events-none absolute overflow-hidden rounded-[1.7rem] border border-[color:var(--glass-border)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--glass-highlight)_48%,transparent),var(--glass-background)_45%,color-mix(in_srgb,var(--accent)_24%,transparent))] shadow-[0_20px_52px_color-mix(in_srgb,var(--foreground)_16%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-2xl"
-            style={{ filter: `url(#${filterIds.refraction})` }}
-            initial={{ opacity: 0, scale: 0.82, top: 0, right: 0, bottom: 0, left: 0 }}
+            className="pointer-events-none absolute rounded-[1.6rem] border border-transparent bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),var(--glass-highlight),color-mix(in_srgb,var(--glass-highlight)_34%,transparent)_35%,transparent_64%),linear-gradient(135deg,color-mix(in_srgb,var(--glass-highlight)_28%,transparent),transparent)] opacity-[calc(var(--item-pointer-glow)*0.95)] shadow-[inset_0_1px_0_var(--glass-highlight)] backdrop-blur-sm transition-[opacity,border-color] duration-150 group-hover/sidebar-item-shell:border-[color:var(--glass-border)]"
+            style={{ filter: canFluid ? `url(#${filterIds.refraction})` : undefined }}
             animate={{
-              opacity: isDragging ? 0.92 : 0.62,
-              scale: isDragging ? 1.04 : 1,
               top: liquidInset,
               right: liquidInset,
               bottom: liquidInset,
               left: liquidInset,
             }}
-            exit={{ opacity: 0, scale: 0.9, top: 0, right: 0, bottom: 0, left: 0 }}
             transition={transition}
-          >
-            <span className="absolute inset-0 bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),var(--glass-highlight),transparent_42%)]" />
-            <span className="absolute inset-0" style={{ filter: `url(#${filterIds.gooStrong})` }}>
-              <motion.span
-                className="absolute -left-6 top-1/2 size-20 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--accent)_30%,transparent)]"
-                animate={canAnimate ? { x: [0, 11, -4, 0], scale: [1, 1.28, 0.96, 1] } : undefined}
-                transition={
-                  canAnimate ? { duration: 2.6, repeat: Infinity, ease: 'easeInOut' } : undefined
-                }
-              />
-              <motion.span
-                className="absolute left-[var(--item-pointer-x)] top-[var(--item-pointer-y)] size-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--glass-highlight)_45%,transparent)]"
-                animate={canAnimate ? { scale: [0.72, 1.34, 0.9] } : undefined}
-                transition={
-                  canAnimate ? { duration: 0.95, repeat: Infinity, ease: 'easeInOut' } : undefined
-                }
-              />
-              <motion.span
-                className="absolute -right-7 bottom-0 size-20 rounded-full bg-[color-mix(in_srgb,var(--primary)_28%,transparent)]"
-                animate={canAnimate ? { x: [0, -9, 4, 0], scale: [1, 0.88, 1.2, 1] } : undefined}
-                transition={
-                  canAnimate ? { duration: 2.9, repeat: Infinity, ease: 'easeInOut' } : undefined
-                }
-              />
-            </span>
-          </motion.span>
+          />
         ) : null}
-      </AnimatePresence>
 
-      {active ? (
-        showLiquidEffects ? (
-          <motion.span
-            aria-hidden="true"
-            layoutId={canAnimate ? `${scopeId}-active-sidebar-item` : undefined}
-            transition={transition}
-            className={sidebarActiveIndicatorVariants({ design })}
-            animate={{
-              top: liquidInset,
-              right: liquidInset,
-              bottom: liquidInset,
-              left: liquidInset,
-            }}
+        <AnimatePresence initial={false}>
+          {showLiquidEffects && (isHovered || isDragging) ? (
+            <motion.span
+              key="fluid-field"
+              aria-hidden="true"
+              className="pointer-events-none absolute overflow-hidden rounded-[1.7rem] border border-[color:var(--glass-border)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--glass-highlight)_48%,transparent),var(--glass-background)_45%,color-mix(in_srgb,var(--accent)_24%,transparent))] shadow-[0_20px_52px_color-mix(in_srgb,var(--foreground)_16%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-2xl"
+              style={{ filter: `url(#${filterIds.refraction})` }}
+              initial={{ opacity: 0, scale: 0.82, top: 0, right: 0, bottom: 0, left: 0 }}
+              animate={{
+                opacity: isDragging ? 0.92 : 0.62,
+                scale: isDragging ? 1.04 : 1,
+                top: liquidInset,
+                right: liquidInset,
+                bottom: liquidInset,
+                left: liquidInset,
+              }}
+              exit={{ opacity: 0, scale: 0.9, top: 0, right: 0, bottom: 0, left: 0 }}
+              transition={transition}
+            >
+              <span className="absolute inset-0 bg-[radial-gradient(circle_at_var(--item-pointer-x)_var(--item-pointer-y),var(--glass-highlight),transparent_42%)]" />
+              <span className="absolute inset-0" style={{ filter: `url(#${filterIds.gooStrong})` }}>
+                <motion.span
+                  className="absolute -left-6 top-1/2 size-20 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--accent)_30%,transparent)]"
+                  animate={
+                    canAnimate ? { x: [0, 11, -4, 0], scale: [1, 1.28, 0.96, 1] } : undefined
+                  }
+                  transition={
+                    canAnimate ? { duration: 2.6, repeat: Infinity, ease: 'easeInOut' } : undefined
+                  }
+                />
+                <motion.span
+                  className="absolute left-[var(--item-pointer-x)] top-[var(--item-pointer-y)] size-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color-mix(in_srgb,var(--glass-highlight)_45%,transparent)]"
+                  animate={canAnimate ? { scale: [0.72, 1.34, 0.9] } : undefined}
+                  transition={
+                    canAnimate ? { duration: 0.95, repeat: Infinity, ease: 'easeInOut' } : undefined
+                  }
+                />
+                <motion.span
+                  className="absolute -right-7 bottom-0 size-20 rounded-full bg-[color-mix(in_srgb,var(--primary)_28%,transparent)]"
+                  animate={canAnimate ? { x: [0, -9, 4, 0], scale: [1, 0.88, 1.2, 1] } : undefined}
+                  transition={
+                    canAnimate ? { duration: 2.9, repeat: Infinity, ease: 'easeInOut' } : undefined
+                  }
+                />
+              </span>
+            </motion.span>
+          ) : null}
+        </AnimatePresence>
+
+        {active ? (
+          showLiquidEffects ? (
+            <motion.span
+              aria-hidden="true"
+              data-sidebar-active-indicator
+              layoutId={canAnimate ? `${scopeId}-active-sidebar-item` : undefined}
+              transition={transition}
+              className={sidebarActiveIndicatorVariants({ design })}
+              animate={{
+                top: liquidInset,
+                right: liquidInset,
+                bottom: liquidInset,
+                left: liquidInset,
+              }}
+            >
+              {activeIndicatorContent}
+            </motion.span>
+          ) : (
+            <span
+              aria-hidden="true"
+              data-sidebar-active-indicator
+              className={sidebarActiveIndicatorVariants({ design })}
+            >
+              {activeIndicatorContent}
+            </span>
+          )
+        ) : null}
+
+        {asChild ? (
+          <Slot ref={ref} {...sharedProps}>
+            {itemContent}
+          </Slot>
+        ) : href ? (
+          <a
+            ref={ref as Ref<HTMLAnchorElement>}
+            {...sharedProps}
+            href={href}
+            target={target}
+            rel={rel}
           >
-            {activeIndicatorContent}
-          </motion.span>
+            {itemContent}
+          </a>
         ) : (
-          <span aria-hidden="true" className={sidebarActiveIndicatorVariants({ design })}>
-            {activeIndicatorContent}
-          </span>
-        )
-      ) : null}
-
-      {asChild ? (
-        <Slot ref={ref} {...sharedProps}>
-          {itemContent}
-        </Slot>
-      ) : href ? (
-        <a
-          ref={ref as Ref<HTMLAnchorElement>}
-          {...sharedProps}
-          href={href}
-          target={target}
-          rel={rel}
-        >
-          {itemContent}
-        </a>
-      ) : (
-        <button
-          ref={ref as Ref<HTMLButtonElement>}
-          {...sharedProps}
-          type={type}
-          disabled={disabled}
-        >
-          {itemContent}
-        </button>
-      )}
-    </motion.div>
+          <button
+            ref={ref as Ref<HTMLButtonElement>}
+            {...sharedProps}
+            type={type}
+            disabled={disabled}
+          >
+            {itemContent}
+          </button>
+        )}
+      </motion.div>
+    </FluidGlassTarget>
   )
 }
 

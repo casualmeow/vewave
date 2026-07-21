@@ -2,9 +2,6 @@ import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowLeft, MessageSquare, Plus, Search } from 'lucide-react'
 
-import { useAuthStore } from '@/modules/auth/model'
-import type { GetApiForumThreads200ThreadsItem } from '@/core/api/generated/model'
-import { useGetApiForumThreads } from '@/core/api/generated/forum/forum'
 import {
   AuthorAvatar,
   CATEGORY_META,
@@ -13,16 +10,18 @@ import {
   isForumCategory,
   timeAgo,
 } from './forum-shared'
+import type { GetApiForumThreads200ThreadsItem } from '@/core/api/generated/model'
+import { useAuthStore } from '@/modules/auth/model'
+import { useGetApiForumThreads } from '@/core/api/generated/forum/forum'
 
 export function ForumCategoryPage({ category }: { category: string }) {
   const user = useAuthStore((state) => state.user)
   const [search, setSearch] = useState('')
   const valid = isForumCategory(category)
 
-  const threadsQuery = useGetApiForumThreads(
-    valid ? { category } : undefined,
-    { query: { enabled: valid } },
-  )
+  const threadsQuery = useGetApiForumThreads(valid ? { category } : undefined, {
+    query: { enabled: valid },
+  })
   const threads = threadsQuery.data?.threads ?? []
 
   if (!valid) {
@@ -80,7 +79,9 @@ export function ForumCategoryPage({ category }: { category: string }) {
         ) : threadsQuery.isError ? (
           <StateNote>Unable to load threads.</StateNote>
         ) : filtered.length === 0 ? (
-          <StateNote>{threads.length === 0 ? 'No threads here yet.' : 'No threads found.'}</StateNote>
+          <StateNote>
+            {threads.length === 0 ? 'No threads here yet.' : 'No threads found.'}
+          </StateNote>
         ) : (
           filtered.map((thread) => (
             <ThreadRow key={thread.id} category={category} thread={thread} />
