@@ -145,29 +145,14 @@ export type CardVariants = VariantProps<typeof resizableCardVariants>
 export type ResizableCardsProps<T extends ResizableCardItem> = {
   items: ReadonlyArray<T>
 
-  /**
-   * Structural presentation for compact and expanded card geometry.
-   */
   presentation?: ResizableCardPresentation
 
-  /**
-   * Shared visual tone for the compact card and expanded dialog.
-   */
   variant?: ResizableCardVariant
 
-  /**
-   * Shared structural size for the compact card and dialog corner treatment.
-   */
   size?: ResizableCardSizeVariant
 
-  /**
-   * Motion strategy used when compact cards open into the expanded dialog.
-   */
   animationPreset?: ResizableCardAnimationPreset
 
-  /**
-   * Optional visual overrides for internal sub-parts.
-   */
   dialogVariant?: ResizableCardVariant
   actionVariant?: ResizableCardVariant
   actionSize?: ResizableCardSizeVariant

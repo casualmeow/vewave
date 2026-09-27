@@ -158,9 +158,7 @@ function writeSavedRooms(userId: string | null | undefined, rooms: Array<SavedRo
   try {
     window.localStorage.setItem(key, JSON.stringify(rooms))
     window.dispatchEvent(new CustomEvent(savedRoomsUpdatedEvent, { detail: { key } }))
-  } catch {
-    // Storage may be unavailable in privacy-restricted contexts.
-  }
+  } catch {}
 }
 
 export function readSavedRooms(userId?: string | null): Array<SavedRoomSummary> {

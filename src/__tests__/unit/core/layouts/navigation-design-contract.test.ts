@@ -1,20 +1,3 @@
-/**
- * Spelling-based design-contract tests — read before refactoring nearby source.
- *
- * These tests import files as raw text (`?raw`) and assert on literal source
- * strings, not runtime behavior. They encode design decisions ("navigation
- * stays calm", "no decorative liquid effects in production", "use the
- * theme-aware brand mark") as regression alarms.
- *
- * When you refactor an imported file (rename a const, extract a hook, move a
- * component, reformat JSX), assertions here MAY break. That is not a bug —
- * it is the contract asking you to confirm the decision still holds. Update
- * the assertion to match the new spelling, or weaken it only if the design
- * decision itself changed.
- *
- * Do not auto-rewrite these tests when they fail; do not convert them to
- * render tests unless one has broken 3+ times for non-substantive reasons.
- */
 import { describe, expect, it } from 'vitest'
 
 import sidebarVariantsSource from '@/components/sidebar/constants/variants.ts?raw'
@@ -36,9 +19,6 @@ import sidebarResourceListSource from '@/core/layouts/app-layout/ui/sidebar/comp
 import studioSidebarSource from '@/core/layouts/studio-layout/studio-sidebar.tsx?raw'
 import sidebarFluidConfigSource from '@/shared/hooks/use-resolved-fluid-config.ts?raw'
 
-// The app sidebar is composed from `app-sidebar.tsx` plus extracted sub-components under
-// `ui/sidebar/components/**`. Contract assertions about the whole product surface check this
-// combined tree instead of a single file so they stay valid across internal decomposition.
 const appSidebarTreeSource = [
   appSidebarSource,
   appSidebarAdminItemSource,

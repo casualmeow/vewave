@@ -1,19 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 type OverlayVisibilityOptions = {
-  /** Overlay auto-hides only while playback is running. */
   playing: boolean
-  /** Idle delay before hiding, from user preferences. */
+
   delayMs: number
-  /** Extra reasons to stay visible (paused menu, pinned drawer, buffering…). */
+
   forceVisible?: boolean
 }
 
-/**
- * Auto-hide controller for stage overlay chrome. The overlay shows on
- * pointer/touch/keyboard activity and stays visible while paused, focused,
- * or while any tracked interaction (menu, drawer) is open.
- */
 export function useOverlayVisibility({ playing, delayMs, forceVisible }: OverlayVisibilityOptions) {
   const [recentActivity, setRecentActivity] = useState(true)
   const [interacting, setInteracting] = useState(false)

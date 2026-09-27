@@ -1,7 +1,3 @@
-// Capture harness for the fluid-glass transmission composite pass.
-// Usage: node scripts/fluid-glass-composite-capture.mjs <outputDir> <baseline|final> [baseUrl]
-// Drives the /ui/showcase material lab against a running dev server and saves
-// 1:1 browser-scale captures plus the displacement/luminance telemetry text.
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -30,7 +26,7 @@ page.on('pageerror', (error) => consoleIssues.push(`[pageerror] ${error.message}
 
 await page.goto(`${baseUrl}/ui/showcase`, { waitUntil: 'networkidle' })
 await page.waitForSelector('[data-fluid-glass-tab-comparison]', { timeout: 20_000 })
-// The shader debug buttons live inside collapsed <details> panels.
+
 await page.$$eval('details', (panels) => panels.forEach((panel) => (panel.open = true)))
 await page.waitForTimeout(1_600)
 
@@ -65,8 +61,6 @@ async function telemetryText() {
 const prefix = phase === 'baseline' ? 'baseline' : 'pass'
 const telemetryLog = []
 
-// "quad" phase: only the four acceptance captures (side-by-side, expressive
-// tab, light field, dark field) for fast tuning iterations.
 if (phase === 'quad') {
   await shoot(comparison, '14-sdf-transmission-side-by-side.png')
   await shoot(transmissionPane, '10-final-expressive-tab.png')
@@ -81,8 +75,10 @@ if (phase === 'quad') {
   process.exit(0)
 }
 
-// Tab comparison: SDF vs Transmission, selected tab, side by side.
-await shoot(sdfPane, phase === 'baseline' ? '01-baseline-sdf.png' : '11-final-production-tab-sdf-pane.png')
+await shoot(
+  sdfPane,
+  phase === 'baseline' ? '01-baseline-sdf.png' : '11-final-production-tab-sdf-pane.png',
+)
 if (phase === 'baseline') {
   await shoot(transmissionPane, '02-baseline-transmission.png')
   await shoot(comparison, '00-baseline-side-by-side.png')
@@ -91,21 +87,26 @@ if (phase === 'baseline') {
   await shoot(comparison, '14-sdf-transmission-side-by-side.png')
 }
 
-// Calibration: background difference view (identical-environment check).
 await clickButton('fbo difference')
-await shoot(calibrationSurface, phase === 'baseline' ? 'baseline-fbo-difference.png' : '03-identical-background-difference.png')
+await shoot(
+  calibrationSurface,
+  phase === 'baseline' ? 'baseline-fbo-difference.png' : '03-identical-background-difference.png',
+)
 await clickButton('transmission')
 
-// Transmission-only isolation (all support layers off).
 await setDebugView('Transmission only')
 telemetryLog.push(`--- transmission-only dark field (${phase})`, await telemetryText())
-await shoot(calibrationSurface, phase === 'baseline' ? 'baseline-transmission-only.png' : '04-transmission-only.png')
+await shoot(
+  calibrationSurface,
+  phase === 'baseline' ? 'baseline-transmission-only.png' : '04-transmission-only.png',
+)
 
-// Displacement telemetry panel for the profile record.
-await shoot(calibrationSection.locator('.font-mono').first(), phase === 'baseline' ? 'baseline-displacement-profile.png' : '05-displacement-profile.png')
+await shoot(
+  calibrationSection.locator('.font-mono').first(),
+  phase === 'baseline' ? 'baseline-displacement-profile.png' : '05-displacement-profile.png',
+)
 
 if (phase === 'final') {
-  // Per-channel transmitted samples + combined dispersion.
   await setDebugView('Red transmitted sample')
   await shoot(calibrationSurface, '06-red-sample.png')
   await setDebugView('Green transmitted sample')
@@ -116,17 +117,21 @@ if (phase === 'final') {
   await shoot(calibrationSurface, '09-combined-dispersion.png')
 }
 
-// Final complete material, dark + light fields.
 await setDebugView('Final complete')
 telemetryLog.push(`--- final dark field (${phase})`, await telemetryText())
-await shoot(calibrationSurface, phase === 'baseline' ? 'baseline-dark-field.png' : '13-final-dark-field.png')
+await shoot(
+  calibrationSurface,
+  phase === 'baseline' ? 'baseline-dark-field.png' : '13-final-dark-field.png',
+)
 await clickButton('light field')
 telemetryLog.push(`--- final light field (${phase})`, await telemetryText())
-await shoot(calibrationSurface, phase === 'baseline' ? 'baseline-light-field.png' : '12-final-light-field.png')
+await shoot(
+  calibrationSurface,
+  phase === 'baseline' ? 'baseline-light-field.png' : '12-final-light-field.png',
+)
 await clickButton('dark field')
 
 if (phase === 'final') {
-  // Production preset transmission tab pane.
   await page.getByLabel('Material preset').selectOption('production')
   await page.waitForTimeout(900)
   await shoot(transmissionPane, '11-final-production-tab.png')

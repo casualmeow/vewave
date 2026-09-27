@@ -209,7 +209,6 @@ function CommitRow({ commit }: { commit: ChangelogCommit }) {
   )
 }
 
-/** Maps a Release Please section name to accent styling. */
 function CategoryTag({ name }: { name: string }) {
   const style = categoryStyle(name)
 
@@ -265,23 +264,6 @@ interface Release {
   groups: Array<ReleaseGroup>
 }
 
-/**
- * Parses a Release Please-generated CHANGELOG.md.
- *
- * Expected format:
- *   ## [1.2.0](https://github.com/owner/repo/compare/v1.1.0...v1.2.0) (2024-01-15)
- *
- *   ### Features
- *
- *   * **api:** add new endpoint ([abc1234](https://github.com/owner/repo/commit/abc1234)), closes [#42](...)
- *   - plain subject without scope ([def5678](https://github.com/owner/repo/commit/def5678))
- *
- *   ### Bug Fixes
- *   ...
- *
- *   ### BREAKING CHANGES
- *   ...
- */
 function parseReleases(markdown: string): Array<Release> {
   const releases: Array<Release> = []
   const lines = markdown.split('\n')
@@ -292,7 +274,6 @@ function parseReleases(markdown: string): Array<Release> {
   for (const rawLine of lines) {
     const line = rawLine
 
-    // Release header: ## [version](url) (date)  OR  ## [version](url)
     const releaseMatch = line.match(/^## \[(.+?)\]\((.+?)\)(?:\s+\((\d{4}-\d{2}-\d{2})\))?/)
     if (releaseMatch) {
       current = {
@@ -307,7 +288,6 @@ function parseReleases(markdown: string): Array<Release> {
 
     if (!current) continue
 
-    // Section header: ### Features, ### Bug Fixes, ### BREAKING CHANGES, etc.
     const sectionMatch = line.match(/^### (.+)$/)
     if (sectionMatch) {
       currentGroup = { name: sectionMatch[1].trim(), items: [] }
@@ -315,7 +295,6 @@ function parseReleases(markdown: string): Array<Release> {
       continue
     }
 
-    // Item: * **scope:** subject ([hash](url))  OR  - subject ([hash](url))
     const itemMatch = line.match(/^[*-]\s+(?:\*\*(.+?):\*\*\s+)?(.+)$/)
     if (itemMatch && currentGroup) {
       const scope = itemMatch[1] ?? null
@@ -330,10 +309,6 @@ function parseReleases(markdown: string): Array<Release> {
   return releases
 }
 
-/**
- * Strips inline markdown commit links and trailing issue refs from an entry body,
- * returning clean display text plus the commit hash and URL.
- */
 function extractEntryMeta(raw: string): {
   subject: string
   shortHash: string | null
@@ -342,14 +317,12 @@ function extractEntryMeta(raw: string): {
   let shortHash: string | null = null
   let commitUrl: string | null = null
 
-  // Commit link: ([abc1234](https://github.com/owner/repo/commit/abc1234))
   const commitMatch = raw.match(/\(\[([0-9a-f]{7,40})\]\((https?:\/\/[^)]+)\)/)
   if (commitMatch) {
     shortHash = commitMatch[1].slice(0, 7)
     commitUrl = commitMatch[2]
   }
 
-  // Remove the commit link group, issue/PR refs, then collapse leftover markdown links.
   const cleaned = raw
     .replace(/\(\[[0-9a-f]{7,40}\]\([^)]+\)\)/g, '')
     .replace(/,?\s*closes\s+\[#\d+\]\([^)]+\)/gi, '')

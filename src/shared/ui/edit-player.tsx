@@ -58,7 +58,6 @@ export default function EditPlayer({ src }: EditPlayerProps) {
             </Tooltip>
           </div>
           <div className="text-sm">Video quality</div>
-          {/* TODO: provide pseudocode for qualities */}
         </div>
       </div>
     </div>

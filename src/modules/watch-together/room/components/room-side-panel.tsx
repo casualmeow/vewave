@@ -29,12 +29,6 @@ type RoomSidePanelProps = {
   className?: string
 }
 
-/**
- * The one coherent panel system for room tools. Queue, chat, people, and
- * history live behind tabs inside this panel; the host surface (workspace
- * column, immersive drawer, or mobile bottom sheet) provides the outer
- * boundary, so the content itself stays border-free.
- */
 export function RoomSidePanel({
   snapshot,
   canControl,

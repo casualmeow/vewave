@@ -21,8 +21,7 @@ describe('fluid glass transmission material contract', () => {
     for (const preset of [production, expressive]) {
       expect(preset.ior).toBeGreaterThan(1.1)
       expect(preset.ior).toBeLessThanOrEqual(1.25)
-      // drei smears sample thickness by pow(roughness, 0.33); anything above
-      // ~0.01 reads as milky fog instead of clear transmission.
+
       expect(preset.roughness).toBeLessThanOrEqual(0.01)
       expect(preset.anisotropy).toBe(0)
       expect(preset.distortion).toBe(0)

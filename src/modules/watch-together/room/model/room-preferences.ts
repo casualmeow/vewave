@@ -10,26 +10,25 @@ export type RoomWorkspacePreset = 'conversation' | 'balanced' | 'cinema' | 'cust
 export type RoomOverlayDensity = 'compact' | 'comfortable'
 
 export type RoomOverlayPreferences = {
-  /** Surface opacity of overlay chrome, 40–100 (%). */
   opacity: number
-  /** Backdrop blur intensity, 0–100 (%). */
+
   blur: number
-  /** Outline intensity of overlay chrome, 0–100 (%). */
+
   outline: number
   density: RoomOverlayDensity
-  /** Corner radius of overlay chrome in px, 0–24. */
+
   cornerRadius: number
-  /** Idle delay before overlay chrome hides during playback, ms. */
+
   autoHideDelayMs: number
 }
 
 export type RoomPreferences = {
   viewMode: RoomViewMode
   stageFit: RoomStageFit
-  /** Immersive drawer pinned beside the stage instead of overlaying it. */
+
   drawerPinned: boolean
   workspacePreset: RoomWorkspacePreset
-  /** Fraction of workspace width given to the video stage, 0.35–0.8. */
+
   workspaceVideoFraction: number
   overlay: RoomOverlayPreferences
 }
@@ -169,9 +168,7 @@ function writeRoomPreferences(storageKey: string, preferences: RoomPreferences) 
   if (canUseBrowserStorage()) {
     try {
       window.localStorage.setItem(storageKey, JSON.stringify(preferences))
-    } catch {
-      // Persist best-effort; in-memory cache still serves this session.
-    }
+    } catch {}
   }
 
   if (typeof window !== 'undefined') {

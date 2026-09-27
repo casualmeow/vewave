@@ -41,11 +41,6 @@ type RoomSettingsDialogProps = {
   resetPreferences: () => void
 }
 
-/**
- * Room details and per-user presentation preferences. Secondary metadata
- * (source, visibility, ownership) and technical diagnostics live here so the
- * primary room UI stays focused on the video.
- */
 export function RoomSettingsDialog({
   open,
   onOpenChange,

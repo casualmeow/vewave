@@ -37,11 +37,6 @@ type RoomVideoListProps = {
   sendMediaSelect: (mediaItemId: string) => boolean
 }
 
-/**
- * The room queue. Hierarchy comes from surface emphasis and spacing —
- * the active item gets a background, upcoming items stay flat rows —
- * instead of wrapping every entry in another bordered card.
- */
 export function RoomVideoList({
   snapshot,
   canControl,

@@ -1,6 +1,3 @@
-// Visual verification matrix for the glass surface system:
-// light/dark × solid/glass, plus reduced-transparency and a no-backdrop-filter
-// engine fallback. Screenshots land in scripts/matrix-*.png.
 import { chromium } from '@playwright/test'
 import { preview } from 'vite'
 

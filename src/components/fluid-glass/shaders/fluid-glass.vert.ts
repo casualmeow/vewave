@@ -1,4 +1,4 @@
-export const fluidGlassVertexShader = /* glsl */ `
+export const fluidGlassVertexShader = `
   varying vec2 vUv;
 
   void main() {

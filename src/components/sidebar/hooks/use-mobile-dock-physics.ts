@@ -1,10 +1,3 @@
-/**
- * useMobileDockPhysics
- *
- * Encapsulates the pointer-tracking and fluid transform physics
- * for the MobileSidebarDock container. Separated from rendering
- * so the dock shell stays a clean orchestrator.
- */
 import { getPointerProgress } from '../helpers'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { useFluidTransform, useRafCssVariables } from '@/shared/hooks'

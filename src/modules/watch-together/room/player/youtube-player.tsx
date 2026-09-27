@@ -16,12 +16,6 @@ type YouTubePlayerProps = {
   controllerRef?: RefObject<EmbeddedPlayerController | null>
 }
 
-/**
- * Chromeless synchronized YouTube embed. Native controls are disabled
- * (`controls=0`) — the room control bar is the only visible control system.
- * Player telemetry (time, duration, state, volume) flows out through `onInfo`;
- * local-only audio commands flow in through `controllerRef`.
- */
 export function YouTubePlayer({
   media,
   playback,
@@ -175,7 +169,6 @@ function getYouTubeEmbedUrl(media: GetApiRoomsByCode200Media) {
   return url.toString()
 }
 
-/** Ask the widget to start streaming `infoDelivery` messages back to us. */
 function beginListening(iframe: HTMLIFrameElement | null) {
   iframe?.contentWindow?.postMessage(
     JSON.stringify({ event: 'listening', id: 'vewave-room', channel: 'widget' }),

@@ -71,9 +71,7 @@ function writeSidebarPins(userId: string | null | undefined, pins: AppSidebarPin
   try {
     window.localStorage.setItem(key, JSON.stringify(pins))
     window.dispatchEvent(new CustomEvent(sidebarPinsUpdatedEvent, { detail: { key } }))
-  } catch {
-    // Storage may be unavailable in privacy-restricted contexts.
-  }
+  } catch {}
 }
 
 export function readSidebarPins(userId?: string | null): AppSidebarPinState {

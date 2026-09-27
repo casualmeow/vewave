@@ -19,8 +19,7 @@ export function AppSidebarIdentity({
 }) {
   const { collapsed } = useSidebarContext()
   const checkingSession = status === 'idle' || status === 'bootstrapping'
-  // Icon mode shrinks the identity visual toward the nav-icon rhythm so the
-  // rail reads as one column instead of a large avatar over small glyphs.
+
   const visualSize = collapsed ? 'size-10' : 'size-14'
 
   if (checkingSession) {

@@ -1,9 +1,3 @@
-/**
- * Animation preset definitions for ResizableCard.
- *
- * This file contains only the data (preset catalogue). Logic, helpers, and
- * shared layout/transition atoms live in `./preset-builder.ts`.
- */
 import {
   allSharedLayout,
   noSharedLayout,

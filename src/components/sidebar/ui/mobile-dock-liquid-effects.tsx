@@ -1,10 +1,3 @@
-/**
- * MobileDockLiquidEffects
- *
- * Renders the SVG filter definitions (goo + refraction) and the
- * ambient glass overlays (sheen + colour blobs). Isolated from the
- * main dock shell so the JSX tree stays readable.
- */
 export function MobileDockLiquidEffects({
   gooFilterId,
   refractionId,
@@ -45,13 +38,11 @@ export function MobileDockLiquidEffects({
         </defs>
       </svg>
 
-      {/* Pointer-reactive sheen overlay */}
       <span
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(circle_at_var(--mobile-dock-pointer-x)_var(--mobile-dock-pointer-y),var(--glass-highlight),transparent_36%),linear-gradient(120deg,transparent,var(--glass-highlight)_var(--mobile-dock-sheen-x),transparent)] opacity-[var(--mobile-dock-glow-opacity)]"
       />
 
-      {/* Ambient colour blobs visible through the refraction filter */}
       <span
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]"

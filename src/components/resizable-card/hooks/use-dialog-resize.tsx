@@ -99,9 +99,7 @@ export function useDialogResize(
       if (target.setPointerCapture) {
         try {
           target.setPointerCapture(event.pointerId)
-        } catch {
-          // Pointer capture can fail if the pointer is already released.
-        }
+        } catch {}
       }
 
       const handlePointerMove = (moveEvent: PointerEvent) => {
@@ -122,9 +120,7 @@ export function useDialogResize(
         if (target.hasPointerCapture?.(event.pointerId)) {
           try {
             target.releasePointerCapture(event.pointerId)
-          } catch {
-            // Ignore stale pointer capture release attempts.
-          }
+          } catch {}
         }
       }
 

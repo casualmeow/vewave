@@ -94,10 +94,6 @@ export function CategoryBadge({ value, className }: { value: string; className?:
   )
 }
 
-/**
- * Renders the author's display name, linking to their profile route when a
- * username is available. Deleted/anonymous authors render as plain text.
- */
 export function AuthorLink({ author, className }: { author: ForumAuthor; className?: string }) {
   const label = authorName(author)
 

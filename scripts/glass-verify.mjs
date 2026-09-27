@@ -1,6 +1,3 @@
-// Visual verification for the experimental refraction prototype (shell header).
-// Injects high-contrast stripes under the header edge and compares refraction
-// off vs. on. Acceptance criterion: stripes visibly displaced near the edges.
 import { chromium } from '@playwright/test'
 import { preview } from 'vite'
 
@@ -58,7 +55,7 @@ for (const refraction of [false, true]) {
 
   const suffix = refraction ? 'on' : 'off'
   const path = `scripts/glass-header-${suffix}.png`
-  // Header occupies y 16..80 (p-4 shell offset); capture across its bottom edge.
+
   await page.screenshot({ path, clip: { x: 300, y: 10, width: 520, height: 110 } })
   shots[suffix] = await page.screenshot({ clip: { x: 300, y: 10, width: 520, height: 110 } })
   await context.close()

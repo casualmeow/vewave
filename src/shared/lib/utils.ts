@@ -1,23 +1,10 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
-/**
- *
- * @param inputs array
- * @returns sorted tailwind classNames
- */
-
 export function cn(...inputs: Array<ClassValue>) {
   return twMerge(clsx(inputs))
 }
 
-/**
- *
- * @param value
- * @param min
- * @param max
- * @returns average number from values
- */
 export function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max)
 }

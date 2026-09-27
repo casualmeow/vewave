@@ -91,19 +91,13 @@ export interface HeaderProps extends MotionHeaderNativeProps {
   hideOnScrollDown?: boolean
   revealAtTop?: number
 
-  /** Enables pointer-reactive shine, small magnetic tilt, and SVG refraction for glass variants. */
   interactiveGlass?: boolean
-  /** Reuses the same fluid presets as the sidebar/tabs glass system. */
   fluidPreset?: HeaderFluidPreset
   magneticStrength?: number
   magneticVerticalStrength?: number
   tiltStrength?: number
   liquidIntensity?: number
 
-  /**
-   * Optional scroll container used for scroll-linked collapse and hide-on-scroll.
-   * Defaults to document scroll when omitted.
-   */
   scrollContainerRef?: RefObject<HTMLElement | null>
 }
 

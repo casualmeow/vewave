@@ -1,11 +1,3 @@
-/**
- * useHeaderInteractiveGlass
- *
- * Encapsulates all pointer-reactive glass behaviour for the Header:
- * - RAF-batched CSS variable updates for sheen / spot effects
- * - Magnetic tilt via useFluidTransform
- * - Derived capability flag
- */
 import type { FocusEvent, PointerEvent as ReactPointerEvent } from 'react'
 import type { HeaderFluidPreset, HeaderVariant } from '../types'
 import { useFinePointer, useFluidTransform, useRafCssVariables } from '@/shared/hooks'

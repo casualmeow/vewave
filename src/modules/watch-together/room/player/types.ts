@@ -6,11 +6,6 @@ export interface WatchPlayerAdapter {
   setPlaybackRate?: (rate: number) => Promise<void> | void
 }
 
-/**
- * Snapshot of the embedded player reported through the provider bridge.
- * `playerState` follows the YouTube iframe API contract:
- * -1 unstarted, 0 ended, 1 playing, 2 paused, 3 buffering, 5 cued.
- */
 export type EmbeddedPlayerInfo = {
   ready: boolean
   currentTimeMs: number | null
@@ -29,7 +24,6 @@ export const initialEmbeddedPlayerInfo: EmbeddedPlayerInfo = {
   muted: false,
 }
 
-/** Local-only commands (audio is per-viewer, never synchronized). */
 export type EmbeddedPlayerController = {
   setVolume: (volume: number) => void
   mute: () => void

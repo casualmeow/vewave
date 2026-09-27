@@ -131,10 +131,6 @@ type RoomHeaderProps = {
   onOpenPeople: () => void
 }
 
-/**
- * Permanent room header reduced to essentials: identity, participants, one
- * Invite action, and an overflow menu. Secondary metadata lives in settings.
- */
 export function RoomHeader({
   snapshot,
   participantCount,

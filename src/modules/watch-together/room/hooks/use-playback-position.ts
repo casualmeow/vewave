@@ -7,11 +7,6 @@ type PlaybackAnchor = {
   anchoredAtMs: number
 }
 
-/**
- * Live playback position derived from the server-authoritative state.
- * Anchors on every playback version and extrapolates locally while playing,
- * so the timeline advances between server updates.
- */
 export function usePlaybackPosition(playback: GetApiRoomsByCode200Playback | null) {
   const anchorRef = useRef<PlaybackAnchor | null>(null)
   const [, setTick] = useState(0)

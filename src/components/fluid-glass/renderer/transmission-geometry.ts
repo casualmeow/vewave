@@ -14,9 +14,7 @@ export type VolumeDescriptor = {
 const normalizedDepth = 0.26
 export const rearDepthRatio = 0.72
 const edgeDepthRatio = 0.055
-// Front weights sum to 1 so the convex profile reaches exactly zero at the rim
-// with no clamped flat band. The heavy quadratic term keeps the broad body
-// participating in refraction instead of leaving displacement to the last 10%.
+
 const frontProfileWeights = [0.62, 0.28, 0.1] as const
 const rearProfileWeights = [0.22, 0.34, 0.44] as const
 
@@ -233,8 +231,6 @@ export function createVolumeGeometry(descriptor: VolumeDescriptor) {
     }
   }
 
-  // Side walls get their own copies of the rim vertices so that
-  // computeVertexNormals() does not blend wall normals into the surfaces.
   const sideFrontIndices: Array<number> = []
   const sideBackIndices: Array<number> = []
   for (let segment = 0; segment < boundarySegments; segment += 1) {

@@ -20,12 +20,6 @@ function clampFraction(fraction: number) {
   )
 }
 
-/**
- * Workspace view: video and room tools side by side across the full room
- * width, split by a draggable divider. Manual drags switch the preset to
- * Custom; double-click (or Home on the keyboard) restores the active preset.
- * Narrow screens stack the stage above the panel instead of squeezing both.
- */
 export function RoomWorkspace({
   stage,
   panel,

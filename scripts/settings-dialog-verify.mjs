@@ -1,4 +1,3 @@
-// Visual verification: settings dialog material in glass vs solid style.
 import { chromium } from '@playwright/test'
 import { preview } from 'vite'
 
