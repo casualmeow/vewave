@@ -1,5 +1,6 @@
 import { act, render } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
 
 import type { RendererLifecycleController } from '@/components/fluid-glass/lens/renderer-lifecycle'
 
@@ -7,9 +8,9 @@ type RendererHarness = {
   lifecycle: RendererLifecycleController
   contextLost: () => void
   fail: () => void
-  listener: ReturnType<typeof vi.fn>
-  resource: ReturnType<typeof vi.fn>
-  canvas: ReturnType<typeof vi.fn>
+  listener: Mock<() => void>
+  resource: Mock<() => void>
+  canvas: Mock<() => void>
 }
 
 const mounted: Array<RendererHarness> = []

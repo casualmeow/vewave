@@ -61,6 +61,10 @@ A deliberately logged database-unavailable error can be part of a passing error-
 
 Reset stores, root appearance attributes, mocks, observers, and media-query stubs. Await asynchronous React effects inside `act`; avoid timers that remain alive after unmount.
 
+Keep Vitest and `@vitest/ui` on matching versions. With Vitest 4, type callable test doubles explicitly, such as `Mock<() => void>`. An unparameterized mock type can also describe a constructor and cannot safely stand in for a cleanup callback.
+
+When a prototype method is already mocked, assign an instance-specific implementation to override only that instance. Spying on an inherited mock can reuse the prototype mock and unintentionally change every element's geometry.
+
 Use clear test names instead of explanatory code comments. Do not fix a failing test by skipping it, weakening accessibility assertions, or suppressing TypeScript errors.
 
 ## Report the actual boundary

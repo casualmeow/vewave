@@ -246,7 +246,7 @@ describe('live DOM lens', () => {
     await act(async () => {
       await vi.advanceTimersByTimeAsync(20)
     })
-    vi.spyOn(target, 'getBoundingClientRect').mockReturnValue({
+    target.getBoundingClientRect = () => ({
       x: 220,
       y: 30,
       left: 220,
