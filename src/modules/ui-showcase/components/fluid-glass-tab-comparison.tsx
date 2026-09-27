@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react'
 
 import { createControlledTextureUrl } from './fluid-glass-calibration'
-// Lab-only deep import: the shader-mode override is deliberately not part of
-// the fluid-glass public barrel so production surfaces cannot reach it.
+
 import {
   TransmissionShaderModeContext,
   type TransmissionShaderMode,
@@ -15,13 +14,16 @@ import {
   type FluidGlassRendererSelection,
   type FluidTransmissionMaterial,
 } from '@/components/fluid-glass'
+import { LensLaboratoryScopeProvider } from '@/components/fluid-glass/lens/scope-context'
 import { cn } from '@/shared/lib/utils'
 
 const comparisonTabs = ['Overview', 'Scene library', 'People'] as const
 
-// Every comparison pane surrounds the same fixed tab so SDF and Transmission
-// captures stay directly comparable regardless of the lab's live selection.
 const fixedComparisonTarget = 'Scene library' satisfies (typeof comparisonTabs)[number]
+
+function shaderComparisonMaterial(base: FluidTransmissionMaterial): FluidTransmissionMaterial {
+  return { ...base, ior: 1.45, thickness: 1.05, chromaticAberration: 0.26 }
+}
 
 function BackendMark({ backend }: { backend: FluidGlassBackend }) {
   return (
@@ -131,7 +133,7 @@ function ShaderModePane({
   )
 
   return (
-    <div className="grid min-w-0 gap-2">
+    <div className="grid min-w-0 gap-2" data-fluid-glass-validation={`shader-${shaderMode}`}>
       <div className="flex items-center justify-between gap-3">
         <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           {shaderMode === 'stock' ? 'Stock drei transmission' : 'Custom patched transmission'}
@@ -149,7 +151,7 @@ function ShaderModePane({
           onBackendChange={setBackend}
           quality="high"
           renderer="transmission-experimental"
-          transmissionMaterial={transmissionMaterial}
+          transmissionMaterial={shaderComparisonMaterial(transmissionMaterial)}
           className="h-40 rounded-2xl"
           contentClassName="flex h-40 items-center justify-center px-5"
         >
@@ -191,15 +193,25 @@ function ShaderModePane({
   )
 }
 
-export function FluidGlassTabComparison({
-  lightDirection,
-  material,
-  transmissionMaterial,
-}: {
+type FluidGlassTabComparisonProps = {
   lightDirection: readonly [number, number]
   material: FluidGlassMaterial
   transmissionMaterial: FluidTransmissionMaterial
-}) {
+}
+
+export function FluidGlassTabComparison(props: FluidGlassTabComparisonProps) {
+  return (
+    <LensLaboratoryScopeProvider>
+      <FluidGlassTabComparisonContent {...props} />
+    </LensLaboratoryScopeProvider>
+  )
+}
+
+function FluidGlassTabComparisonContent({
+  lightDirection,
+  material,
+  transmissionMaterial,
+}: FluidGlassTabComparisonProps) {
   const environmentUrl = useMemo(() => createControlledTextureUrl('dark'), [])
   if (!environmentUrl) return null
 
@@ -232,6 +244,7 @@ export function FluidGlassTabComparison({
           material={material}
           renderer="transmission-experimental"
           transmissionMaterial={transmissionMaterial}
+          validationId="scene-library-transmission"
         />
       </div>
       <div className="mb-3 mt-6">

@@ -10,3 +10,8 @@ src/routeTree.gen.ts
 merge.ps1
 .tanstack/tmp
 .tmp/
+
+# Lens spike (Phase 2): raw per-cell shards are disposable intermediates.
+# The merged results.json/results.md and the deterministic screenshots under
+# artifacts/lens-spike/screens are committed evidence and stay tracked.
+artifacts/lens-spike/raw/

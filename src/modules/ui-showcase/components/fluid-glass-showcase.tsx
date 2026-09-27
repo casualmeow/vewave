@@ -2,6 +2,8 @@ import { CircleDot, Grip, Layers3, Radio, RefreshCw, Sparkles } from 'lucide-rea
 import { useCallback, useMemo, useState } from 'react'
 
 import { FluidGlassCalibration, type FluidGlassCalibrationMode } from './fluid-glass-calibration'
+import { FluidGlassSourceComparison } from './fluid-glass-source-comparison'
+import { FluidGlassAcceptanceScene } from './fluid-glass-acceptance-scene'
 import { FluidGlassTabComparison } from './fluid-glass-tab-comparison'
 import {
   FluidGlassGroup,
@@ -16,6 +18,9 @@ import {
   type FluidGlassTelemetry,
   type FluidTransmissionMaterial,
 } from '@/components/fluid-glass'
+
+import { LensLaboratoryScopeProvider } from '@/components/fluid-glass/lens/scope-context'
+import { formatLensPaneDebug, useLensPaneDebug } from '@/components/fluid-glass/lens/pane-debug'
 import {
   FLUID_GLASS_MATERIAL_PRESETS,
   FLUID_TRANSMISSION_MATERIAL_PRESETS,
@@ -347,21 +352,50 @@ const emptyInteractionDiagnostics: FluidGlassInteractionDiagnostics = {
   lastPointerTargetId: null,
 }
 
-function BackendBadge({ backend }: { backend: FluidGlassBackend }) {
+function BackendBadge({
+  backend,
+  expects,
+}: {
+  backend: FluidGlassBackend
+
+  expects?: FluidGlassBackend
+}) {
+  const debug = useLensPaneDebug()
+  const resolved = debug?.legacyBackend ?? backend
+  const fellBack = expects !== undefined && resolved !== expects
+
   return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-semibold',
-        backend === 'transmission'
-          ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
-          : backend === 'sdf'
-            ? 'border-sky-500/25 bg-sky-500/10 text-sky-700 dark:text-sky-300'
-            : 'border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300',
-      )}
+    <div
+      className="flex flex-col items-start gap-1"
+      data-fluid-glass-pane-status={resolved}
+      data-fluid-glass-pane-expected={expects}
+      data-fluid-glass-pane-fallback={fellBack || undefined}
     >
-      <span className="size-1.5 rounded-full bg-current" />
-      {backend === 'transmission' ? 'Transmission' : backend === 'sdf' ? 'SDF' : 'CSS'}
-    </span>
+      <span
+        className={cn(
+          'inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-semibold',
+          fellBack
+            ? 'border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-300'
+            : resolved === 'transmission'
+              ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+              : resolved === 'sdf'
+                ? 'border-sky-500/25 bg-sky-500/10 text-sky-700 dark:text-sky-300'
+                : 'border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300',
+        )}
+      >
+        <span className="size-1.5 rounded-full bg-current" />
+        {resolved === 'transmission' ? 'Transmission' : resolved === 'sdf' ? 'SDF' : 'CSS'}
+        {fellBack ? ` \u2014 expected ${expects}` : null}
+      </span>
+      {debug && (fellBack || debug.degraded) ? (
+        <pre
+          data-fluid-glass-pane-debug
+          className="whitespace-pre rounded-md border border-border/60 bg-background/80 px-2 py-1 font-mono text-[0.6rem] leading-tight text-muted-foreground"
+        >
+          {formatLensPaneDebug(debug)}
+        </pre>
+      ) : null}
+    </div>
   )
 }
 
@@ -382,9 +416,11 @@ function ToneScenario({
   const [sdfBackend, setSdfBackend] = useState<FluidGlassBackend>('css')
   const [sdfDarkActive, setSdfDarkActive] = useState('capsule')
   const [sdfDarkBackend, setSdfDarkBackend] = useState<FluidGlassBackend>('css')
+  const [cssActive, setCssActive] = useState('capsule')
+  const [cssBackend, setCssBackend] = useState<FluidGlassBackend>('css')
 
   return (
-    <div className="grid gap-3">
+    <div className="grid gap-3 lg:grid-cols-2">
       <FluidGlassGroup
         activation="always"
         environment={{ type: 'theme', pattern: 'grid', tone }}
@@ -400,7 +436,7 @@ function ToneScenario({
         contentClassName="relative flex min-h-40 items-center justify-center gap-3 p-5"
       >
         <div className="absolute left-3 top-3">
-          <BackendBadge backend={backend} />
+          <BackendBadge backend={backend} expects="transmission" />
         </div>
         <div
           aria-label={`${tone} field adaptation`}
@@ -486,7 +522,7 @@ function ToneScenario({
           contentClassName="relative flex min-h-40 items-center justify-center gap-3 p-5"
         >
           <div className="absolute left-3 top-3">
-            <BackendBadge backend={sdfBackend} />
+            <BackendBadge backend={sdfBackend} expects="sdf" />
           </div>
           <FluidGlassTarget
             id="sdf-light-circle"
@@ -546,7 +582,7 @@ function ToneScenario({
           contentClassName="relative flex min-h-40 items-center justify-center gap-3 p-5"
         >
           <div className="absolute left-3 top-3">
-            <BackendBadge backend={sdfDarkBackend} />
+            <BackendBadge backend={sdfDarkBackend} expects="sdf" />
           </div>
           <FluidGlassTarget
             id="sdf-dark-circle"
@@ -586,6 +622,68 @@ function ToneScenario({
               )}
             >
               Dark field
+            </button>
+          </FluidGlassTarget>
+        </FluidGlassGroup>
+      </div>
+
+      <div data-fluid-glass-validation="light-field-css">
+        <FluidGlassGroup
+          activation="always"
+          environment={{ type: 'theme', pattern: 'grid', tone: 'light' }}
+          quality="high"
+          materialPreset="expressive"
+          debugView="final"
+          renderer="auto"
+          forceFallback
+          material={material}
+          transmissionMaterial={transmissionMaterial}
+          lightDirection={lightDirection}
+          onBackendChange={setCssBackend}
+          className="fluid-glass-lab min-h-40 rounded-2xl border border-white/10"
+          contentClassName="relative flex min-h-40 items-center justify-center gap-3 p-5"
+        >
+          <div className="absolute left-3 top-3">
+            <BackendBadge backend={cssBackend} expects="css" />
+          </div>
+          <FluidGlassTarget
+            id="css-light-circle"
+            scopeId="css-light-field"
+            shape="circle"
+            active={cssActive === 'circle'}
+            asChild
+          >
+            <button
+              type="button"
+              onClick={() => setCssActive('circle')}
+              aria-pressed={cssActive === 'circle'}
+              className={cn(
+                'grid size-14 place-items-center rounded-full text-sm',
+                targetFocus,
+                'text-slate-900',
+              )}
+            >
+              <Sparkles className="size-5" />
+            </button>
+          </FluidGlassTarget>
+          <FluidGlassTarget
+            id="css-light-capsule"
+            scopeId="css-light-field"
+            shape="capsule"
+            active={cssActive === 'capsule'}
+            asChild
+          >
+            <button
+              type="button"
+              onClick={() => setCssActive('capsule')}
+              aria-pressed={cssActive === 'capsule'}
+              className={cn(
+                'h-12 rounded-full px-5 text-sm font-semibold',
+                targetFocus,
+                'text-slate-900',
+              )}
+            >
+              CSS fallback
             </button>
           </FluidGlassTarget>
         </FluidGlassGroup>
@@ -710,7 +808,20 @@ function SizeStressTargets({
   )
 }
 
+function opticalAcceptanceRequested() {
+  if (typeof window === 'undefined') return false
+  return new URLSearchParams(window.location.search).has('optical-acceptance')
+}
+
 export function FluidGlassShowcase() {
+  return (
+    <LensLaboratoryScopeProvider>
+      {opticalAcceptanceRequested() ? <FluidGlassAcceptanceScene /> : <FluidGlassShowcaseContent />}
+    </LensLaboratoryScopeProvider>
+  )
+}
+
+function FluidGlassShowcaseContent() {
   const [activeVertical, setActiveVertical] = useState('broadcast')
   const [activeTab, setActiveTab] = useState<(typeof horizontalTargets)[number]>('Overview')
   const [activeExample, setActiveExample] = useState<'circle' | 'capsule' | 'wide'>('capsule')
@@ -816,6 +927,8 @@ export function FluidGlassShowcase() {
         </div>
         <BackendBadge backend={backend} />
       </header>
+
+      <FluidGlassSourceComparison />
 
       <div className="border-b border-border/70 bg-muted/20 p-4 sm:p-5">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">

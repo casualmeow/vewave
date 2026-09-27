@@ -25,7 +25,11 @@
     "fix": "npm run format && npm run lint:fix",
     "check": "npm run routes:gen && npm run format:check && npm run lint && npm run typecheck:tsc && npm run test",
     "prepare": "husky",
-    "lint-staged": "lint-staged --concurrent 1"
+    "lint-staged": "lint-staged --concurrent 1",
+    "test:ui": "vitest --ui",
+    "spike:lens": "node scripts/lens-spike.mjs",
+    "spike:lens:report": "node scripts/lens-spike-report.mjs",
+    "spike:lens:fixtures": "node scripts/lens-spike-fixtures.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -95,6 +99,7 @@
     "typescript": "^6.0.3",
     "vite": "^6.4.3",
     "vitest": "^3.2.6",
-    "web-vitals": "^4.2.4"
+    "web-vitals": "^4.2.4",
+    "@vitest/ui": "^3.2.6"
   }
 }
