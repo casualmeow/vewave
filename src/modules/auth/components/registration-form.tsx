@@ -18,6 +18,7 @@ import {
   FormMessage,
   Input,
 } from '@/shared/ui'
+import { SecureInput } from '@/shared/ui/secure-input'
 
 export const RegistrationForm = () => {
   const navigate = useNavigate()
@@ -66,24 +67,29 @@ export const RegistrationForm = () => {
   }
 
   return (
-    <div className="w-full max-w-sm space-y-6">
-      <div className="grid gap-3">
-        <OAuthButtons />
-        <PasskeyButton mode="sign-up" getRegistrationInput={getPasskeyRegistrationInput} />
-      </div>
-      <AuthFormDivider />
+    <div className="w-full space-y-5">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-5"
+          aria-labelledby="sign-up-title"
+          noValidate
+        >
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>First Name</FormLabel>
+                <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="John" {...field} />
+                  <Input
+                    {...field}
+                    placeholder="Your name"
+                    autoComplete="name"
+                    className="h-12 rounded-lg bg-background/60 px-3.5 shadow-none"
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage role="alert" />
               </FormItem>
             )}
           />
@@ -94,9 +100,17 @@ export const RegistrationForm = () => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="john.doe@example.com" type="email" {...field} />
+                  <Input
+                    {...field}
+                    placeholder="you@example.com"
+                    type="email"
+                    autoComplete="email"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    className="h-12 rounded-lg bg-background/60 px-3.5 shadow-none"
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage role="alert" />
               </FormItem>
             )}
           />
@@ -107,21 +121,42 @@ export const RegistrationForm = () => {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your password" type="password" {...field} />
+                  <SecureInput
+                    {...field}
+                    placeholder="Create a password"
+                    autoComplete="new-password"
+                    className="h-12 rounded-lg bg-background/60 px-3.5 shadow-none"
+                  />
                 </FormControl>
                 <FormDescription>Password must be at least 8 characters long.</FormDescription>
-                <FormMessage />
+                <FormMessage role="alert" />
               </FormItem>
             )}
           />
           {form.formState.errors.root ? (
-            <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>
+            <p role="alert" className="text-sm text-destructive">
+              {form.formState.errors.root.message}
+            </p>
           ) : null}
-          <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? 'Creating account...' : 'Create account'}
+          <Button
+            type="submit"
+            className="h-12 w-full rounded-lg shadow-none"
+            disabled={form.formState.isSubmitting}
+            aria-busy={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting ? 'Creating account…' : 'Create account'}
           </Button>
         </form>
       </Form>
+      <AuthFormDivider />
+      <div className="space-y-2">
+        <OAuthButtons layout="compact" />
+        <PasskeyButton
+          mode="sign-up"
+          presentation="quiet"
+          getRegistrationInput={getPasskeyRegistrationInput}
+        />
+      </div>
     </div>
   )
 }

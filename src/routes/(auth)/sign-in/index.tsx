@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { LoginForm } from '@/modules/auth'
+import { SignInPage } from '@/modules/auth'
 
 export const Route = createFileRoute('/(auth)/sign-in/')({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -11,5 +11,5 @@ export const Route = createFileRoute('/(auth)/sign-in/')({
 function SignInRoute() {
   const { redirectTo } = Route.useSearch()
 
-  return <LoginForm redirectTo={redirectTo} />
+  return <SignInPage redirectTo={redirectTo} />
 }

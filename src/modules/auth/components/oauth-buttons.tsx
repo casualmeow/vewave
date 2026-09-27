@@ -6,14 +6,16 @@ import {
   type PublicKeyCredentialCreationOptionsJSON,
   type PublicKeyCredentialRequestOptionsJSON,
 } from '@simplewebauthn/browser'
-import { Blocks, Chrome, Fingerprint, Gamepad2 } from 'lucide-react'
+import { Fingerprint } from 'lucide-react'
 import { toast } from 'sonner'
 import { useNavigate } from '@tanstack/react-router'
 import { useAuthStore, type AuthUser } from '../model'
+import { DiscordMark, GoogleMark, MicrosoftMark } from './provider-marks'
 import { httpClient } from '@/core/api/http/client'
 import { getApiErrorMessage } from '@/core/api/http/errors'
 import { apiUrl } from '@/shared/config'
 import { Button } from '@/shared/ui'
+import { cn } from '@/shared/lib/utils'
 
 type OAuthProvider = 'google' | 'discord' | 'microsoft'
 
@@ -35,22 +37,22 @@ const providers = [
   {
     id: 'google',
     label: 'Google',
-    Icon: Chrome,
+    Icon: GoogleMark,
   },
   {
     id: 'discord',
     label: 'Discord',
-    Icon: Gamepad2,
+    Icon: DiscordMark,
   },
   {
     id: 'microsoft',
     label: 'Microsoft',
-    Icon: Blocks,
+    Icon: MicrosoftMark,
   },
 ] satisfies Array<{
   id: OAuthProvider
   label: string
-  Icon: typeof Chrome
+  Icon: typeof GoogleMark
 }>
 
 function buildOAuthStartUrl(provider: OAuthProvider) {
@@ -59,21 +61,30 @@ function buildOAuthStartUrl(provider: OAuthProvider) {
   return url.toString()
 }
 
-export function OAuthButtons() {
+export function OAuthButtons({ layout = 'stack' }: { layout?: 'stack' | 'compact' }) {
   return (
-    <div className="grid gap-3">
+    <div className={cn('grid gap-3', layout === 'compact' && 'grid-cols-3 gap-2')}>
       {providers.map(({ id, label, Icon }) => (
         <Button
           key={id}
           type="button"
           variant="outline"
-          className="w-full"
+          className={cn(
+            'w-full',
+            layout === 'compact' && 'h-11 min-w-0 rounded-lg px-2 shadow-none has-[>svg]:px-2',
+          )}
+          aria-label={`Continue with ${label}`}
+          title={`Continue with ${label}`}
           onClick={() => {
             window.location.assign(buildOAuthStartUrl(id))
           }}
         >
-          <Icon aria-hidden="true" className="size-4" />
-          Continue with {label}
+          <Icon />
+          {layout === 'compact' ? (
+            <span className="hidden min-[420px]:inline text-xs">{label}</span>
+          ) : (
+            `Continue with ${label}`
+          )}
         </Button>
       ))}
     </div>
@@ -111,7 +122,7 @@ async function authenticateWithPasskey() {
   return data
 }
 
-type PasskeyButtonProps =
+type PasskeyButtonProps = { presentation?: 'default' | 'quiet' } & (
   | {
       mode: 'sign-in'
       getRegistrationInput?: never
@@ -120,12 +131,18 @@ type PasskeyButtonProps =
       mode: 'sign-up'
       getRegistrationInput: () => PasskeyRegistrationInput | null
     }
+)
 
 export function PasskeyButton(props: PasskeyButtonProps) {
   const navigate = useNavigate()
   const setAuthenticated = useAuthStore((state) => state.setAuthenticated)
   const [isPending, setIsPending] = useState(false)
-  const label = props.mode === 'sign-in' ? 'Continue with Passkey' : 'Create with Passkey'
+  const label =
+    props.mode === 'sign-in'
+      ? props.presentation === 'quiet'
+        ? 'Use a passkey'
+        : 'Continue with Passkey'
+      : 'Create with Passkey'
 
   async function handlePasskey() {
     if (!browserSupportsWebAuthn()) {
@@ -160,8 +177,11 @@ export function PasskeyButton(props: PasskeyButtonProps) {
   return (
     <Button
       type="button"
-      variant="outline"
-      className="w-full"
+      variant={props.presentation === 'quiet' ? 'ghost' : 'outline'}
+      className={cn(
+        'w-full',
+        props.presentation === 'quiet' && 'h-11 rounded-lg text-muted-foreground',
+      )}
       disabled={isPending}
       onClick={handlePasskey}
     >

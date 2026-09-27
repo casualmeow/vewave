@@ -65,14 +65,14 @@ export const LoginForm = ({ redirectTo }: LoginFormProps) => {
   }
 
   return (
-    <div className="w-full max-w-sm space-y-6">
-      <div className="grid gap-3">
-        <OAuthButtons />
-        <PasskeyButton mode="sign-in" />
-      </div>
-      <AuthFormDivider />
+    <div className="w-full space-y-5">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-5"
+          aria-labelledby="sign-in-title"
+          noValidate
+        >
           <FormField
             control={form.control}
             name="email"
@@ -80,9 +80,17 @@ export const LoginForm = ({ redirectTo }: LoginFormProps) => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="you@example.com" type="email" />
+                  <Input
+                    {...field}
+                    placeholder="you@example.com"
+                    type="email"
+                    autoComplete="email"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    className="h-12 rounded-lg bg-background/60 px-3.5 shadow-none"
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage role="alert" />
               </FormItem>
             )}
           />
@@ -93,25 +101,38 @@ export const LoginForm = ({ redirectTo }: LoginFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
-                <div className="relative">
-                  <FormControl>
-                    <div className="relative">
-                      <SecureInput {...field} placeholder="Enter your password" />
-                    </div>
-                  </FormControl>
-                </div>
-                <FormMessage />
+                <FormControl>
+                  <SecureInput
+                    {...field}
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
+                    className="h-12 rounded-lg bg-background/60 px-3.5 shadow-none"
+                  />
+                </FormControl>
+                <FormMessage role="alert" />
               </FormItem>
             )}
           />
           {form.formState.errors.root ? (
-            <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>
+            <p role="alert" className="text-sm text-destructive">
+              {form.formState.errors.root.message}
+            </p>
           ) : null}
-          <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? 'Signing in...' : 'Sign in'}
+          <Button
+            type="submit"
+            className="h-12 w-full rounded-lg shadow-none"
+            disabled={form.formState.isSubmitting}
+            aria-busy={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting ? 'Signing in…' : 'Sign in'}
           </Button>
         </form>
       </Form>
+      <AuthFormDivider />
+      <div className="space-y-2">
+        <OAuthButtons layout="compact" />
+        <PasskeyButton mode="sign-in" presentation="quiet" />
+      </div>
     </div>
   )
 }

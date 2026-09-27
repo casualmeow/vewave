@@ -1,24 +1,36 @@
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { Button, Input, type InputProps } from '@/shared/ui'
+import { cn } from '@/shared/lib/utils'
 
 interface SecureInputProps extends Omit<InputProps, 'tooltip'> {}
 
-export const SecureInput = (props: SecureInputProps) => {
+export const SecureInput = ({ className, ...props }: SecureInputProps) => {
   const [showPassword, setShowPassword] = useState(false)
 
   return (
     <div className="relative">
-      <Input type={showPassword ? 'text' : 'password'} className="pr-10" {...props} />
+      <Input
+        {...props}
+        type={showPassword ? 'text' : 'password'}
+        className={cn(className, 'pr-12')}
+      />
       <Button
         type="button"
         variant="ghost"
         size="icon"
-        onClick={() => setShowPassword(!showPassword)}
-        className="absolute right-1 top-1/2 -translate-y-1/2"
-        tabIndex={-1}
+        onClick={() => setShowPassword((visible) => !visible)}
+        className="absolute right-0.5 top-1/2 size-11 -translate-y-1/2 text-muted-foreground"
+        aria-label={showPassword ? 'Hide password' : 'Show password'}
+        aria-pressed={showPassword}
+        aria-controls={props.id}
+        disabled={props.disabled}
       >
-        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        {showPassword ? (
+          <EyeOff aria-hidden="true" className="size-4" />
+        ) : (
+          <Eye aria-hidden="true" className="size-4" />
+        )}
       </Button>
     </div>
   )
