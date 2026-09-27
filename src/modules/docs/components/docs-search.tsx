@@ -79,14 +79,14 @@ export function DocsSearchDialog({ open, onOpenChange }: DocsSearchDialogProps) 
       <SearchDialogContent className="border-border bg-card text-card-foreground shadow-[0_28px_90px_color-mix(in_srgb,var(--foreground)_32%,transparent)]">
         <SearchDialogHeader className="border-b border-border bg-muted">
           <SearchDialogIcon />
-          <SearchDialogInput placeholder="Search docs, components, props..." />
+          <SearchDialogInput placeholder="Search guides, components, props..." />
           <SearchDialogClose />
         </SearchDialogHeader>
         <SearchDialogList
           items={query.data === 'empty' ? [] : query.data}
           Empty={() => (
             <div className="px-6 py-12 text-center text-sm text-muted-foreground">
-              Nothing matched. Try a component name, prop, or route.
+              Nothing matched. Try a topic, folder, component, or prop.
             </div>
           )}
         />

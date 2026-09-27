@@ -1,174 +1,117 @@
 import { Link, Outlet, useLocation } from '@tanstack/react-router'
 import { SearchProvider } from 'fumadocs-ui/contexts/search'
-import gsap from 'gsap'
-import { Code2, Layers3 } from 'lucide-react'
-import { useLayoutEffect, useRef } from 'react'
-
+import { useState } from 'react'
 import { docsNavItems } from '../content/docs-content'
+import { handbookGroups, handbookHref, handbookManifest } from '../content/handbook-manifest'
 import { sharedUiCategories, sharedUiDocNavItems } from '../content/shared-ui-docs-nav'
 import { DocsSearchButton, DocsSearchDialog } from './docs-search'
-import type { ComponentType, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/utils'
-import { VewaveLogoMark } from '@/shared/theme'
-
-const primaryDocsNav = docsNavItems.slice(0, 3)
-const componentDocsNav = docsNavItems.slice(3)
 
 export function DocsShell() {
-  const rootRef = useRef<HTMLDivElement>(null)
-  const location = useLocation()
-  const activePathname = stripTrailingSlash(location.pathname)
-
-  useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.docs-gsap-reveal',
-        { autoAlpha: 0, y: 14 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.58,
-          ease: 'power3.out',
-          stagger: 0.055,
-        },
-      )
-
-      gsap.fromTo(
-        '.docs-gsap-rule',
-        { scaleX: 0, transformOrigin: 'left center' },
-        { scaleX: 1, duration: 0.72, ease: 'power2.out' },
-      )
-    }, rootRef)
-
-    return () => ctx.revert()
-  }, [location.pathname])
+  const pathname = useLocation({ select: (location) => location.pathname.replace(/\/$/, '') })
+  const [navigationOpen, setNavigationOpen] = useState(false)
+  const referenceLinks = docsNavItems.filter((item) => item.to !== '/admin/docs')
+  const linkClass = (href: string) =>
+    cn(
+      'block rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring',
+      pathname === href && 'bg-accent font-medium text-foreground',
+    )
 
   return (
     <SearchProvider SearchDialog={DocsSearchDialog} preload>
-      <div
-        ref={rootRef}
-        className="grid w-full gap-6 text-foreground lg:grid-cols-[18rem_minmax(0,1fr)]"
-      >
-        <aside className="docs-gsap-reveal max-h-[20rem] overflow-y-auto lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] lg:max-h-none lg:overflow-visible">
-          <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm">
-            <div className="space-y-3 border-b border-border p-4">
-              <Link to="/admin/docs" className="flex items-center gap-3">
-                <VewaveLogoMark className="size-10 rounded-lg" surfaceToken="card" />
-                <span>
-                  <span className="block text-sm font-semibold">Vewave Docs</span>
-                  <span className="block text-xs text-muted-foreground">Admin knowledge base</span>
-                </span>
-              </Link>
+      <div className="grid w-full min-w-0 gap-8 text-foreground lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12">
+        <aside className="min-w-0 lg:sticky lg:top-24 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto">
+          <div className="mb-5 flex items-center justify-between gap-3 lg:block">
+            <Link to="/admin/docs" className="block text-base font-semibold tracking-tight">
+              Vewave <span className="font-normal text-muted-foreground">/ Docs</span>
+            </Link>
+            <div className="lg:mt-4">
               <DocsSearchButton />
             </div>
-
-            <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Docs table of contents">
-              <DocsTocSection title="Start">
-                {primaryDocsNav.map((item) => {
-                  const isActive = isTocLinkActive(activePathname, item.to, item.exact)
-
-                  return (
-                    <DocsTocLink
-                      key={item.to}
-                      active={isActive}
-                      description={item.description}
-                      icon={item.icon}
-                      title={item.title}
-                      to={item.to}
-                    />
-                  )
-                })}
-              </DocsTocSection>
-
-              <DocsTocSection title="Reusable components">
-                {componentDocsNav.map((item) => {
-                  const isActive = isTocLinkActive(activePathname, item.to, item.exact)
-
-                  return (
-                    <DocsTocLink
-                      key={item.to}
-                      active={isActive}
-                      description={item.description}
-                      icon={item.icon}
-                      title={item.title}
-                      to={item.to}
-                    />
-                  )
-                })}
-              </DocsTocSection>
-
-              <DocsTocSection title="Shared UI primitives">
-                <Link
-                  to="/admin/docs/ui/components/shared"
-                  className={cn(
-                    'mb-3 flex items-center gap-2 rounded-md px-2.5 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground',
-                    isTocLinkActive(activePathname, '/admin/docs/ui/components/shared', true) &&
-                      'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
-                  )}
-                >
-                  <Layers3 className="size-3.5" />
-                  Catalog overview
-                </Link>
-
-                <div className="space-y-4">
-                  {sharedUiCategories.map((category) => {
-                    const docs = sharedUiDocNavItems.filter((doc) => doc.category === category.id)
-
-                    return (
-                      <div key={category.id} className="space-y-1.5">
-                        <div className="px-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                          {category.title}
-                        </div>
-                        <div className="space-y-0.5">
-                          {docs.map((doc) => {
-                            const isActive = isTocLinkActive(activePathname, doc.to, true)
-
-                            return (
-                              <Link
-                                key={doc.to}
-                                to={doc.to}
-                                className={cn(
-                                  'group relative flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-[background-color,color] hover:bg-accent hover:text-accent-foreground',
-                                  isActive &&
-                                    'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
-                                )}
-                                aria-current={isActive ? 'page' : undefined}
-                              >
-                                <span
-                                  className={cn(
-                                    'size-1.5 rounded-full bg-border transition-colors group-hover:bg-primary',
-                                    isActive && 'bg-primary-foreground',
-                                  )}
-                                />
-                                <span className="truncate">{doc.title}</span>
-                              </Link>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </DocsTocSection>
-            </nav>
-
-            <div className="hidden border-t border-border p-4 lg:block">
-              <div className="rounded-lg border border-border bg-muted p-3">
-                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  <Code2 className="size-3.5 text-primary" />
-                  API-first docs
-                </div>
-                <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  Each primitive now has a dedicated route, live example, usage snippet, and prop
-                  table.
-                </p>
-              </div>
-            </div>
           </div>
+          <button
+            type="button"
+            aria-expanded={navigationOpen}
+            aria-controls="docs-navigation"
+            className="mb-4 flex w-full justify-between rounded-md border border-border px-3 py-2 text-sm lg:hidden"
+            onClick={() => setNavigationOpen((open) => !open)}
+          >
+            Browse documentation <span aria-hidden>{navigationOpen ? '?' : '+'}</span>
+          </button>
+          <nav
+            id="docs-navigation"
+            aria-label="Documentation"
+            className={cn('space-y-7 pb-6', navigationOpen ? 'block' : 'hidden lg:block')}
+          >
+            {handbookGroups.map((group) => (
+              <NavigationGroup key={group} title={group}>
+                {handbookManifest
+                  .filter((entry) => entry.group === group)
+                  .sort((a, b) => a.order - b.order)
+                  .map((entry) => (
+                    <Link
+                      key={entry.slug}
+                      to={handbookHref(entry.slug)}
+                      onClick={() => setNavigationOpen(false)}
+                      className={linkClass(handbookHref(entry.slug))}
+                      aria-current={pathname === handbookHref(entry.slug) ? 'page' : undefined}
+                    >
+                      {entry.title}
+                    </Link>
+                  ))}
+              </NavigationGroup>
+            ))}
+            <NavigationGroup title="Component reference">
+              {referenceLinks.map((entry) => (
+                <Link
+                  key={entry.to}
+                  to={entry.to}
+                  onClick={() => setNavigationOpen(false)}
+                  className={linkClass(entry.to)}
+                  aria-current={pathname === entry.to ? 'page' : undefined}
+                >
+                  {entry.title}
+                </Link>
+              ))}
+            </NavigationGroup>
+            <NavigationGroup title="Shared UI primitives">
+              {sharedUiCategories.map((category) => (
+                <details
+                  key={category.id}
+                  open={
+                    sharedUiDocNavItems.some(
+                      (item) => item.category === category.id && item.to === pathname,
+                    )
+                      ? true
+                      : undefined
+                  }
+                  className="mb-2"
+                >
+                  <summary className="cursor-pointer rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">
+                    {category.title}
+                  </summary>
+                  <div className="ml-3 border-l border-border pl-2">
+                    {sharedUiDocNavItems
+                      .filter((item) => item.category === category.id)
+                      .map((item) => (
+                        <Link
+                          key={item.to}
+                          to={item.to}
+                          onClick={() => setNavigationOpen(false)}
+                          className={linkClass(item.to)}
+                          aria-current={pathname === item.to ? 'page' : undefined}
+                        >
+                          {item.title}
+                        </Link>
+                      ))}
+                  </div>
+                </details>
+              ))}
+            </NavigationGroup>
+          </nav>
         </aside>
-
-        <main className="docs-gsap-reveal min-w-0">
-          <div className="docs-gsap-rule mb-5 h-px w-full bg-border" />
+        <main className="min-w-0">
           <Outlet />
         </main>
       </div>
@@ -176,73 +119,11 @@ export function DocsShell() {
   )
 }
 
-type TocLinkProps = {
-  active: boolean
-  description: string
-  icon: ComponentType<{ className?: string }>
-  title: string
-  to: (typeof docsNavItems)[number]['to']
-}
-
-function DocsTocSection({ children, title }: { children: ReactNode; title: string }) {
+function NavigationGroup({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="mb-5">
-      <h2 className="mb-2 px-2.5 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-        {title}
-      </h2>
-      <div className="space-y-1">{children}</div>
+    <section>
+      <h2 className="mb-2 px-3 text-xs font-medium text-muted-foreground">{title}</h2>
+      <div className="space-y-0.5">{children}</div>
     </section>
   )
-}
-
-function DocsTocLink({ active, description, icon: Icon, title, to }: TocLinkProps) {
-  return (
-    <Link
-      to={to}
-      className={cn(
-        'group relative flex gap-2.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground transition-[background-color,color] hover:bg-accent hover:text-accent-foreground',
-        active &&
-          'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
-      )}
-      aria-current={active ? 'page' : undefined}
-    >
-      <span
-        className={cn(
-          'absolute inset-y-2 left-0 w-0.5 rounded-full bg-transparent transition-colors',
-          active && 'bg-primary-foreground',
-        )}
-      />
-      <Icon
-        className={cn(
-          'mt-0.5 size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary',
-          active && 'text-primary-foreground',
-        )}
-      />
-      <span className="min-w-0">
-        <span className="block truncate font-medium">{title}</span>
-        <span
-          className={cn(
-            'mt-0.5 line-clamp-2 block text-xs leading-5 text-muted-foreground',
-            active && 'text-primary-foreground/80',
-          )}
-        >
-          {description}
-        </span>
-      </span>
-    </Link>
-  )
-}
-
-function isTocLinkActive(pathname: string, to: string, exact = false) {
-  const normalizedTo = stripTrailingSlash(to)
-
-  if (exact) {
-    return pathname === normalizedTo
-  }
-
-  return pathname === normalizedTo || pathname.startsWith(`${normalizedTo}/`)
-}
-
-function stripTrailingSlash(value: string) {
-  return value === '/' ? value : value.replace(/\/$/, '')
 }

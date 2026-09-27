@@ -123,7 +123,7 @@ const glassUsageSnippet = `function LiquidItem(props: GlassFluidInteractionProps
 
 function SharedSelectionLens({ activeId }: { activeId: string }) {
   return (
-    <FluidGlassGroup environment={{ type: 'theme' }} quality="auto">
+    <FluidGlassGroup environment={{ type: 'auto-dom' }} quality="auto">
       {['rooms', 'servers'].map((id) => (
         <FluidGlassTarget
           key={id}
@@ -265,17 +265,83 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
     title: 'Glass',
     eyebrow: 'Motion / liquid interaction foundation',
     description:
-      'Shared glass-interaction utilities plus the controlled-environment WebGL2 material used by Sidebar and settings navigation for real edge refraction with sharp DOM foregrounds.',
+      'Shared selection lenses for sidebar and settings navigation: native SVG refraction over live HTML where enabled, CSS glass elsewhere, and opt-in WebGL rendering for controlled backgrounds. Legacy interaction presets remain available.',
     to: '/admin/docs/ui/components/glass',
     icon: Sparkles,
     importSnippet: glassImportSnippet,
     usageSnippet: glassUsageSnippet,
     apiRows: [
       {
-        name: 'FluidGlassGroup',
-        type: 'environment, quality, activation, renderer, material, transmissionMaterial, forceFallback',
+        name: 'onBackendChange',
+        type: "(backend: 'css' | 'sdf' | 'transmission') => void",
         description:
-          'Owns one demand-driven SDF canvas by default, plus the explicitly selected transmission experiment, target registry, shared spring lens, and semantic CSS fallback.',
+          'Compatibility callback: css includes native SVG and solid rendering. data-fluid-glass-resolved-backend exposes the detailed result for diagnostics. Reduced motion snaps the shared lens; reduced transparency and solid appearance use an opaque selection.',
+      },
+      {
+        name: 'FluidGlassGroup',
+        type: 'environment, motion, quality, activation, renderer, material, transmissionMaterial, forceFallback',
+        description:
+          'Owns target selection and one shared motion controller. Declare auto-dom for live HTML; SVG follows the Edge refraction setting and browser support. Theme (the unchanged default) and readable image sources may use SDF or explicitly selected transmission.',
+      },
+      {
+        name: 'FluidGlassGroup.motion',
+        type: "'auto' | 'off' | 'subtle' | 'fluid'",
+        description:
+          'Auto follows saved Glass motion in glass style and uses Subtle for solid surfaces. Off snaps; Subtle slides for 180ms without deformation; Fluid travels for 225ms with up to 5% stretch / 2% compression and settles by 300ms. Keyboard input and reduced motion always snap, including explicit preview profiles.',
+      },
+      {
+        name: 'GlassSurface.role',
+        type: "'none' | 'shell' | 'header' | 'navigation' | 'dialog' | 'form' | 'sheet' | 'menu' | 'control' | 'media'",
+        description:
+          'Chooses a semantic tint, reading veil, thickness and solid fallback from the shared glass material. The common intensity profile supplies 2/4/6px scattering, IOR 1.5, white reflections and limited dispersion. Reading opacity is contrast-derived against bright and dark backdrops. DOM dialogs and forms retain their bounded height-field refraction; the form role adds no dialog semantics, focus trap or entrance animation. Native HTML stays sharp and keyboard/reduced motion disables fluid response. Use asChild to preserve native/Radix semantics and refs.',
+      },
+      {
+        name: 'GlassSurface.motion / presence',
+        type: "motion?: 'auto' | 'off' | 'subtle' | 'fluid'; presence?: 'none' | 'dialog' | 'popover' | 'sheet'",
+        description:
+          'Motion follows the saved appearance policy with keyboard and reduced-motion overrides. Presence independently declares overlay entry/exit; page frames use none and popovers keep their trigger origin. Only decorative material responds to pressure; labels, focus rings and hit rectangles stay fixed.',
+      },
+      {
+        name: 'GlassInteractionScope',
+        type: 'children: ReactNode',
+        description:
+          'Import from @/shared/lib/glass-interaction-scope at a product layout boundary. App, Studio and authentication already provide it. Routes native input to the nearest registered surface, including portals, without making parent and child panes react together. Fine-pointer response stays within 40px of the edge; touch is press/release only. Editing, keyboard input, scrolling, hidden tabs and lost window focus reset the response. Material frames settle within 300ms and stop requesting frames.',
+      },
+      {
+        name: 'GlassSurface.backdropSource',
+        type: "'dom' | 'scene'",
+        description:
+          'Defaults to dom: refracts live backdrop pixels through supported SVG filters with a CSS fallback. Use scene only for outer panes over a controlled background inside GlassSceneHost. The pane registers measured geometry with that host and disables native optics only after its first successful scene paint. Missing hosts, renderer failure and reduced transparency retain fallback material. Both adapters share the same optical recipe and keep children in native HTML.',
+      },
+      {
+        name: 'GlassSceneHost',
+        type: 'source, sourceOptions, enabled?, paused?, motion?, className?, style?, children?',
+        description:
+          'Import from @/components/glass-scene. Owns one lazy Three renderer, neutral environment and shared transmission capture for registered panes over a renderer-owned source. A source factory supplies opaque objects, option/size updates, optional demand-driven frames and pointer interaction, and disposal; it never captures HTML or creates another renderer. Canvas className/style position the host without adding a layout wrapper. The canvas is capped at 2M pixels and DPR 1.5; transmission uses 75% of each dimension (at most 1.125M pixels), with additional mipmap and multisampling storage. Rendering stops at rest and caps at 30 active frames per second; hidden or offscreen scenes suspend. Saved motion constraints and failure cleanup apply to every pane.',
+      },
+      {
+        name: 'Canvas UI Glass Object',
+        type: 'createGlassObject(canvas, options): GlassObjectInstance | null',
+        description:
+          'Adapted from canvasui.dev/r/glass-object-react.json; source and MIT + Commons Clause license live in components/canvas-ui. Options specify src, material, composition (object by default, or auth), optional pathColors (sRGB fills keyed by SVG path ID), background/highlight, environmentIntensity, motion, onLoad, onError. Individual SVG paths retain their shared geometry coordinates. Object uses matte or colored transmissive faces; the optional auth composition keeps opaque paths behind a separate clear beveled lens with static sweeping bands. setOptions updates colors/materials; setPointer accepts normalized coordinates (Subtle up to 2 degrees, Fluid up to 4 degrees); destroy releases geometry, materials, renderer, fetch, observers and frame clock. Demand rendering stops at rest, caps at 30fps / DPR 1.5 / 600K pixels, and pauses offscreen or hidden. Sign-in and sign-up instead share AuthPageLayout and the common glass scene: an auth source draws dither, finite edge deformation and the opaque Solid print, while the shared physical material owns all glass optics for the measured plate. Native SVG and controls stay sharp above a 140px form readability veil; Solid and failed WebGL retain opaque material. Auth does not change saved background settings. The reusable Glass Object API remains independent.',
+      },
+      {
+        name: 'AppBackdrop',
+        type: 'paused?: boolean, children?: ReactNode',
+        description:
+          'Import from @/components/app-backdrop and wrap the active App or Studio layout. Reads account-scoped AppearanceSettings.background: preset (none/ribbons/silk/contours), palette (theme/custom), colors, brightness, speed, animated. Supplies opaque background objects to GlassSceneHost, which renders the source and registered outer panes in one context at up to 2M pixels / 30fps; there is no second production backdrop renderer. None supplies a flat theme source. Solid, reduced transparency and forced fallback disable the host while preserving children; renderer failures retain CSS material and a static background. Reduced motion and paused render still frames, and hidden scenes suspend.',
+      },
+      {
+        name: 'BackdropPreview',
+        type: 'settings: BackgroundSettings, tokens: ThemeTokens, mode: ResolvedAppearanceMode',
+        description:
+          'Import from @/components/app-backdrop for a single live canvas preview in background settings. Shares the actual scene shader with a 100K-pixel limit and CSS fallback. Respects reduced motion/transparency, owns and releases its renderer, and leaves selection, sliders, and color inputs in accessible HTML.',
+      },
+      {
+        name: 'SettingsDialogContent',
+        type: 'sections: SettingsDialogSection[], value: string, onValueChange, title?, footer?: ReactNode',
+        description:
+          'Import from @/components/settings-dialog. Compose inside one Dialog root. Sections supply id, label, description, icon, and either content or tabs. Each tab supplies id, label, and content. Optional searchItems on a section or tab supply label, keywords, and a target matching data-settings-anchor in the panel. Search opens the matching section and tab, then focuses its control. Arrow Down enters results; Escape clears search before closing the dialog. App and Studio share one Appearance section with Colors, Glass, and Background tabs; tab selection survives section changes. The optional footer mounts inside the open dialog, preserving one save owner across navigation and search. Dialogs use the shared 2/4/6px scattering and contrast-derived reading veil with a clearer refracted perimeter. Its 24px corners and motion follow saved appearance preferences; keyboard/reduced motion is immediate.',
       },
       {
         name: 'FluidGlassTarget',
@@ -293,7 +359,7 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
         name: 'FluidGlassRendererSelection',
         type: "'auto' | 'transmission-experimental'",
         description:
-          'Keeps production on SDF and exposes the Drei transmission volume only as an explicit calibration-lab selection.',
+          'Auto resolves DOM sources to SVG/CSS and controlled sources to SDF. Transmission is explicit and requires a readable controlled source. Ordinary application controls retain HTML semantics.',
       },
       {
         name: 'FluidTransmissionMaterial',
@@ -358,11 +424,42 @@ export const componentDocs: Record<ComponentDocSlug, ComponentDoc> = {
     ],
     sections: [
       {
-        title: 'Role in the component layer',
-        body: 'Glass is not a route or visual component by itself. It is the reusable interaction layer that keeps liquid-glass controls consistent across complex component packages.',
+        title: 'Shared chrome and selection motion',
+        body: 'Use the saved appearance policy in product navigation and segmented controls. The lens follows the committed selection, hover stays local, and labels and click targets stay stationary. Turn motion off or compare Subtle and Fluid in the source comparison showcase. Its settings preview uses the real settings shell and updates live device preferences.',
+        code: `<FluidGlassGroup environment={{ type: 'auto-dom' }} motion="auto">
+  <FluidGlassTarget id="appearance" active behaviors={['selection']} asChild>
+    <button className="rounded-md px-3 py-2" aria-pressed>Appearance</button>
+  </FluidGlassTarget>
+</FluidGlassGroup>`,
       },
       {
-        title: 'Presets before magic numbers',
+        title: 'Responsive settings shell',
+        body: 'Supply feature panels to the presentation shell. Desktop uses a vertical rail; mobile uses a scrolling horizontal tablist. Appearance nests Colors, Glass, and Background in a second tablist; each tablist owns its arrow keys. Search matches labels and keywords across sections and tabs without mutating preferences. Escape clears search first, then closes the dialog; focus returns to the opener. The footer keeps saving feedback visible through navigation and search. Each segmented track and the outer navigation own one selected lens. Segments retain native buttons and aria-pressed; hover does not select, keyboard changes snap, and Solid or reduced transparency keep an opaque selected state.',
+        code: `<Dialog>
+  <DialogTrigger asChild><Button>Settings</Button></DialogTrigger>
+  <SettingsDialogContent
+    value={section}
+    onValueChange={setSection}
+    sections={appearanceSettingsSections}
+    footer={<AppearanceSettingsFooter />}
+  />
+</Dialog>`,
+      },
+      {
+        title: 'Choose the backdrop source',
+        body: 'Use auto-dom for application controls. Edge refraction enables SVG displacement where supported, with CSS glass elsewhere. Theme and readable image sources are controlled environments; their pixels may be sampled by WebGL. Labels, focus rings, and hit areas remain unchanged when the backend changes.',
+        code: `<FluidGlassGroup
+  environment={{ type: 'image', src: '/your-backdrop.png' }}
+  activation="always"
+  renderer="transmission-experimental"
+>
+  <FluidGlassTarget id="preview" active asChild>
+    <button className="rounded-lg px-4 py-2">Preview</button>
+  </FluidGlassTarget>
+</FluidGlassGroup>`,
+      },
+      {
+        title: 'Legacy interaction presets',
         body: 'Start with fluidPreset and override individual numbers only for a specific shell or control. This keeps Header, Sidebar, and Tabs visually related.',
         code: `<Header variant="liquidGlass" fluidPreset="balanced" />
 
@@ -801,7 +898,7 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
         name: 'motion',
         type: "'none' | 'soft' | 'fluid'",
         description:
-          'Controls entrance, hover, and active-indicator motion. Use soft for persistent navigation; fluid is for explicitly expressive surfaces.',
+          'Controls legacy entrance, hover, and active-indicator motion. App and Studio use none here and let FluidGlassGroup follow the saved glass motion preference; fluid on Sidebar is reserved for expressive showcases.',
       },
       {
         name: 'fluidPreset',
@@ -1037,8 +1134,9 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
       },
       {
         title: 'App shell usage',
-        body: 'Authenticated app layouts compose Sidebar from root pieces, then pass mobileDockItems so the same route model powers the desktop rail and the bottom dock. Persistent app navigation gets glass, soft motion, explicit active state, and non-draggable dock behavior from shared defaults.',
+        body: 'Authenticated layouts pass mobileDockItems so one route model powers the rail and dock. App and Studio use stationary Sidebar controls with a shared FluidGlassGroup selection lens. The mobile dock provides its own lens. All follow the saved glass motion preference and remain non-draggable in production.',
         code: `<Sidebar
+  motion="none"
   mobileDockItems={mobileDockItems}
   mobileDockPathname={location.pathname}
   mobileDockAriaLabel="App mobile navigation"
@@ -1051,14 +1149,16 @@ const canInteractiveGlass = interactiveGlass && finePointer && !prefersReducedMo
     title="Vewave"
     subtitle="Watch together"
   />
-  <SidebarSection title="Watch">
-    <SidebarItem asChild active>
-      <Link to="/projects">
-        <SidebarItemIcon><Radio /></SidebarItemIcon>
-        <SidebarItemLabel>Rooms</SidebarItemLabel>
-      </Link>
-    </SidebarItem>
-  </SidebarSection>
+  <FluidGlassGroup environment={{ type: 'auto-dom' }} className="fluid-glass-navigation">
+    <SidebarSection title="Watch">
+      <SidebarItem asChild active>
+        <Link to="/projects">
+          <SidebarItemIcon><Radio /></SidebarItemIcon>
+          <SidebarItemLabel>Rooms</SidebarItemLabel>
+        </Link>
+      </SidebarItem>
+    </SidebarSection>
+  </FluidGlassGroup>
   <SidebarFooter>
     <SidebarItem type="button" icon={<Settings />}>Settings</SidebarItem>
   </SidebarFooter>

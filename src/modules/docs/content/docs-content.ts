@@ -1,18 +1,15 @@
 import {
   BookOpen,
   Boxes,
-  Cable,
   Code2,
   Component,
   FileCode2,
-  GitBranch,
   GalleryHorizontalEnd,
   Layers3,
   Palette,
   Paintbrush,
   PanelLeft,
   Route,
-  ShieldCheck,
   Sparkles,
   Wrench,
 } from 'lucide-react'
@@ -107,57 +104,6 @@ export const docsNavItems = [
     exact: false,
   },
 ] as const satisfies ReadonlyArray<DocsNavItem>
-
-export const quickStartCommands = [
-  { label: 'Install dependencies', command: 'npm install' },
-  { label: 'Copy local env', command: 'cp .env.example .env' },
-  { label: 'Generate REST client', command: 'npm run api:gen' },
-  { label: 'Start frontend', command: 'npm run dev' },
-] as const
-
-export const overviewCards = [
-  {
-    title: 'Core API',
-    description:
-      'REST transport, generated clients, auth refresh, and Orval mutators live under src/core/api.',
-    icon: Cable,
-  },
-  {
-    title: 'Module Pages',
-    description:
-      'Feature flows stay in src/modules so TanStack route files remain thin URL wiring.',
-    icon: GitBranch,
-  },
-  {
-    title: 'Validation',
-    description:
-      'Use npm run test, npm run check, and npm run build before shipping broad UI or API work.',
-    icon: ShieldCheck,
-  },
-] as const
-
-export const architectureRows = [
-  {
-    path: 'src/components/**',
-    purpose: 'Complex reusable UI components such as Header and ResizableCard.',
-  },
-  {
-    path: 'src/shared/ui/**',
-    purpose: 'Small shadcn-like primitives and low-level shared UI pieces.',
-  },
-  {
-    path: 'src/modules/**',
-    purpose: 'Feature/page compositions, including docs, auth, watch-together, and showcase flows.',
-  },
-  {
-    path: 'src/core/**',
-    purpose: 'App-level services, layouts, API transport, generated clients, and errors.',
-  },
-  {
-    path: 'src/routes/**',
-    purpose: 'Folder-based TanStack Router definitions only; no business logic.',
-  },
-] as const
 
 export const uiPrinciples = [
   {

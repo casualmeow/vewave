@@ -1,11 +1,6 @@
+import { handbookSearchRecords } from './handbook-content'
 import { componentDocs } from './component-docs-content'
-import {
-  architectureRows,
-  docsNavItems,
-  overviewCards,
-  uiComponentDocs,
-  uiPrinciples,
-} from './docs-content'
+import { docsNavItems, uiComponentDocs, uiPrinciples } from './docs-content'
 import { sharedUiCategories, sharedUiDocNavItems } from './shared-ui-docs-nav'
 
 export type DocsSearchRecord = {
@@ -71,22 +66,6 @@ function createOverviewRecords() {
       breadcrumbs: ['Docs'],
       keywords: [item.to],
     })),
-    ...overviewCards.map((item) => ({
-      id: `overview:${item.title}`,
-      title: item.title,
-      description: item.description,
-      url: '/admin/docs',
-      breadcrumbs: ['Docs', 'Overview'],
-      keywords: [],
-    })),
-    ...architectureRows.map((row) => ({
-      id: `architecture:${row.path}`,
-      title: row.path,
-      description: row.purpose,
-      url: '/admin/docs',
-      breadcrumbs: ['Docs', 'Architecture'],
-      keywords: [],
-    })),
     ...uiPrinciples.map((item) => ({
       id: `ui-principle:${item.title}`,
       title: item.title,
@@ -107,6 +86,7 @@ function createOverviewRecords() {
 }
 
 export const docsSearchRecords: Array<DocsSearchRecord> = [
+  ...handbookSearchRecords,
   ...createOverviewRecords(),
   ...createComponentRecords(),
   ...createSharedUiRecords(),

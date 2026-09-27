@@ -19,7 +19,7 @@ Adds to root `AGENTS.md`. Stack, formatting, imports, and the `routes → module
 
 ## Reusable Component Docs
 
-When a reusable component under `src/components/**` gains a new public prop, behavior mode, or structural variant: update its UI-kit docs page under `/docs/ui/components/**`. Document the real API, distinguish visual from structural variants, include basic + advanced usage, and note interaction/accessibility behavior.
+When a reusable component under `src/components/**` gains a new public prop, behavior mode, or structural variant: update its UI-kit docs page under `/admin/docs/ui/components/**`. Document the real API, distinguish visual from structural variants, include basic + advanced usage, and note interaction/accessibility behavior.
 
 ## React 19 Conventions
 
@@ -40,7 +40,7 @@ Verification should match the size of the change, not run on autopilot.
 
 - For small changes (a class, a prop, copy, a single component edit): confirm the edit in the diff and stop. Do not run the full build, the full test suite, or launch a browser to visually verify.
 - Run only the single test file that covers the touched surface — for sidebar/navigation work that is `src/__tests__/unit/core/layouts/navigation-design-contract.test.ts`. Not the whole suite.
-- Run `npm run check` (typecheck) only when you changed types, imports, or signatures. Not a default step for markup or CSS edits.
+- Run `npm run typecheck:tsc` when types, imports, or signatures change. Run `npm run routes:gen` first when routes change; `npm run check` also runs formatting, linting, and unit tests.
 - Use barrel imports; remove stale imports and dead files you created. Do not delete code you did not write.
 - Never repair pre-existing test or typecheck failures unrelated to the change. Report them in one line and continue. See root `AGENTS.md` "Effort And Scope Discipline".
 - If you did not run a command, do not claim you did. Report failures honestly and stop.
@@ -53,3 +53,9 @@ Verification should match the size of the change, not run on autopilot.
 - Avoid starter assets in product UI (sample avatars, placeholder logos, default demo copy, generic dashboard filler).
 - Rounded surfaces express hierarchy — do not apply the same radius and contrast treatment to every layer.
 - Top-level product/navigation icons use Vewave-specific assets when the surface is identity-bearing; Lucide for low-risk utility actions.
+
+## Code And Documentation
+
+Follow root `AGENTS.md`: write authored code without comments. Put explanations in `docs/` and maintain the relevant handbook guide when contracts, lifecycle, or ownership change. Preserve required notices and generated files.
+
+Keep all code under `src/` free of comments, including generated output. Orval and route generation remove generated commentary through `scripts/source-comments.mjs`; maintain that pipeline rather than hand-editing generated code. Retain legally required notices. Describe implementation constraints in the relevant handbook guide.

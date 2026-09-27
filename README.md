@@ -5,20 +5,20 @@ component work.
 
 The detailed project documentation now lives inside the app:
 
-- `/docs` - setup, architecture, backend integration, validation workflow
-- `/docs/ui` - UI architecture, component ownership, styling and showcase conventions
-- `/docs/ui/components` - UI-kit style component API documentation
+- `/admin/docs` - Markdown developer handbook: setup, architecture, contracts, and validation
+- `docs/` - the same handbook, readable directly in Git without an admin account
+- `/admin/docs/ui` - UI architecture, component ownership, styling and showcase conventions
+- `/admin/docs/ui/components` - UI-kit style component API documentation
 - `/ui/showcase` - live component playgrounds
 
-The docs route uses Fumadocs UI page primitives and styles while preserving this repo's existing
-Vite + TanStack Router architecture.
+The in-app docs require an administrator account. Markdown handbook pages share navigation and
+search with the existing component references, using Vite and TanStack Router.
 
 ## Quick Start
 
-```bash
+```powershell
 npm install
-cp .env.example .env
-npm run api:gen
+Copy-Item .env.example .env.local
 npm run dev
 ```
 
@@ -42,7 +42,8 @@ transport lives under `src/core/api/http/**`.
 
 ## Validation
 
-Before shipping substantial work, run:
+Start with the affected unit test and `npm run typecheck:tsc`. Regenerate the route tree when
+routes change. For broad validation when the change warrants it:
 
 ```bash
 npm run check

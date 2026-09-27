@@ -1,0 +1,121 @@
+.handbook-prose {
+  color: var(--foreground);
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.handbook-prose h1 {
+  margin: 0 0 1.5rem;
+  font-size: clamp(1.875rem, 3vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+.handbook-prose h2,
+.handbook-prose h3 {
+  scroll-margin-top: 6rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+.handbook-prose h2 {
+  margin: 2.75rem 0 1rem;
+  font-size: 1.375rem;
+}
+.handbook-prose h3 {
+  margin: 2rem 0 0.75rem;
+  font-size: 1.0625rem;
+}
+.handbook-prose p,
+.handbook-prose ul,
+.handbook-prose ol,
+.handbook-prose blockquote {
+  margin: 1rem 0;
+}
+.handbook-prose > h1 + p {
+  color: var(--muted-foreground);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+.handbook-prose ul {
+  padding-left: 1.4rem;
+  list-style: disc;
+}
+.handbook-prose ol {
+  padding-left: 1.4rem;
+  list-style: decimal;
+}
+.handbook-prose li {
+  padding-left: 0.2rem;
+  margin: 0.35rem 0;
+}
+.handbook-prose a {
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 0.2em;
+}
+.handbook-prose a:hover {
+  text-decoration-color: currentColor;
+}
+.handbook-prose :is(h2, h3) a {
+  text-decoration: none;
+}
+.handbook-prose :is(h2, h3) a:hover {
+  text-decoration: underline;
+}
+.handbook-prose a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+.handbook-prose :not(pre) > code {
+  padding: 0.15em 0.35em;
+  border-radius: 0.25rem;
+  background: var(--muted);
+  font-size: 0.85em;
+}
+.handbook-prose blockquote {
+  padding-left: 1rem;
+  border-left: 2px solid var(--border);
+  color: var(--muted-foreground);
+}
+.handbook-table {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+.handbook-table:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.handbook-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.handbook-table th {
+  font-weight: 600;
+  text-align: left;
+}
+.handbook-table th,
+.handbook-table td {
+  padding: 0.8rem 0.9rem 0.8rem 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  min-width: 9rem;
+}
+.handbook-code {
+  margin: 1.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  box-shadow: none;
+}
+.handbook-code pre {
+  padding: 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.75;
+}
+.handbook-prose strong {
+  font-weight: 600;
+}
