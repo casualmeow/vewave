@@ -1,4 +1,5 @@
 import { defineConfig } from 'orval'
+import { cleanSourceComments } from './scripts/source-comments.mjs'
 
 export default defineConfig({
   vewave: {
@@ -13,10 +14,17 @@ export default defineConfig({
       httpClient: 'axios',
       clean: true,
       override: {
+        header: false,
+        jsDoc: { filter: () => [] },
         mutator: {
           path: './src/core/api/http/orval-mutator.ts',
           name: 'orvalMutator',
         },
+      },
+    },
+    hooks: {
+      afterAllFilesWrite: () => {
+        cleanSourceComments(['src/core/api/generated'])
       },
     },
   },
