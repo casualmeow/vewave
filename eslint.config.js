@@ -1,12 +1,9 @@
-//  @ts-check
-
 import { fileURLToPath } from 'node:url'
 import { dirname } from 'node:path'
 import { tanstackConfig } from '@tanstack/eslint-config'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-/** @type {import("eslint").Linter.Config[]} */
 export default [
   {
     ignores: [
@@ -24,7 +21,9 @@ export default [
       parserOptions: {
         tsconfigRootDir: __dirname,
         project: null,
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ['scripts/lens-spike-instrument.js'],
+        },
       },
     },
     rules: {

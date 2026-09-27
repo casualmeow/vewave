@@ -25,7 +25,7 @@
     "fix": "npm run format && npm run lint:fix",
     "check": "npm run routes:gen && npm run format:check && npm run lint && npm run typecheck:tsc && npm run test",
     "prepare": "husky",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged --concurrent 1"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
