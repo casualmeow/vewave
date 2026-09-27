@@ -1,25 +1,9 @@
-/**
- * Chromium-first refraction backend for the glass material.
- *
- * Real optics, not blur: a displacement map is generated from the signed
- * distance field of the surface's rounded-rectangle shape, and applied to the
- * backdrop through an SVG feDisplacementMap referenced by
- * `backdrop-filter: url(#...)`. The map keeps the center neutral (0.5/0.5)
- * and concentrates displacement along the curved boundary, so content behind
- * the surface visibly bends around its edges while the middle stays stable.
- *
- * `backdrop-filter: url()` renders correctly only in Chromium engines today;
- * everything here sits behind supportsLiquidGlassRefraction() and the
- * "experimental refraction" appearance flag. The CSS material remains the
- * production backend everywhere else.
- */
-
 export type DisplacementMapOptions = {
   width: number
   height: number
-  /** Corner radius of the surface, CSS px. */
+
   radius: number
-  /** How far the refraction zone reaches inward from the boundary, CSS px. */
+
   edgeWidth: number
 }
 
@@ -49,8 +33,6 @@ export function supportsLiquidGlassRefraction() {
     CSS.supports('backdrop-filter', 'url(#glass)') ||
     CSS.supports('-webkit-backdrop-filter', 'url(#glass)')
 
-  // Gecko and WebKit parse url() filters but do not render them for
-  // backdrop-filter; restrict the backend to Chromium engines.
   const isChromium = /Chrom(e|ium)\//.test(navigator.userAgent) || 'userAgentData' in navigator
 
   cachedSupport = supportsUrlFilter && isChromium
@@ -70,12 +52,6 @@ function smoothstep(edge0: number, edge1: number, value: number) {
   return t * t * (3 - 2 * t)
 }
 
-/**
- * Samples the inward edge-refraction vector for one point in a rounded rect.
- * The center and exterior remain neutral; only the inner edge band carries a
- * surface-normal displacement. Keeping this pure makes the optical geometry
- * independently verifiable from canvas and browser filter support.
- */
 export function sampleRoundedRectEdgeDisplacement({
   edgeWidth,
   height,
@@ -116,13 +92,12 @@ export function sampleRoundedRectEdgeDisplacement({
   }
 }
 
-const maxMapPixels = 90_000
+const maxMapPixels = 750_000
+const mapCache = new Map<string, string>()
+const maxCachedMaps = 32
+const cachedPixels = new Map<string, number>()
+const maxCachedPixels = 2_000_000
 
-/**
- * R channel = X displacement, G channel = Y displacement, 128 = neutral.
- * Returns a PNG data URL sized to (a downscaled copy of) the element; feImage
- * stretches it back over the filter region.
- */
 export function createEdgeDisplacementMap({
   width,
   height,
@@ -133,9 +108,21 @@ export function createEdgeDisplacementMap({
     return null
   }
 
-  const scale = Math.min(1, Math.sqrt(maxMapPixels / (width * height)))
-  const mapWidth = Math.max(2, Math.round(width * scale))
-  const mapHeight = Math.max(2, Math.round(height * scale))
+  const cacheKey = `${width}:${height}:${radius}:${edgeWidth}`
+  const cached = mapCache.get(cacheKey)
+  if (cached) {
+    mapCache.delete(cacheKey)
+    mapCache.set(cacheKey, cached)
+    return cached
+  }
+
+  const scale = Math.min(
+    1,
+    Math.max(0.5, 12 / Math.max(1, edgeWidth)),
+    Math.sqrt(maxMapPixels / (width * height)),
+  )
+  const mapWidth = Math.max(2, Math.floor(width * scale))
+  const mapHeight = Math.max(2, Math.floor(height * scale))
   const mapRadius = Math.max(0, Math.min(radius * scale, mapWidth / 2, mapHeight / 2))
   const mapEdge = Math.max(2, edgeWidth * scale)
 
@@ -174,5 +161,18 @@ export function createEdgeDisplacementMap({
 
   context.putImageData(image, 0, 0)
 
-  return canvas.toDataURL('image/png')
+  const href = canvas.toDataURL('image/png')
+  const pixels = mapWidth * mapHeight
+  while (
+    mapCache.size &&
+    (mapCache.size >= maxCachedMaps ||
+      [...cachedPixels.values()].reduce((sum, size) => sum + size, pixels) > maxCachedPixels)
+  ) {
+    const oldest = mapCache.keys().next().value!
+    mapCache.delete(oldest)
+    cachedPixels.delete(oldest)
+  }
+  mapCache.set(cacheKey, href)
+  cachedPixels.set(cacheKey, pixels)
+  return href
 }

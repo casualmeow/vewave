@@ -18,3 +18,6 @@ export type {
   FluidGlassTransitionDebugSnapshot,
   FluidGlassTransitionTraceEntry,
 } from './types'
+
+export { toConsumerState } from './lens/telemetry-contract'
+export type { LensConsumerState, LensVisualMode } from './lens/telemetry-contract'

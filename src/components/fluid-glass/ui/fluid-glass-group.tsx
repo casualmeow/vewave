@@ -1,6 +1,10 @@
 import {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
+  useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -9,41 +13,44 @@ import {
 
 import { resolveFluidGlassMaterial, resolveFluidTransmissionMaterial } from '../constants'
 import { FluidGlassContext } from '../context/fluid-glass-context'
-import { resolveFluidGlassBackend, supportsWebGl2 } from '../renderer/backend'
-import { FluidGlassRenderer } from '../renderer/fluid-glass-renderer'
-import { FluidGlassTransmissionRenderer } from '../renderer/fluid-glass-transmission-renderer'
+import { resolveFluidGlassBackendResolution } from '../renderer/backend'
+import { FluidGlassDomRenderer } from '../renderer/dom-lens-renderer'
+import { RendererErrorBoundary } from '../renderer/renderer-error-boundary'
+import { useLensAppearance } from '../hooks/use-lens-appearance'
+import { useBackdropReadability } from '../hooks/use-backdrop-readability'
 import { FluidGlassStore } from '../renderer/store'
+import { ACTIVE_LENS_GEOMETRY_POLICY } from '../lens/geometry-policy'
+import { ContextRecoveryController } from '../lens/context-recovery'
+import { LensDebugChannel } from '../lens/telemetry-contract'
+import { LensPaneDebugContext, type LensPaneDebugSnapshot } from '../lens/pane-debug'
+import {
+  RendererLifecycleController,
+  type LensRendererLifecycleState,
+} from '../lens/renderer-lifecycle'
+import { createLensStateAdapter } from '../lens/lens-state'
+import { isWebglBackend, toLegacyBackend } from '../lens/backend-resolution'
+import { useLensScopeGuard } from '../lens/scope-context'
+import { lensWebGlScopeGuard } from '../lens/webgl-scope-guard'
+import { probeWebglSupport } from '../lens/capability'
+import type { LensScopeDenialReason } from '../lens/webgl-scope-guard'
 import type { FluidGlassGroupProps, FluidGlassInteractionDiagnostics } from '../types'
-import { GlassSurface } from '@/shared/ui/glass-surface'
 import { cn } from '@/shared/lib/utils'
+import { resolveGlassMotion } from '@/shared/theme/glass-motion'
 
 const defaultLightDirection = [-0.72, 0.68] as const
 
-type AppearanceState = {
-  experimentalRefraction: boolean
-  reducedMotion: boolean
-  reducedTransparency: boolean
-  surfaceStyle: string
-}
+const recoveryReadinessTimeoutMs = 4_000
 
-function readAppearanceState(): AppearanceState {
-  if (typeof window === 'undefined') {
-    return {
-      experimentalRefraction: false,
-      reducedMotion: false,
-      reducedTransparency: false,
-      surfaceStyle: 'solid',
-    }
-  }
-
-  const root = document.documentElement
-  return {
-    experimentalRefraction: root.dataset.glassRefraction === 'on',
-    reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-    reducedTransparency: window.matchMedia('(prefers-reduced-transparency: reduce)').matches,
-    surfaceStyle: root.dataset.surfaceStyle ?? 'solid',
-  }
-}
+const FluidGlassRenderer = lazy(() =>
+  import('../renderer/fluid-glass-renderer').then((module) => ({
+    default: module.FluidGlassRenderer,
+  })),
+)
+const FluidGlassTransmissionRenderer = lazy(() =>
+  import('../renderer/fluid-glass-transmission-renderer').then((module) => ({
+    default: module.FluidGlassTransmissionRenderer,
+  })),
+)
 
 export function FluidGlassGroup({
   activation = 'appearance',
@@ -57,6 +64,7 @@ export function FluidGlassGroup({
   material: materialOverrides,
   materialPreset = 'production',
   mode = 'shared-lens',
+  motion = 'auto',
   onBackendChange,
   onInteractionDiagnostics,
   onTelemetry,
@@ -65,16 +73,41 @@ export function FluidGlassGroup({
   simulateReducedMotion = false,
   transmissionMaterial: transmissionMaterialOverrides,
 }: FluidGlassGroupProps) {
-  const [appearance, setAppearance] = useState(readAppearanceState)
-  const [rendererFailed, setRendererFailed] = useState<'sdf' | 'transmission' | null>(null)
-  const fallbackLensRef = useRef<HTMLDivElement>(null)
+  const appearance = useLensAppearance()
+  const [domRefractionFailed, setDomRefractionFailed] = useState(false)
+  const handleDomUnavailable = useCallback(() => setDomRefractionFailed(true), [])
+  const scopeId = useId()
+
+  const scopeGuard = useLensScopeGuard()
+  const recovery = useMemo(() => new ContextRecoveryController(), [])
+  const debugChannel = useMemo(() => new LensDebugChannel(), [])
+  const [recoverySnapshot, setRecoverySnapshot] = useState(() => recovery.snapshot)
+  const [rendererGeneration, setRendererGeneration] = useState(0)
+  const [scopeOwned, setScopeOwned] = useState(false)
+  const [scopeDenialReason, setScopeDenialReason] = useState<LensScopeDenialReason | null>(null)
+  const [scopeAvailable, setScopeAvailable] = useState(() => scopeGuard.canAcquire(scopeId))
   const interactionDiagnosticsRef = useRef<FluidGlassInteractionDiagnostics>({
     pointerOverCount: 0,
     pointerOutCount: 0,
     pointerMoveCount: 0,
     lastPointerTargetId: null,
   })
+
+  const recoveryTimersRef = useRef(new Set<number>())
+  const trackRecoveryTimer = useCallback((timer: number) => {
+    recoveryTimersRef.current.add(timer)
+    return () => {
+      recoveryTimersRef.current.delete(timer)
+      window.clearTimeout(timer)
+    }
+  }, [])
+
   const store = useMemo(() => new FluidGlassStore(), [])
+
+  const lensAdapter = useMemo(
+    () => createLensStateAdapter(store, ACTIVE_LENS_GEOMETRY_POLICY),
+    [store],
+  )
   const material = useMemo(
     () => resolveFluidGlassMaterial(materialPreset, materialOverrides),
     [materialOverrides, materialPreset],
@@ -83,49 +116,83 @@ export function FluidGlassGroup({
     () => resolveFluidTransmissionMaterial(materialPreset, transmissionMaterialOverrides),
     [materialPreset, transmissionMaterialOverrides],
   )
+
+  const sourceReadability = useBackdropReadability(environment)
+
   const reducedMotion = appearance.reducedMotion || simulateReducedMotion
-  const transmissionPreferred =
-    renderer === 'transmission-experimental' && rendererFailed !== 'transmission'
-  const backend = resolveFluidGlassBackend({
+  const motionProfile = resolveGlassMotion({
+    ...appearance,
+    preference: appearance.glassMotion,
+    requested: motion,
+    reducedMotion,
+  })
+  const transmissionPreferred = renderer === 'transmission-experimental'
+
+  const rendererHealthy =
+    recoverySnapshot.phase === 'healthy' || recoverySnapshot.phase === 'recovering'
+  const resolution = resolveFluidGlassBackendResolution({
     activation,
     environment,
     experimentalRefraction: appearance.experimentalRefraction,
-    forceFallback: forceFallback || rendererFailed === 'sdf',
+    forceFallback:
+      forceFallback ||
+      appearance.forceFallback ||
+      (environment.type === 'auto-dom' && domRefractionFailed),
     quality,
     reducedTransparency: appearance.reducedTransparency,
+    rendererHealthy,
+    sourceReadability,
     surfaceStyle: appearance.surfaceStyle,
     transmissionPreferred,
-    webgl2: supportsWebGl2(),
+    webgl2:
+      environment.type !== 'auto-dom' &&
+      quality !== 'disabled' &&
+      !forceFallback &&
+      !appearance.reducedTransparency &&
+      (activation === 'always' ||
+        (appearance.surfaceStyle === 'glass' && appearance.experimentalRefraction)) &&
+      probeWebglSupport(),
+    webglScopeAvailable: scopeOwned || scopeAvailable,
   })
+  const backend = toLegacyBackend(resolution.backend)
+  const wantsWebgl = isWebglBackend(resolution.backend)
+
+  const [rendererSession, setRendererSession] = useState(0)
+  const lifecycle = useMemo(() => {
+    void rendererGeneration
+    void rendererSession
+    return new RendererLifecycleController()
+  }, [rendererGeneration, rendererSession])
+
+  const lifecycleId = `${rendererGeneration}:${rendererSession}`
+  const [lifecycleState, setLifecycleState] = useState<LensRendererLifecycleState>(
+    () => lifecycle.state,
+  )
+
   const handleRendererFailure = useCallback(() => {
-    if (backend === 'sdf' || backend === 'transmission') setRendererFailed(backend)
-  }, [backend])
+    const phase = recovery.snapshot.phase
+    const next =
+      phase === 'lost' || phase === 'recovering'
+        ? recovery.notifyRecoveryFailed()
+        : recovery.notifyContextLost('renderer-error')
+    debugChannel.record('recovery-attempt', `renderer error handled as ${next.phase}`, scopeId)
+    setRecoverySnapshot(next)
+  }, [debugChannel, recovery, scopeId])
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const root = document.documentElement
-    const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const transparencyMedia = window.matchMedia('(prefers-reduced-transparency: reduce)')
-    const update = () => setAppearance(readAppearanceState())
-    const observer = new MutationObserver(update)
+  const handleContextLost = useCallback(() => {
+    debugChannel.record('context-lost', 'webgl context lost', scopeId)
+    setRecoverySnapshot(recovery.notifyContextLost())
+  }, [debugChannel, recovery, scopeId])
 
-    observer.observe(root, {
-      attributes: true,
-      attributeFilter: ['data-glass-refraction', 'data-surface-style'],
-    })
-    motionMedia.addEventListener('change', update)
-    transparencyMedia.addEventListener('change', update)
+  const handleRendererReady = useCallback(() => {
+    debugChannel.record('context-restored', 'renderer reported readiness', scopeId)
+    setRecoverySnapshot(recovery.notifyRestored())
+  }, [debugChannel, recovery, scopeId])
 
-    return () => {
-      observer.disconnect()
-      motionMedia.removeEventListener('change', update)
-      transparencyMedia.removeEventListener('change', update)
-    }
-  }, [])
-
-  useEffect(() => {
+  useLayoutEffect(() => {
+    store.motion.setMotionProfile(motionProfile)
     store.setReducedMotion(reducedMotion)
-  }, [reducedMotion, store])
+  }, [motionProfile, reducedMotion, store])
 
   useEffect(() => {
     store.setResolvedMaterials(material, transmissionMaterial)
@@ -147,31 +214,169 @@ export function FluidGlassGroup({
   }, [store])
 
   useEffect(() => {
+    store.scheduleMeasurement()
+  }, [resolution.backend, store])
+
+  useEffect(() => {
     onBackendChange?.(backend)
   }, [backend, onBackendChange])
 
   useEffect(() => {
-    if (backend !== 'css') return
-    return store.subscribe(() => {
-      const lens = fallbackLensRef.current
-      if (!lens) return
-      const state = store.current
-      const width = state.width * state.scaleX
-      const height = state.height * state.scaleY
-      const offsetX = state.x - (width - state.width) / 2
-      const offsetY = state.y - (height - state.height) / 2
-      lens.style.width = `${width}px`
-      lens.style.height = `${height}px`
-      lens.style.borderRadius = `${state.radius}px`
-      lens.style.opacity = `${state.opacity}`
-      lens.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`
-    })
-  }, [backend, store])
+    const timers = recoveryTimersRef.current
+    return () => {
+      for (const timer of timers) window.clearTimeout(timer)
+      timers.clear()
+      store.destroy()
+      recovery.dispose()
+      debugChannel.destroy()
+    }
+  }, [debugChannel, recovery, store])
 
+  const wasWebglRef = useRef(wantsWebgl)
+  useEffect(() => {
+    const previous = wasWebglRef.current
+    wasWebglRef.current = wantsWebgl
+    if (wantsWebgl && !previous && lifecycle.disposed) {
+      setRendererSession((session) => session + 1)
+    }
+  }, [lifecycle, wantsWebgl])
+
+  useEffect(() => {
+    setLifecycleState(lifecycle.state)
+    return lifecycle.subscribe((state, reason) => {
+      setLifecycleState(state)
+      debugChannel.record('lifecycle-transition', `${state}: ${reason}`, scopeId)
+    })
+  }, [debugChannel, lifecycle, scopeId])
+
+  useEffect(() => {
+    if (!wantsWebgl) return
+    const acquisition = scopeGuard.acquire(scopeId)
+    if (!acquisition.granted) {
+      debugChannel.record(
+        'scope-denied',
+        `slot held by ${acquisition.ownerId ?? 'unknown'}`,
+        scopeId,
+      )
+      setScopeDenialReason(acquisition.reason as LensScopeDenialReason)
+      setScopeAvailable(false)
+      return
+    }
+    debugChannel.record('scope-acquired', 'webgl slot acquired', scopeId)
+    setScopeDenialReason(null)
+    setScopeOwned(true)
+
+    let released = false
+    const release = () => {
+      if (released) return
+      released = true
+      scopeGuard.release(scopeId)
+      debugChannel.record('scope-released', 'webgl slot released', scopeId)
+      setScopeOwned(false)
+    }
+
+    if (!lifecycle.disposed) lifecycle.register('scope', release)
+    return release
+  }, [debugChannel, lifecycle, scopeGuard, scopeId, wantsWebgl])
+
+  useEffect(() => {
+    setScopeAvailable(scopeGuard.canAcquire(scopeId))
+    return scopeGuard.subscribe(() => {
+      setScopeAvailable(scopeGuard.canAcquire(scopeId))
+    })
+  }, [scopeGuard, scopeId])
+
+  useEffect(() => {
+    if (recoverySnapshot.phase !== 'lost') return
+    if (!recovery.canAttemptRecovery) {
+      lifecycle.transition('terminal-fallback', 'recovery budget exhausted')
+      setRecoverySnapshot(recovery.notifyTerminal('attempts-exhausted'))
+      return
+    }
+    return trackRecoveryTimer(
+      window.setTimeout(() => {
+        const next = recovery.beginRecovery()
+        debugChannel.record(
+          'recovery-attempt',
+          `attempt ${next.attempts}/${next.maxAttempts}`,
+          scopeId,
+        )
+        setRecoverySnapshot(next)
+        lifecycle.transition('recovering', `recovery attempt ${next.attempts}`)
+
+        setRendererGeneration((generation) => generation + 1)
+      }, 0),
+    )
+  }, [debugChannel, lifecycle, recovery, recoverySnapshot.phase, scopeId, trackRecoveryTimer])
+
+  useEffect(() => {
+    if (recoverySnapshot.phase !== 'recovering') return
+    return trackRecoveryTimer(
+      window.setTimeout(() => {
+        debugChannel.record('recovery-attempt', 'readiness timeout', scopeId)
+        const next = recovery.notifyRecoveryFailed()
+        if (next.phase === 'terminal') {
+          lifecycle.transition('terminal-fallback', 'recovery readiness timeout')
+        }
+        setRecoverySnapshot(next)
+      }, recoveryReadinessTimeoutMs),
+    )
+  }, [debugChannel, lifecycle, recovery, recoverySnapshot.phase, scopeId, trackRecoveryTimer])
+
+  useEffect(() => {
+    if (recoverySnapshot.phase !== 'terminal') return
+    debugChannel.record(
+      'recovery-terminal',
+      `terminal fallback: ${recoverySnapshot.reason}`,
+      scopeId,
+    )
+  }, [debugChannel, recoverySnapshot.phase, recoverySnapshot.reason, scopeId])
+
+  useEffect(() => {
+    debugChannel.record('backend-resolved', `${resolution.backend}: ${resolution.reason}`, scopeId)
+  }, [debugChannel, resolution.backend, resolution.reason, scopeId])
+
+  useEffect(() => {
+    debugChannel.record(
+      'source-readability-changed',
+      `${resolution.sourceCategory}: ${sourceReadability}`,
+      scopeId,
+    )
+  }, [debugChannel, resolution.sourceCategory, scopeId, sourceReadability])
+
+  const groupElementRef = useRef<HTMLDivElement | null>(null)
   const setGroupRef = useCallback(
-    (element: HTMLDivElement | null) => store.setGroup(element),
+    (element: HTMLDivElement | null) => {
+      groupElementRef.current = element
+      store.setGroup(element)
+    },
     [store],
   )
+
+  useEffect(() => {
+    let frame = 0
+    let stableFrames = 0
+    let signature = ''
+    const deadline = performance.now() + 1_200
+
+    const tick = () => {
+      const element = groupElementRef.current
+      if (!element) return
+      const rect = element.getBoundingClientRect()
+      const next = `${rect.x.toFixed(2)}:${rect.y.toFixed(2)}:${rect.width.toFixed(2)}:${rect.height.toFixed(2)}`
+      if (next !== signature) {
+        signature = next
+        stableFrames = 0
+        store.scheduleMeasurement()
+      } else {
+        stableFrames += 1
+      }
+      if (stableFrames < 3 && performance.now() < deadline) frame = requestAnimationFrame(tick)
+    }
+
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [store])
   const publishInteractionDiagnostics = useCallback(
     (
       counter: 'pointerOverCount' | 'pointerOutCount' | 'pointerMoveCount',
@@ -212,77 +417,142 @@ export function FluidGlassGroup({
     [publishInteractionDiagnostics],
   )
 
+  const paneDebug: LensPaneDebugSnapshot = useMemo(
+    () => ({
+      requestedRenderer: renderer,
+      resolvedBackend: resolution.backend,
+      legacyBackend: backend,
+      reason: resolution.reason,
+      degraded: resolution.degraded,
+      accessibilityEnforced: resolution.accessibilityEnforced,
+      sourceCategory: resolution.sourceCategory,
+      sourceReadability,
+      scopeId,
+      ownsScope: scopeOwned,
+      scopeDenialReason,
+      scopeOwnerId: scopeGuard.ownerId,
+      ownershipClass: scopeGuard.ownershipClass,
+      lifecycleState,
+      recoveryPhase: recoverySnapshot.phase,
+    }),
+    [
+      backend,
+      lifecycleState,
+      recoverySnapshot.phase,
+      renderer,
+      resolution.accessibilityEnforced,
+      resolution.backend,
+      resolution.degraded,
+      resolution.reason,
+      resolution.sourceCategory,
+      scopeDenialReason,
+      scopeGuard,
+      scopeId,
+      scopeOwned,
+      sourceReadability,
+    ],
+  )
+
+  const domRenderer = (
+    <FluidGlassDomRenderer
+      lens={lensAdapter}
+      backend={wantsWebgl ? 'css-approximation' : resolution.backend}
+      reason={resolution.reason}
+      material={material}
+      environment={environment}
+      lightDirection={lightDirection}
+      onUnavailable={handleDomUnavailable}
+    />
+  )
+
   return (
     <FluidGlassContext.Provider value={store}>
-      <div
-        ref={setGroupRef}
-        onPointerMove={handlePointerMove}
-        onPointerOut={handlePointerOut}
-        onPointerOver={handlePointerOver}
-        data-fluid-glass-group={mode}
-        data-fluid-glass-backend={backend}
-        data-fluid-glass-tone={environment.type === 'theme' ? environment.tone : undefined}
-        data-fluid-glass-debug={debugView === 'final' ? undefined : debugView}
-        data-reduced-motion={reducedMotion || undefined}
-        className={cn('relative isolate overflow-hidden', className)}
-      >
-        {backend === 'sdf' ? (
-          <FluidGlassRenderer
-            debugView={debugView}
-            environment={environment}
-            lightDirection={lightDirection}
-            material={material}
-            quality={quality === 'disabled' ? 'low' : quality}
-            store={store}
+      <LensPaneDebugContext.Provider value={paneDebug}>
+        <div
+          ref={setGroupRef}
+          onPointerMove={handlePointerMove}
+          onPointerOut={handlePointerOut}
+          onPointerOver={handlePointerOver}
+          data-fluid-glass-group={mode}
+          data-fluid-glass-requested-renderer={renderer}
+          data-fluid-glass-backend={backend}
+          data-fluid-glass-resolved-backend={resolution.backend}
+          data-fluid-glass-reason={resolution.reason}
+          data-fluid-glass-degraded={resolution.degraded || undefined}
+          data-fluid-glass-accessibility-enforced={resolution.accessibilityEnforced || undefined}
+          data-fluid-glass-source={resolution.sourceCategory}
+          data-fluid-glass-readability={sourceReadability}
+          data-fluid-glass-geometry-policy={ACTIVE_LENS_GEOMETRY_POLICY}
+          data-fluid-glass-lifecycle={lifecycleState}
+          data-fluid-glass-recovery={recoverySnapshot.phase}
+          data-fluid-glass-recovery-attempts={`${recoverySnapshot.attempts}/${recoverySnapshot.maxAttempts}`}
+          data-fluid-glass-scope-owner={scopeOwned ? scopeId : undefined}
+          data-fluid-glass-scope-denial={scopeDenialReason ?? undefined}
+          data-fluid-glass-scope-boundary={
+            scopeGuard === lensWebGlScopeGuard ? 'production' : 'laboratory'
+          }
+          data-fluid-glass-tone={environment.type === 'theme' ? environment.tone : undefined}
+          data-fluid-glass-debug={debugView === 'final' ? undefined : debugView}
+          data-reduced-motion={reducedMotion || undefined}
+          data-glass-motion={motionProfile}
+          className={cn(
+            'relative',
+
+            environment.type === 'auto-dom' ? 'overflow-visible' : 'isolate overflow-hidden',
+            className,
+          )}
+        >
+          <RendererErrorBoundary
+            key={`${lifecycleId}:${resolution.backend}`}
             onFailure={handleRendererFailure}
-            onTelemetry={store.telemetry.publish}
-          />
-        ) : null}
+          >
+            <Suspense fallback={domRenderer}>
+              {resolution.backend === 'sdf' ? (
+                <FluidGlassRenderer
+                  key={lifecycleId}
+                  debugView={debugView}
+                  environment={environment}
+                  lens={lensAdapter}
+                  lifecycle={lifecycle}
+                  lightDirection={lightDirection}
+                  material={material}
+                  quality={quality === 'disabled' ? 'low' : quality}
+                  store={store}
+                  onContextLost={handleContextLost}
+                  onFailure={handleRendererFailure}
+                  onReady={handleRendererReady}
+                  onTelemetry={onTelemetry ? store.telemetry.publish : undefined}
+                />
+              ) : null}
 
-        {backend === 'transmission' ? (
-          <FluidGlassTransmissionRenderer
-            debugView={debugView}
-            environment={environment}
-            lightDirection={lightDirection}
-            material={transmissionMaterial}
-            materialPreset={materialPreset}
-            quality={quality === 'disabled' ? 'low' : quality}
-            store={store}
-            onFailure={handleRendererFailure}
-            onTelemetry={store.telemetry.publish}
-          />
-        ) : null}
+              {resolution.backend === 'transmission-experimental' ? (
+                <FluidGlassTransmissionRenderer
+                  key={lifecycleId}
+                  lens={lensAdapter}
+                  lifecycle={lifecycle}
+                  onReady={handleRendererReady}
+                  onContextLost={handleContextLost}
+                  debugView={debugView}
+                  environment={environment}
+                  lightDirection={lightDirection}
+                  material={transmissionMaterial}
+                  materialPreset={materialPreset}
+                  quality={quality === 'disabled' ? 'low' : quality}
+                  store={store}
+                  onFailure={handleRendererFailure}
+                  onTelemetry={onTelemetry ? store.telemetry.publish : undefined}
+                />
+              ) : null}
 
-        {backend === 'css' ? (
-          <>
-            <div
-              aria-hidden
-              data-fluid-glass-environment={environment.type}
-              data-pattern={environment.type === 'theme' ? environment.pattern : undefined}
-              data-tone={environment.type === 'theme' ? environment.tone : undefined}
-              className="fluid-glass-css-environment pointer-events-none absolute inset-0 z-0"
-              style={
-                environment.type === 'image'
-                  ? { backgroundImage: `url(${JSON.stringify(environment.src)})` }
-                  : undefined
-              }
-            />
-            <GlassSurface
-              ref={fallbackLensRef}
-              aria-hidden
-              role="control"
-              surface="auto"
-              thickness="thin"
-              elevation="embedded"
-              className="pointer-events-none absolute left-0 top-0 z-[1] border-[color:var(--glass-border)]"
-            />
-          </>
-        ) : null}
+              {!wantsWebgl ? domRenderer : null}
+            </Suspense>
+          </RendererErrorBoundary>
 
-        <div data-fluid-glass-content className={cn('relative z-10', contentClassName)}>
-          {children}
+          <div data-fluid-glass-content className={cn('relative z-10', contentClassName)}>
+            {children}
+          </div>
         </div>
-      </div>
+      </LensPaneDebugContext.Provider>
     </FluidGlassContext.Provider>
   )
 }

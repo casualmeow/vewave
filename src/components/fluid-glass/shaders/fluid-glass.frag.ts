@@ -1,4 +1,4 @@
-export const fluidGlassFragmentShader = /* glsl */ `
+export const fluidGlassFragmentShader = `
   precision highp float;
 
   varying vec2 vUv;
@@ -16,6 +16,12 @@ export const fluidGlassFragmentShader = /* glsl */ `
   uniform float uShape;
   uniform float uSamples;
   uniform float uDark;
+  uniform vec3 uThemeBackground;
+  uniform vec3 uThemeSurface;
+  uniform vec3 uThemePrimary;
+  uniform vec3 uThemeMuted;
+  uniform vec3 uTintColor;
+  uniform vec3 uReflectionColor;
   uniform float uPattern;
   uniform float uUseImage;
   uniform sampler2D uEnvironment;
@@ -137,21 +143,19 @@ export const fluidGlassFragmentShader = /* glsl */ `
   }
 
   vec3 themeEnvironment(vec2 uv) {
-    vec3 lightBase = vec3(0.925, 0.946, 0.952);
-    vec3 darkBase = vec3(0.055, 0.066, 0.082);
-    vec3 base = mix(lightBase, darkBase, uDark);
-    vec3 accentA = mix(vec3(0.18, 0.55, 0.62), vec3(0.16, 0.50, 0.58), uDark);
-    vec3 accentB = mix(vec3(0.86, 0.56, 0.22), vec3(0.70, 0.39, 0.18), uDark);
+    vec3 base = mix(uThemeBackground, uThemeSurface, uv.y * 0.36);
+    vec3 accentA = mix(base, uThemePrimary, 0.16);
+    vec3 accentB = mix(base, uThemeMuted, 0.1);
     float washA = exp(-length((uv - vec2(0.15, 0.84)) * vec2(1.0, 1.45)) * 4.6);
     float washB = exp(-length((uv - vec2(0.92, 0.12)) * vec2(1.2, 1.0)) * 5.2);
-    vec3 color = base + accentA * washA * mix(0.045, 0.105, uDark) +
-      accentB * washB * mix(0.028, 0.075, uDark);
+    vec3 color = mix(base, accentA, washA);
+    color = mix(color, accentB, washB);
     float lines = linePattern(uv) * uPattern;
-    vec3 lineColor = mix(vec3(0.56, 0.67, 0.7), vec3(0.23, 0.32, 0.38), uDark);
+    vec3 lineColor = mix(base, uThemeMuted, 0.34);
     color = mix(color, lineColor, lines * mix(0.34, 0.58, uDark));
     float signal = (1.0 - smoothstep(0.01, 0.025, abs(fract(uv.x * 7.0 + 0.21) - 0.5))) *
       uPattern;
-    color = mix(color, accentA, signal * mix(0.48, 0.58, uDark));
+    color = mix(color, uThemePrimary, signal * mix(0.16, 0.22, uDark));
     return color;
   }
 
@@ -337,12 +341,13 @@ export const fluidGlassFragmentShader = /* glsl */ `
     float environmentLuminance = dot(base, vec3(0.2126, 0.7152, 0.0722));
     float brightAdaptation = smoothstep(0.62, 0.9, environmentLuminance);
     float darkAdaptation = 1.0 - smoothstep(0.08, 0.36, environmentLuminance);
-    float exposure = mix(0.92, 0.88, brightAdaptation);
-    float expressiveExposure = mix(0.96, 0.945, brightAdaptation);
+
+    float exposure = mix(0.92, 0.88, brightAdaptation) + darkAdaptation * 0.16;
+    float expressiveExposure = mix(0.96, 0.945, brightAdaptation) + darkAdaptation * 0.18;
     float effectiveExposure = mix(exposure, expressiveExposure, expressiveMix);
     vec3 noScatterTransmission = noScatterSource * effectiveExposure;
     vec3 noTintTransmission = opticalTransmission * effectiveExposure;
-    vec3 tintColor = mix(vec3(0.82, 0.9, 0.92), vec3(0.14, 0.18, 0.2), darkAdaptation);
+    vec3 tintColor = uTintColor;
     float tintLuminance = dot(tintColor, vec3(0.2126, 0.7152, 0.0722));
     vec3 transmission = noTintTransmission +
       (tintColor - vec3(tintLuminance)) * effectiveTintOpacity * 0.22;
@@ -350,7 +355,9 @@ export const fluidGlassFragmentShader = /* glsl */ `
     float f0 = pow((uIor - 1.0) / (uIor + 1.0), 2.0);
     float fresnel = f0 + (1.0 - f0) *
       pow(1.0 - max(dot(viewDirection, normal), 0.0), 5.0);
-    float transmissionBalance = 1.0 - fresnel * effectiveInternalReflection * 0.38;
+
+    float transmissionBalance =
+      1.0 - fresnel * effectiveInternalReflection * mix(0.38, 0.2, darkAdaptation);
     transmission *= transmissionBalance;
     noScatterTransmission *= transmissionBalance;
     noTintTransmission *= transmissionBalance;
@@ -363,7 +370,7 @@ export const fluidGlassFragmentShader = /* glsl */ `
     float interruptedRim = rimZone * pow(directionalLight, 1.15) *
       (0.28 + fresnel * 1.8) * effectiveRimIntensity * uInteractionHighlight;
 
-    vec3 highlightColor = mix(vec3(0.97, 0.9, 0.72), vec3(0.88, 0.96, 1.0), uDark);
+    vec3 highlightColor = uReflectionColor;
     vec3 brightRimColor = mix(highlightColor, base * 0.7, brightAdaptation);
     float expressiveBodyLightScale =
       mix(1.0, mix(1.0, 0.45, brightAdaptation), expressiveMix);

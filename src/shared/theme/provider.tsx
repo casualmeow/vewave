@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import {
   loadAppearanceSettings,
   sanitizeAppearanceSettings,
+  sanitizeBackgroundSettings,
   saveAppearanceSettings,
 } from './persistence'
 import { getVewaveLogoFaviconHref } from './logo'
@@ -15,21 +16,65 @@ import {
 } from './contract'
 import { normalizeHexColor } from './validators'
 import { AppearanceContext, type AppearanceContextValue } from './context'
+import { glassMotionProfiles } from './glass-motion'
 
 export function AppThemeProvider({ children }: { children: ReactNode }) {
   return <AppearanceStateProvider>{children}</AppearanceStateProvider>
 }
 
 function AppearanceStateProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<AppearanceSettings>(() => loadAppearanceSettings())
+  const [{ accountId, settings }, setScope] = useState(() => ({
+    accountId: null as string | null,
+    settings: loadAppearanceSettings(),
+  }))
+  const setSettings = useCallback(
+    (next: AppearanceSettings | ((current: AppearanceSettings) => AppearanceSettings)) => {
+      setScope((current) => ({
+        ...current,
+        settings: typeof next === 'function' ? next(current.settings) : next,
+      }))
+    },
+    [],
+  )
+  const bindAppearanceAccount = useCallback(
+    (owner: string | null, saved?: AppearanceSettings | null) => {
+      setScope((current) =>
+        current.accountId === owner
+          ? current
+          : {
+              accountId: owner,
+              settings: saved ? sanitizeAppearanceSettings(saved) : loadAppearanceSettings(owner),
+            },
+      )
+    },
+    [],
+  )
   const [systemMode, setSystemMode] = useState<ResolvedAppearanceMode>(() => getSystemMode())
   const mode: AppearanceMode = settings.mode
   const resolvedMode: ResolvedAppearanceMode = mode === 'system' ? systemMode : mode
   const tokens = useMemo(() => resolveThemeTokens(settings, resolvedMode), [resolvedMode, settings])
 
   useEffect(() => {
-    saveAppearanceSettings(settings)
-  }, [settings])
+    saveAppearanceSettings(settings, accountId)
+  }, [settings, accountId])
+
+  useEffect(() => {
+    const root = document.documentElement
+    root.dataset.inputModality = 'pointer'
+    const keyboard = (event: KeyboardEvent) => {
+      if (!event.metaKey && !event.ctrlKey && !event.altKey) root.dataset.inputModality = 'keyboard'
+    }
+    const pointer = () => {
+      root.dataset.inputModality = 'pointer'
+    }
+    document.addEventListener('keydown', keyboard, true)
+    document.addEventListener('pointerdown', pointer, true)
+    return () => {
+      document.removeEventListener('keydown', keyboard, true)
+      document.removeEventListener('pointerdown', pointer, true)
+      delete root.dataset.inputModality
+    }
+  }, [])
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-color-scheme: dark)')
@@ -51,9 +96,14 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
     root.dataset.resolvedMode = resolvedMode
     root.dataset.preset = settings.preset
     root.dataset.glassIntensity = settings.glassIntensity
+    root.dataset.glassMotion = settings.glassMotion
+    root.style.setProperty(
+      '--glass-selection-duration',
+      `${glassMotionProfiles[settings.glassMotion].travelMs}ms`,
+    )
     root.dataset.logoStrategy = settings.logoStrategy
     root.dataset.surfaceStyle = settings.surfaceStyle
-    root.dataset.glassRefraction = settings.experimentalRefraction ? 'on' : 'off'
+    root.dataset.glassRefraction = settings.surfaceStyle === 'glass' ? 'on' : 'off'
     applyThemeTokens(tokens, root)
 
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', tokens.background)
@@ -71,6 +121,8 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
       delete root.dataset.resolvedMode
       delete root.dataset.preset
       delete root.dataset.glassIntensity
+      delete root.dataset.glassMotion
+      root.style.removeProperty('--glass-selection-duration')
       delete root.dataset.logoStrategy
       delete root.dataset.surfaceStyle
       delete root.dataset.glassRefraction
@@ -81,6 +133,7 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
     resolvedMode,
     settings.experimentalRefraction,
     settings.glassIntensity,
+    settings.glassMotion,
     settings.logoStrategy,
     settings.preset,
     settings.surfaceStyle,
@@ -91,11 +144,13 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
     (updater: (current: AppearanceSettings) => AppearanceSettings) => {
       setSettings((current) => updater(current))
     },
-    [],
+    [setSettings],
   )
 
   const value = useMemo<AppearanceContextValue>(
     () => ({
+      accountId,
+      bindAppearanceAccount,
       mode,
       resolvedMode,
       settings,
@@ -178,6 +233,15 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
       setGlassIntensity: (glassIntensity) => {
         updateSettings((current) => ({ ...current, glassIntensity }))
       },
+      setGlassMotion: (glassMotion) => {
+        updateSettings((current) => ({ ...current, glassMotion }))
+      },
+      setBackground: (background) => {
+        updateSettings((current) => ({
+          ...current,
+          background: sanitizeBackgroundSettings({ ...current.background, ...background }),
+        }))
+      },
       setLogoStrategy: (logoStrategy) => {
         updateSettings((current) => ({ ...current, logoStrategy }))
       },
@@ -197,7 +261,16 @@ function AppearanceStateProvider({ children }: { children: ReactNode }) {
         updateSettings((current) => ({ ...current, experimentalRefraction: enabled }))
       },
     }),
-    [mode, resolvedMode, settings, tokens, updateSettings],
+    [
+      accountId,
+      bindAppearanceAccount,
+      mode,
+      resolvedMode,
+      settings,
+      tokens,
+      updateSettings,
+      setSettings,
+    ],
   )
 
   return <AppearanceContext.Provider value={value}>{children}</AppearanceContext.Provider>

@@ -8,10 +8,10 @@ import {
   FramebufferDiagnostic,
   TransmissionEnvironment,
   createReflectionTexture,
-  readDarkMode,
   updateRenderTargetColorSpace,
   useEnvironmentTexture,
 } from './transmission-environment'
+import { useFluidGlassTheme } from './fluid-glass-theme'
 import {
   clamp,
   createVolumeGeometry,
@@ -31,6 +31,7 @@ import {
   type TransmissionShaderMode,
 } from './transmission-material'
 import { captureTransmissionTelemetry } from './transmission-telemetry'
+import type { LensStateAdapter } from '../lens/lens-state'
 import type { FluidGlassStore } from './store'
 import type {
   FluidGlassEnvironmentSource,
@@ -44,6 +45,9 @@ import type {
 export function TransmissionScene({
   debugView,
   environment,
+  lens: lensState,
+  onFailure,
+  onReady,
   lightDirection,
   material,
   materialPreset,
@@ -54,6 +58,9 @@ export function TransmissionScene({
 }: {
   debugView: FluidGlassDebugView
   environment: FluidGlassEnvironmentSource
+  lens: LensStateAdapter
+  onFailure: () => void
+  onReady: () => void
   lightDirection: readonly [number, number]
   material: FluidTransmissionMaterial
   materialPreset: FluidGlassMaterialPreset
@@ -67,8 +74,9 @@ export function TransmissionScene({
   const invalidate = useThree((state) => state.invalidate)
   const scene = useThree((state) => state.scene)
   const size = useThree((state) => state.size)
-  const texture = useEnvironmentTexture(environment)
-  const reflectionTexture = useMemo(createReflectionTexture, [])
+  const texture = useEnvironmentTexture(environment, onFailure)
+  const theme = useFluidGlassTheme(environment, gl.domElement)
+  const reflectionTexture = useMemo(() => createReflectionTexture(theme), [theme])
   const environmentScene = useMemo(() => new Scene(), [])
   const renderTarget = useFBO({
     depthBuffer: false,
@@ -102,14 +110,14 @@ export function TransmissionScene({
   const samples = materialPreset === 'expressive' ? 8 : resolvedQuality.scatterSamples
   const isFramebufferDebug =
     debugView === 'fbo-raw' || debugView === 'fbo-overlay' || debugView === 'fbo-difference'
-  const darkTheme =
-    environment.type === 'theme' &&
-    (environment.tone === 'dark' || (environment.tone === 'auto' && readDarkMode(environment)))
+  const darkTheme = theme.dark
   const { reflection: reflectionEnabled } = resolveTransmissionSupportLayers(debugView, material)
   const environmentKey =
     environment.type === 'image'
       ? `image:${environment.src}`
-      : `theme:${environment.pattern ?? 'calm'}:${environment.tone ?? 'auto'}`
+      : environment.type === 'theme'
+        ? `theme:${environment.pattern ?? 'calm'}:${environment.tone ?? 'auto'}`
+        : `theme:calm:auto`
 
   useEffect(() => {
     updateRenderTargetColorSpace(renderTarget)
@@ -134,13 +142,13 @@ export function TransmissionScene({
   }, [descriptor.key, store])
 
   useEffect(() => () => geometry.dispose(), [geometry])
-  useEffect(() => store.subscribe(invalidate), [invalidate, store])
+  useEffect(() => lensState.subscribe(invalidate), [invalidate, lensState])
   useEffect(() => {
     lastTelemetryAt.current = Number.NEGATIVE_INFINITY
     invalidate()
     const frame = requestAnimationFrame(invalidate)
     return () => cancelAnimationFrame(frame)
-  }, [debugView, environmentKey, invalidate, material, materialPreset, texture])
+  }, [debugView, environmentKey, invalidate, material, materialPreset, texture, theme])
 
   useFrame((state, delta) => {
     const previousTarget = gl.getRenderTarget()
@@ -149,11 +157,20 @@ export function TransmissionScene({
     gl.render(environmentScene, camera)
     gl.setRenderTarget(previousTarget)
 
+    if (environment.type !== 'image' || texture) onReady()
+
     const mesh = meshRef.current
     const transmission = materialRef.current
     if (!mesh) return
 
-    const lens = store.current
+    const snapshot = lensState.read()
+    const lens = {
+      ...store.current,
+      ...snapshot.current,
+      ...snapshot.motion,
+      opacity: snapshot.opacity,
+      interactionEnergy: snapshot.motion.energy,
+    }
     const dragAmount = smoothstep(0.68, 1, lens.interactionEnergy)
     const speed = Math.hypot(lens.velocityX, lens.velocityY)
     const width = Math.max(1, lens.width * lens.scaleX)
@@ -195,9 +212,7 @@ export function TransmissionScene({
     if (transmission) {
       transmission.opacity = clamp(lens.opacity, 0, 1)
       transmission.ior = currentIor
-      // Material thickness is local-space: three's getVolumeTransmissionRay
-      // multiplies it by the mesh's model scale (= height), which yields the
-      // intended world ray length of currentThickness * height.
+
       transmission.thickness = currentThickness
       transmission.roughness = currentRoughness
       transmission.anisotropicBlur = currentAnisotropy
@@ -249,31 +264,21 @@ export function TransmissionScene({
 
   return (
     <>
-      {/*
-        Alpha/compositing contract: the same controlled environment is rendered
-        twice — once into the FBO (portal scene) that the transmission material
-        refracts, and once into the main scene as the visible backdrop, so the
-        canvas reproduces the environment 1:1 outside the lens (verified by the
-        fbo-difference view). Inside the mesh footprint the material's output is
-        the refracted FBO sample itself (base image, alpha 1) — it replaces the
-        backdrop instead of layering a low-opacity effect over it.
-      */}
       {createPortal(
         <TransmissionEnvironment
           environment={environment}
           height={size.height}
+          theme={theme}
           texture={texture}
           width={size.width}
         />,
         environmentScene,
       )}
 
-      <TransmissionEnvironment
-        environment={environment}
-        height={size.height}
-        texture={texture}
-        width={size.width}
-      />
+      <mesh position={[0, 0, -60]}>
+        <planeGeometry args={[size.width, size.height]} />
+        <meshBasicMaterial map={renderTarget.texture} toneMapped={false} depthWrite={false} />
+      </mesh>
 
       {isFramebufferDebug ? (
         <FramebufferDiagnostic
@@ -285,14 +290,13 @@ export function TransmissionScene({
         />
       ) : null}
 
-      <ambientLight intensity={reflectionEnabled ? (darkTheme ? 0.002 : 0.006) : 0} />
-      {/*
-        No shadow-map shadow: a transparent lens must not cast the polygonal
-        silhouette of its own mesh (it rendered as a jagged starburst on light
-        backgrounds). If an external shadow returns it must be a separate
-        analytic capsule, never the mesh silhouette through a shadow map.
-      */}
+      <ambientLight
+        color={theme.reflection}
+        intensity={reflectionEnabled ? (darkTheme ? 0.002 : 0.006) : 0}
+      />
+
       <directionalLight
+        color={theme.reflection}
         intensity={reflectionEnabled ? (darkTheme ? 0.03 : 0.05) : 0}
         position={[lightDirection[0] * 220, lightDirection[1] * 220, 180]}
       />
@@ -333,9 +337,6 @@ export function TransmissionScene({
             color="#ffffff"
             distortion={material.distortion}
             distortionScale={material.distortionScale}
-            // Fresnel gates the environment reflection (F0 ≈ 0.7%), so a high
-            // intensity yields only a directional partial edge highlight — the
-            // clear center picks up well under 1% of it.
             envMapIntensity={reflectionEnabled ? (darkTheme ? 0.6 : 0.35) : 0}
             ior={material.ior}
             metalness={0}

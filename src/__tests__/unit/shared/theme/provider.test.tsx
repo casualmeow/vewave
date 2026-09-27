@@ -27,7 +27,8 @@ function createStorageMock(): Storage {
 }
 
 function ThemeModeHarness() {
-  const { mode, resolvedMode, setMode } = useAppearance()
+  const { mode, resolvedMode, setMode, setPreset, setGlassMotion, setSurfaceStyle, setBackground } =
+    useAppearance()
 
   return (
     <div>
@@ -38,6 +39,21 @@ function ThemeModeHarness() {
       </button>
       <button type="button" onClick={() => setMode('light')}>
         Light
+      </button>
+      <button type="button" onClick={() => setPreset('noir')}>
+        Noir / OLED
+      </button>
+      <button type="button" onClick={() => setGlassMotion('off')}>
+        Motion off
+      </button>
+      <button type="button" onClick={() => setSurfaceStyle('glass')}>
+        Glass
+      </button>
+      <button type="button" onClick={() => setSurfaceStyle('solid')}>
+        Solid
+      </button>
+      <button type="button" onClick={() => setBackground({ preset: 'contours', animated: false })}>
+        Contours
       </button>
     </div>
   )
@@ -93,6 +109,50 @@ describe('AppThemeProvider', () => {
     removeThemeHeadElements()
   })
 
+  it('automatically enables glass optics and retains background settings across surface changes', async () => {
+    render(
+      <AppThemeProvider>
+        <ThemeModeHarness />
+      </AppThemeProvider>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Glass' }))
+    expect(document.documentElement.dataset.glassRefraction).toBe('on')
+    fireEvent.click(screen.getByRole('button', { name: 'Contours' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Solid' }))
+    expect(document.documentElement.dataset.glassRefraction).toBe('off')
+    await waitFor(() => {
+      const saved = JSON.parse(window.localStorage.getItem(appearanceStorageKey) ?? '{}')
+      expect(saved.experimentalRefraction).toBe(false)
+      expect(saved.background).toMatchObject({ preset: 'contours', animated: false, speed: 0.15 })
+    })
+  })
+
+  it('applies Noir across the page and persists it without resetting the chosen background', () => {
+    render(
+      <AppThemeProvider>
+        <ThemeModeHarness />
+      </AppThemeProvider>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Dark' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Contours' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Noir / OLED' }))
+    const root = document.documentElement
+    expect(root.dataset.preset).toBe('noir')
+    expect(root.style.getPropertyValue('--background')).toBe('#000000')
+    expect(root.style.getPropertyValue('--card')).toBe('#0B0B0B')
+    expect(root.style.getPropertyValue('--primary')).toBe('#D8D8D8')
+    expect(root.style.colorScheme).toBe('dark')
+    const saved = JSON.parse(window.localStorage.getItem(appearanceStorageKey) ?? '{}')
+    expect(saved).toMatchObject({
+      preset: 'noir',
+      mode: 'dark',
+      background: { preset: 'contours' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Light' }))
+    expect(root.style.getPropertyValue('--background')).toBe('#F7F7F7')
+    expect(root.dataset.preset).toBe('noir')
+  })
+
   it('switches light and dark mode on the current page without reload', async () => {
     render(
       <AppThemeProvider>
@@ -119,6 +179,26 @@ describe('AppThemeProvider', () => {
     })
 
     expect(JSON.parse(window.localStorage.getItem(appearanceStorageKey) ?? '{}').mode).toBe('light')
+  })
+
+  it('persists motion independently and tracks keyboard versus pointer input', async () => {
+    render(
+      <AppThemeProvider>
+        <ThemeModeHarness />
+      </AppThemeProvider>,
+    )
+    expect(document.documentElement.dataset.glassMotion).toBe('fluid')
+    fireEvent.keyDown(document, { key: 'Tab' })
+    expect(document.documentElement.dataset.inputModality).toBe('keyboard')
+    fireEvent.pointerDown(document)
+    expect(document.documentElement.dataset.inputModality).toBe('pointer')
+    fireEvent.click(screen.getByRole('button', { name: 'Motion off' }))
+    await waitFor(() => {
+      expect(document.documentElement.dataset.glassMotion).toBe('off')
+      expect(
+        JSON.parse(window.localStorage.getItem(appearanceStorageKey) ?? '{}').glassMotion,
+      ).toBe('off')
+    })
   })
 
   it('updates favicon links from the actual resolved appearance', async () => {

@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { createContext, useContext } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef } from 'react'
 import { LinearSRGBColorSpace, NoToneMapping } from 'three'
 
 import { resolveFluidGlassQuality } from '../constants'
@@ -13,6 +13,8 @@ import type {
   FluidGlassTelemetry,
   FluidTransmissionMaterial,
 } from '../types'
+import type { LensStateAdapter } from '../lens/lens-state'
+import type { RendererLifecycleController } from '../lens/renderer-lifecycle'
 import type { FluidGlassStore } from './store'
 import type { TransmissionShaderMode } from './transmission-material'
 
@@ -23,17 +25,15 @@ export {
 } from './transmission-material'
 export type { TransmissionShaderMode } from './transmission-material'
 
-/**
- * Lab-only override for the material-lab comparison: 'stock' renders the
- * untouched drei MeshTransmissionMaterial (no onBeforeCompile patch).
- * Consumed here, outside the Canvas, because React context does not cross
- * the react-three-fiber renderer boundary; forwarded into the scene as a prop.
- */
 export const TransmissionShaderModeContext = createContext<TransmissionShaderMode>('custom')
 
 export function FluidGlassTransmissionRenderer({
   debugView,
   environment,
+  lens,
+  lifecycle,
+  onContextLost,
+  onReady,
   lightDirection,
   material,
   materialPreset,
@@ -44,6 +44,10 @@ export function FluidGlassTransmissionRenderer({
 }: {
   debugView: FluidGlassDebugView
   environment: FluidGlassEnvironmentSource
+  lens: LensStateAdapter
+  lifecycle: RendererLifecycleController
+  onContextLost: () => void
+  onReady: () => void
   lightDirection: readonly [number, number]
   material: FluidTransmissionMaterial
   materialPreset: FluidGlassMaterialPreset
@@ -55,6 +59,19 @@ export function FluidGlassTransmissionRenderer({
   const shaderMode = useContext(TransmissionShaderModeContext)
   const resolvedQuality = resolveFluidGlassQuality(quality)
   const dpr = Math.min(1.5, resolvedQuality.dpr)
+  const sceneReady = useRef(false)
+  const handleSceneReady = useCallback(() => {
+    if (sceneReady.current) return
+    sceneReady.current = true
+    lifecycle.transition('ready', 'transmission scene rendered')
+    onReady()
+  }, [lifecycle, onReady])
+
+  useEffect(() => {
+    sceneReady.current = false
+    lifecycle.transition('creating', 'transmission renderer mounted')
+    return () => lifecycle.dispose('transmission renderer unmounted')
+  }, [lifecycle])
 
   return (
     <div
@@ -74,7 +91,7 @@ export function FluidGlassTransmissionRenderer({
             antialias: true,
             premultipliedAlpha: true,
             powerPreference: 'high-performance',
-            preserveDrawingBuffer: true,
+            preserveDrawingBuffer: Boolean(onTelemetry),
           }}
           onCreated={({ gl, invalidate }) => {
             gl.outputColorSpace = LinearSRGBColorSpace
@@ -82,24 +99,32 @@ export function FluidGlassTransmissionRenderer({
             gl.setClearColor('#000000', 0)
             const canvas = gl.domElement
             canvas.style.pointerEvents = 'none'
-            let restored = false
-            canvas.addEventListener('webglcontextrestored', () => {
-              restored = true
+            const handleRestored = () => {
               invalidate()
-            })
-            canvas.addEventListener('webglcontextlost', (event) => {
+              lifecycle.transition('recovering', 'webgl context restoring')
+            }
+            const handleLost = (event: Event) => {
               event.preventDefault()
-              restored = false
-              window.setTimeout(() => {
-                if (canvas.isConnected && !restored && gl.getContext().isContextLost()) onFailure()
-              }, 1_200)
+              sceneReady.current = false
+              lifecycle.transition('context-lost', 'webglcontextlost')
+              onContextLost()
+            }
+            canvas.addEventListener('webglcontextrestored', handleRestored)
+            canvas.addEventListener('webglcontextlost', handleLost)
+            lifecycle.register('listener', () => {
+              canvas.removeEventListener('webglcontextrestored', handleRestored)
+              canvas.removeEventListener('webglcontextlost', handleLost)
             })
+            lifecycle.register('resource', () => gl.dispose())
           }}
           fallback={null}
         >
           <TransmissionScene
             debugView={debugView}
             environment={environment}
+            lens={lens}
+            onFailure={onFailure}
+            onReady={handleSceneReady}
             lightDirection={lightDirection}
             material={material}
             materialPreset={materialPreset}

@@ -2,6 +2,7 @@ import { Slot } from '@radix-ui/react-slot'
 import { useCallback, useEffect, useRef, type PointerEvent as ReactPointerEvent } from 'react'
 
 import { useFluidGlassStore } from '../context/fluid-glass-context'
+import { ACTIVE_LENS_GEOMETRY_POLICY, targetGeometryIsAuthoritative } from '../lens/geometry-policy'
 import type { FluidGlassBehavior, FluidGlassTargetProps } from '../types'
 import { cn } from '@/shared/lib/utils'
 
@@ -169,7 +170,9 @@ export function FluidGlassTarget({
       drag.peakVelocityY = velocityY
     }
 
-    event.currentTarget.style.translate = `${nextX}px ${nextY}px`
+    if (!targetGeometryIsAuthoritative(ACTIVE_LENS_GEOMETRY_POLICY)) {
+      event.currentTarget.style.translate = `${nextX}px ${nextY}px`
+    }
     store?.updatePointerVelocity(id, velocity)
     store?.scheduleMeasurement()
   }

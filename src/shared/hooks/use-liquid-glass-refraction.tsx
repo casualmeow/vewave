@@ -1,98 +1,117 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createEdgeDisplacementMap, supportsLiquidGlassRefraction } from '../lib/liquid-glass'
+import { LiquidGlassFilter } from '../ui/liquid-glass-filter'
+import { ModalGlassFilter } from '../ui/modal-glass-filter'
+import { createModalGlassMaps, getModalGlassStyle } from '../lib/modal-glass'
+import { resolveGlassMotion } from '../theme/glass-motion'
+import { useGlassInteractionScope } from '../lib/glass-interaction-scope'
+import { useGlassAppearance } from './use-glass-appearance'
+import { useModalGlassMotion } from './use-modal-glass-motion'
+import type { GlassMotion } from '../theme/contract'
+import type { ModalGlassMaps } from '../lib/modal-glass'
+import type { LiquidGlassMap } from '../ui/liquid-glass-filter'
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from 'react'
 
 type LiquidGlassRefractionOptions = {
   enabled: boolean
-  /** Whether the material itself is pressable. Static chrome only tracks the rim highlight. */
+
+  profile?: 'edge' | 'modal'
+  motion?: 'auto' | GlassMotion
+
+  motionEnabled?: boolean
+
   interactive?: boolean
-  /** Corner radius of the surface, CSS px. */
-  radius?: number
-  /** Refraction zone reach from the boundary inward, CSS px. */
+
+  radius?: number | 'auto'
+
   edgeWidth?: number
-  /** feDisplacementMap scale at rest, CSS px of maximum displacement. */
+
   refraction?: number
-  /** Scattering (feGaussianBlur stdDeviation) applied after refraction. */
+
   scattering?: number
   saturation?: number
 }
 
-type FilterState = {
-  href: string
-  width: number
-  height: number
-}
+type FilterState = LiquidGlassMap | ModalGlassMaps
 
-/**
- * Drives the experimental refraction backend for one glass surface.
- *
- * Layer split: this hook owns backdrop scattering + edge refraction (inside
- * the SVG filter). Tint, rim highlight, and shadow stay in the CSS material;
- * foreground content is never processed. Pointer position feeds the local rim
- * highlight (CSS vars); press raises refraction strength via the filter scale.
- */
 export function useLiquidGlassRefraction({
   enabled,
+  profile = 'edge',
+  motion = 'auto',
+  motionEnabled = enabled,
   interactive = false,
-  radius = 10,
+  radius = 'auto',
   edgeWidth = 14,
   refraction = 22,
-  scattering = 9,
-  saturation = 1.35,
+  scattering,
+  saturation = 1.1,
 }: LiquidGlassRefractionOptions) {
+  const appearance = useGlassAppearance()
+  const scope = useGlassInteractionScope()
+  const glassMotion = resolveGlassMotion({
+    ...appearance,
+    requested: motion,
+    preference: appearance.glassMotion,
+  })
   const elementRef = useRef<HTMLElement | null>(null)
+  const [element, setElement] = useState<HTMLElement | null>(null)
+  const ref = useCallback((node: HTMLElement | null) => {
+    elementRef.current = node
+    setElement(node)
+  }, [])
   const pointerFrame = useRef<number | null>(null)
-  const lastGeometry = useRef<string | null>(null)
   const filterId = `liquid-glass-${useId().replace(/[^a-zA-Z0-9-]/g, '')}`
   const [filter, setFilter] = useState<FilterState | null>(null)
   const [pressed, setPressed] = useState(false)
-  const [prefersReducedTransparency, setPrefersReducedTransparency] = useState(false)
   const supported = typeof window !== 'undefined' && supportsLiquidGlassRefraction()
-  const forcedFallback =
-    typeof document !== 'undefined' &&
-    document.documentElement.dataset.glassCapability === 'fallback'
-  const active = enabled && supported && !prefersReducedTransparency && !forcedFallback
+  const active =
+    enabled && supported && !appearance.reducedTransparency && !appearance.forceFallback
+  const modalIntensity = profile === 'modal' ? appearance.glassIntensity : null
+  const modalMap = active && filter && 'mask' in filter ? filter : null
+  const modalRefs = useModalGlassMotion(element, modalMap, glassMotion, motionEnabled)
 
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-      return
-    }
-
-    const media = window.matchMedia('(prefers-reduced-transparency: reduce)')
-    const updatePreference = () => setPrefersReducedTransparency(media.matches)
-
-    updatePreference()
-    media.addEventListener('change', updatePreference)
-
-    return () => media.removeEventListener('change', updatePreference)
-  }, [])
-
-  useEffect(() => {
-    const element = elementRef.current
-
     if (!active || !element) {
-      lastGeometry.current = null
       setFilter(null)
       return
     }
 
     let debounce: ReturnType<typeof setTimeout> | null = null
+    let lastGeometry = ''
 
     const regenerate = () => {
-      const rect = element.getBoundingClientRect()
-      const width = Math.round(rect.width)
-      const height = Math.round(rect.height)
-      const geometry = `${width}:${height}:${radius}:${edgeWidth}`
+      const width = element.offsetWidth
+      const height = element.offsetHeight
+      const cssRadius = getComputedStyle(element).borderTopLeftRadius
+      const measuredRadius =
+        radius === 'auto'
+          ? (Number.parseFloat(cssRadius) || 0) *
+            (cssRadius.includes('%') ? Math.min(width, height) / 100 : 1)
+          : radius
+      const geometry = `${width}:${height}:${measuredRadius}:${edgeWidth}:${modalIntensity}`
 
-      if (geometry === lastGeometry.current) {
+      if (geometry === lastGeometry) {
         return
       }
 
-      const href = createEdgeDisplacementMap({ width, height, radius, edgeWidth })
-
-      lastGeometry.current = href ? geometry : null
-
-      setFilter(href ? { href, width, height } : null)
+      lastGeometry = geometry
+      try {
+        if (modalIntensity) {
+          setFilter(
+            createModalGlassMaps({
+              width,
+              height,
+              radius: measuredRadius,
+              intensity: modalIntensity,
+            }),
+          )
+          return
+        }
+        const href = createEdgeDisplacementMap({ width, height, radius: measuredRadius, edgeWidth })
+        setFilter(href ? { href, width, height } : null)
+      } catch {
+        setFilter(null)
+      }
     }
 
     const observer = new ResizeObserver(() => {
@@ -111,46 +130,61 @@ export function useLiquidGlassRefraction({
         clearTimeout(debounce)
       }
     }
-  }, [active, edgeWidth, radius])
+  }, [active, element, edgeWidth, radius, modalIntensity])
 
-  const handlePointerMove = useCallback((event: ReactPointerEvent<HTMLElement>) => {
-    const element = elementRef.current
+  const handlePointerMove = useCallback(
+    (event: ReactPointerEvent<HTMLElement>) => {
+      if (
+        scope ||
+        !enabled ||
+        profile === 'modal' ||
+        glassMotion !== 'fluid' ||
+        !window.matchMedia('(hover: hover) and (pointer: fine)').matches
+      )
+        return
+      const target = elementRef.current
 
-    if (!element || pointerFrame.current !== null) {
-      return
+      if (!target || pointerFrame.current !== null) {
+        return
+      }
+
+      const { clientX, clientY } = event
+
+      pointerFrame.current = requestAnimationFrame(() => {
+        pointerFrame.current = null
+        const rect = target.getBoundingClientRect()
+
+        target.style.setProperty(
+          '--glass-pointer-x',
+          `${Math.min(100, Math.max(0, ((clientX - rect.left) / rect.width) * 100)).toFixed(2)}%`,
+        )
+        target.style.setProperty(
+          '--glass-pointer-y',
+          `${Math.min(100, Math.max(0, ((clientY - rect.top) / rect.height) * 100)).toFixed(2)}%`,
+        )
+      })
+    },
+    [enabled, glassMotion, profile, scope],
+  )
+
+  useEffect(() => {
+    if (glassMotion !== 'fluid') {
+      elementRef.current?.style.removeProperty('--glass-pointer-x')
+      elementRef.current?.style.removeProperty('--glass-pointer-y')
     }
-
-    const { clientX, clientY } = event
-
-    pointerFrame.current = requestAnimationFrame(() => {
-      pointerFrame.current = null
-      const rect = element.getBoundingClientRect()
-
-      element.style.setProperty(
-        '--glass-pointer-x',
-        `${Math.min(100, Math.max(0, ((clientX - rect.left) / rect.width) * 100)).toFixed(2)}%`,
-      )
-      element.style.setProperty(
-        '--glass-pointer-y',
-        `${Math.min(100, Math.max(0, ((clientY - rect.top) / rect.height) * 100)).toFixed(2)}%`,
-      )
-    })
-  }, [])
-
-  useEffect(
-    () => () => {
+    return () => {
       if (pointerFrame.current !== null) {
         cancelAnimationFrame(pointerFrame.current)
+        pointerFrame.current = null
       }
-    },
-    [],
-  )
+    }
+  }, [glassMotion])
 
   const handlers = useMemo(
     () => ({
       onPointerMove: handlePointerMove,
       onPointerDown: () => {
-        if (interactive) {
+        if (!scope && enabled && interactive && glassMotion === 'fluid') {
           setPressed(true)
         }
       },
@@ -158,51 +192,41 @@ export function useLiquidGlassRefraction({
       onPointerLeave: () => setPressed(false),
       onPointerCancel: () => setPressed(false),
     }),
-    [handlePointerMove, interactive],
+    [enabled, glassMotion, handlePointerMove, interactive, scope],
   )
 
-  const style: CSSProperties | undefined =
-    active && filter
-      ? ({ '--glass-experimental-filter': `url(#${filterId})` } as CSSProperties)
-      : undefined
+  const style = {
+    ...(enabled && profile === 'modal'
+      ? getModalGlassStyle(appearance.resolvedMode, appearance.glassIntensity)
+      : {}),
+    ...(active && filter
+      ? {
+          '--glass-refraction-filter': `url(#${filterId})${profile !== 'modal' && scattering === undefined ? ' blur(min(6px, calc(var(--glass-blur-base, 3px) * var(--glass-thickness, 1))))' : ''}`,
+        }
+      : {}),
+  } as CSSProperties
 
-  const filterNode: ReactNode =
-    active && filter ? (
-      <svg aria-hidden width="0" height="0" className="pointer-events-none absolute">
-        <filter
-          id={filterId}
-          x="-20%"
-          y="-20%"
-          width="140%"
-          height="140%"
-          colorInterpolationFilters="sRGB"
-        >
-          <feImage
-            href={filter.href}
-            x="0"
-            y="0"
-            width={filter.width}
-            height={filter.height}
-            preserveAspectRatio="none"
-            result="map"
-          />
-          <feDisplacementMap
-            in="SourceGraphic"
-            in2="map"
-            scale={pressed ? refraction * 1.45 : refraction}
-            xChannelSelector="R"
-            yChannelSelector="G"
-            result="displaced"
-          />
-          <feGaussianBlur in="displaced" stdDeviation={scattering} result="scattered" />
-          <feColorMatrix in="scattered" type="saturate" values={`${saturation}`} />
-        </filter>
-      </svg>
-    ) : null
+  const filterNode: ReactNode = modalMap ? (
+    <ModalGlassFilter
+      id={filterId}
+      map={modalMap}
+      refs={modalRefs}
+      mode={appearance.resolvedMode}
+    />
+  ) : active && filter && 'href' in filter ? (
+    <LiquidGlassFilter
+      id={filterId}
+      map={filter}
+      refraction={pressed && glassMotion === 'fluid' ? refraction * 1.2 : refraction}
+      scattering={scattering ?? 0}
+      saturation={saturation}
+    />
+  ) : null
 
   return {
-    ref: elementRef,
+    ref,
     active: active && filter !== null,
+    motion: glassMotion,
     pressed,
     style,
     filterNode,

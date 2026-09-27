@@ -2,12 +2,16 @@ import {
   appearanceConfigVersion,
   appearanceModes,
   appearancePresetIds,
+  backgroundPresets,
+  backgroundPalettes,
   editableThemeTokenNames,
   glassIntensities,
+  glassMotions,
   logoStrategies,
   surfaceStyles,
   type AppearanceMode,
   type AppearanceSettings,
+  type BackgroundSettings,
   type ResolvedAppearanceMode,
   type ThemeTokenOverrides,
 } from './contract'
@@ -56,6 +60,32 @@ function sanitizeModeOverrides(
   }
 }
 
+export function sanitizeBackgroundSettings(value: unknown): BackgroundSettings {
+  const defaults = defaultAppearanceSettings.background
+  const input = isRecord(value) ? value : {}
+  const unit = (candidate: unknown, fallback: number) =>
+    typeof candidate === 'number' && Number.isFinite(candidate)
+      ? Math.max(0, Math.min(1, candidate))
+      : fallback
+  const colors = Array.isArray(input.colors) ? input.colors : []
+  const color = (index: 0 | 1) =>
+    (typeof colors[index] === 'string' ? normalizeHexColor(colors[index]) : null) ??
+    defaults.colors[index]
+
+  return {
+    preset: backgroundPresets.includes(input.preset as BackgroundSettings['preset'])
+      ? (input.preset as BackgroundSettings['preset'])
+      : defaults.preset,
+    palette: backgroundPalettes.includes(input.palette as BackgroundSettings['palette'])
+      ? (input.palette as BackgroundSettings['palette'])
+      : defaults.palette,
+    colors: [color(0), color(1)],
+    brightness: unit(input.brightness, defaults.brightness),
+    speed: unit(input.speed, defaults.speed),
+    animated: typeof input.animated === 'boolean' ? input.animated : defaults.animated,
+  }
+}
+
 export function sanitizeAppearanceSettings(value: unknown): AppearanceSettings {
   if (!isRecord(value)) {
     return defaultAppearanceSettings
@@ -84,6 +114,11 @@ export function sanitizeAppearanceSettings(value: unknown): AppearanceSettings {
       glassIntensities.includes(value.glassIntensity as AppearanceSettings['glassIntensity'])
         ? (value.glassIntensity as AppearanceSettings['glassIntensity'])
         : defaultAppearanceSettings.glassIntensity,
+    glassMotion:
+      typeof value.glassMotion === 'string' &&
+      glassMotions.includes(value.glassMotion as AppearanceSettings['glassMotion'])
+        ? (value.glassMotion as AppearanceSettings['glassMotion'])
+        : defaultAppearanceSettings.glassMotion,
     surfaceStyle:
       typeof value.surfaceStyle === 'string' &&
       surfaceStyles.includes(value.surfaceStyle as AppearanceSettings['surfaceStyle'])
@@ -93,6 +128,7 @@ export function sanitizeAppearanceSettings(value: unknown): AppearanceSettings {
       typeof value.experimentalRefraction === 'boolean'
         ? value.experimentalRefraction
         : defaultAppearanceSettings.experimentalRefraction,
+    background: sanitizeBackgroundSettings(value.background),
     customTheme: {
       enabled:
         typeof customTheme.enabled === 'boolean'
@@ -121,18 +157,28 @@ export function withAppearanceSettingsInAppConfig(
   }
 }
 
-export function loadAppearanceSettings() {
+export function getAppearanceStorageKey(accountId: string | null = null) {
+  return accountId
+    ? `${appearanceStorageKey}:account:${encodeURIComponent(accountId)}`
+    : appearanceStorageKey
+}
+
+export function loadAppearanceSettings(accountId: string | null = null) {
   if (typeof window === 'undefined') {
     return defaultAppearanceSettings
   }
 
   try {
-    const rawValue = JSON.parse(window.localStorage.getItem(appearanceStorageKey) ?? 'null')
+    const rawValue = JSON.parse(
+      window.localStorage.getItem(getAppearanceStorageKey(accountId)) ?? 'null',
+    )
     const settings = sanitizeAppearanceSettings(rawValue)
 
     if (isRecord(rawValue) && typeof rawValue.mode === 'string') {
       return settings
     }
+
+    if (accountId) return settings
 
     const legacyMode = window.localStorage.getItem(appearanceModeStorageKey)
 
@@ -144,6 +190,11 @@ export function loadAppearanceSettings() {
   }
 }
 
-export function saveAppearanceSettings(settings: AppearanceSettings) {
-  window.localStorage.setItem(appearanceStorageKey, JSON.stringify(settings))
+export function saveAppearanceSettings(
+  settings: AppearanceSettings,
+  accountId: string | null = null,
+) {
+  try {
+    window.localStorage.setItem(getAppearanceStorageKey(accountId), JSON.stringify(settings))
+  } catch {}
 }

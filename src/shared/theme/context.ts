@@ -4,8 +4,10 @@ import type {
   AppearanceMode,
   AppearancePresetId,
   AppearanceSettings,
+  BackgroundSettings,
   EditableThemeTokenName,
   GlassIntensity,
+  GlassMotion,
   LogoStrategy,
   ResolvedAppearanceMode,
   SurfaceStyle,
@@ -13,6 +15,8 @@ import type {
 import type { resolveThemeTokens } from './resolver'
 
 export type AppearanceContextValue = {
+  accountId: string | null
+  bindAppearanceAccount: (accountId: string | null, saved?: AppearanceSettings | null) => void
   mode: AppearanceMode
   resolvedMode: ResolvedAppearanceMode
   resetAppearance: () => void
@@ -27,6 +31,8 @@ export type AppearanceContextValue = {
     value: string,
   ) => void
   setGlassIntensity: (glassIntensity: GlassIntensity) => void
+  setGlassMotion: (glassMotion: GlassMotion) => void
+  setBackground: (background: Partial<BackgroundSettings>) => void
   setLogoStrategy: (logoStrategy: LogoStrategy) => void
   setExperimentalRefraction: (enabled: boolean) => void
   setMode: (mode: AppearanceMode) => void

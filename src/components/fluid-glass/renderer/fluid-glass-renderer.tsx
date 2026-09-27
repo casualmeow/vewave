@@ -1,8 +1,11 @@
 import { Canvas } from '@react-three/fiber'
+import { useEffect, useRef } from 'react'
 
 import { resolveFluidGlassQuality } from '../constants'
 import { FluidGlassScene } from './fluid-glass-scene'
 import { RendererErrorBoundary } from './renderer-error-boundary'
+import type { LensStateAdapter } from '../lens/lens-state'
+import type { RendererLifecycleController } from '../lens/renderer-lifecycle'
 import type {
   FluidGlassDebugView,
   FluidGlassEnvironmentSource,
@@ -15,24 +18,42 @@ import type { FluidGlassStore } from './store'
 export function FluidGlassRenderer({
   debugView,
   environment,
+  lens,
+  lifecycle,
   lightDirection,
   material,
+  onContextLost,
   onFailure,
+  onReady,
   onTelemetry,
   quality,
   store,
 }: {
   debugView: FluidGlassDebugView
   environment: FluidGlassEnvironmentSource
+
+  lens: LensStateAdapter
+
+  lifecycle: RendererLifecycleController
   lightDirection: readonly [number, number]
   material: FluidGlassMaterial
+  onContextLost: () => void
   onFailure: () => void
+  onReady: () => void
   onTelemetry?: (telemetry: FluidGlassTelemetry) => void
   quality: FluidGlassQuality
   store: FluidGlassStore
 }) {
   const resolvedQuality = resolveFluidGlassQuality(quality)
   const dpr = Math.min(1.5, resolvedQuality.dpr * resolvedQuality.framebufferScale)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+
+  useEffect(() => {
+    lifecycle.transition('creating', 'renderer mounted')
+    return () => {
+      lifecycle.dispose('renderer unmounted')
+    }
+  }, [lifecycle])
 
   return (
     <div
@@ -48,29 +69,47 @@ export function FluidGlassRenderer({
             antialias: false,
             alpha: false,
             powerPreference: 'high-performance',
-            preserveDrawingBuffer: true,
+            preserveDrawingBuffer: Boolean(onTelemetry),
           }}
           onCreated={({ gl, invalidate }) => {
             const canvas = gl.domElement
             canvas.style.pointerEvents = 'none'
-            let restored = false
-            canvas.addEventListener('webglcontextrestored', () => {
-              restored = true
+            canvasRef.current = canvas
+
+            const handleRestored = () => {
               invalidate()
-            })
-            canvas.addEventListener('webglcontextlost', (event) => {
+
+              lifecycle.transition('recovering', 'webgl context restoring')
+              lifecycle.transition('ready', 'webgl context restored')
+              onReady()
+            }
+            const handleLost = (event: Event) => {
               event.preventDefault()
-              restored = false
-              window.setTimeout(() => {
-                if (canvas.isConnected && !restored && gl.getContext().isContextLost()) onFailure()
-              }, 1_200)
+              lifecycle.transition('context-lost', 'webglcontextlost')
+              onContextLost()
+            }
+
+            canvas.addEventListener('webglcontextrestored', handleRestored)
+            canvas.addEventListener('webglcontextlost', handleLost)
+
+            lifecycle.register('listener', () => {
+              canvas.removeEventListener('webglcontextrestored', handleRestored)
+              canvas.removeEventListener('webglcontextlost', handleLost)
             })
+            lifecycle.register('resource', () => gl.dispose())
+            lifecycle.register('canvas', () => {
+              canvasRef.current = null
+            })
+
+            lifecycle.transition('ready', 'webgl context created')
+            onReady()
           }}
           fallback={null}
         >
           <FluidGlassScene
             debugView={debugView}
             environment={environment}
+            lens={lens}
             lightDirection={lightDirection}
             material={material}
             onFailure={onFailure}

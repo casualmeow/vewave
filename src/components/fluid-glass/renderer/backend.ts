@@ -1,6 +1,14 @@
+import { adaptEnvironmentSource, describeBackdropSource } from '../lens/backdrop-source'
+import {
+  probeCssBackdropFilterSupport,
+  probeNativeSvgRefractionSupport,
+  probeWebglSupport,
+  resolveLensCapabilities,
+} from '../lens/capability'
+import { resolveLensBackend, toLegacyBackend } from '../lens/backend-resolution'
+import type { LensBackendResolution, LensMaterialIntent } from '../lens/backend-resolution'
+import type { LensSourceReadability } from '../lens/backdrop-source'
 import type { FluidGlassBackend, FluidGlassEnvironmentSource } from '../types'
-
-let cachedWebGl2Support: boolean | undefined
 
 export type FluidGlassBackendOptions = {
   environment?: FluidGlassEnvironmentSource
@@ -12,49 +20,65 @@ export type FluidGlassBackendOptions = {
   webgl2: boolean
   activation: 'always' | 'appearance'
   transmissionPreferred?: boolean
+
+  sourceReadability?: LensSourceReadability
+
+  webglScopeAvailable?: boolean
+
+  rendererHealthy?: boolean
 }
 
 export function supportsWebGl2() {
-  if (typeof document === 'undefined') return false
-  if (cachedWebGl2Support !== undefined) return cachedWebGl2Support
-
-  try {
-    const context = document.createElement('canvas').getContext('webgl2')
-    const supported = Boolean(context)
-    context?.getExtension('WEBGL_lose_context')?.loseContext()
-    cachedWebGl2Support = supported
-    return cachedWebGl2Support
-  } catch {
-    cachedWebGl2Support = false
-    return false
-  }
+  return probeWebglSupport()
 }
 
-export function resolveFluidGlassBackend({
+export function resolveFluidGlassBackendResolution({
   activation,
   environment,
   experimentalRefraction,
   forceFallback,
   quality,
   reducedTransparency,
+  rendererHealthy = true,
+  sourceReadability,
   surfaceStyle,
-  webgl2,
   transmissionPreferred = false,
-}: FluidGlassBackendOptions): FluidGlassBackend {
-  if (activation === 'appearance' && surfaceStyle === 'solid') return 'css'
+  webgl2,
+  webglScopeAvailable = true,
+}: FluidGlassBackendOptions): LensBackendResolution {
+  const source = adaptEnvironmentSource(environment)
+  const descriptor = describeBackdropSource(source, sourceReadability)
 
-  const appearanceAllowsGpu = activation === 'always' || experimentalRefraction
+  const capability = resolveLensCapabilities({
+    cssBackdropFilter: probeCssBackdropFilterSupport(),
+    nativeSvgRefraction: probeNativeSvgRefractionSupport(),
+    nativeSvgExperimentalEnabled: surfaceStyle === 'glass' || experimentalRefraction,
+    webgl: webgl2,
+    reducedTransparency,
+    reducedMotion: false,
+    advancedEffectsAllowed:
+      activation === 'always' || surfaceStyle === 'glass' || experimentalRefraction,
+    webglScopeAvailable,
+    rendererHealthy: rendererHealthy && !forceFallback,
+  })
 
-  if (
-    !environment ||
-    !appearanceAllowsGpu ||
-    forceFallback ||
-    quality === 'disabled' ||
-    reducedTransparency ||
-    !webgl2
-  ) {
-    return 'css'
-  }
+  const optedOut =
+    quality === 'disabled' || (activation === 'appearance' && surfaceStyle === 'solid')
+  const intent: LensMaterialIntent = optedOut
+    ? 'solid'
+    : transmissionPreferred
+      ? 'transmission-experimental'
+      : 'refractive'
 
-  return transmissionPreferred ? 'transmission' : 'sdf'
+  return resolveLensBackend({
+    source: descriptor,
+    capability,
+    intent,
+
+    allowExperimentalTransmission: transmissionPreferred,
+  })
+}
+
+export function resolveFluidGlassBackend(options: FluidGlassBackendOptions): FluidGlassBackend {
+  return toLegacyBackend(resolveFluidGlassBackendResolution(options).backend)
 }

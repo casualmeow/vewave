@@ -1,5 +1,3 @@
-/* fumadocs ships a prebuilt Tailwind bundle using the same cascade layers;
-   it must come first so app utilities (incl. responsive variants) win the cascade. */
 @import 'fumadocs-ui/style.css';
 @import 'tailwindcss';
 @import 'tw-animate-css';
@@ -223,6 +221,10 @@ code {
     background-size: cover;
   }
 
+  .fluid-glass-css-environment[data-fluid-glass-environment='auto-dom'] {
+    background: none;
+  }
+
   .fluid-glass-css-environment[data-pattern='grid'] {
     background-image:
       linear-gradient(color-mix(in srgb, var(--foreground) 10%, transparent) 1px, transparent 1px),
@@ -264,23 +266,62 @@ code {
     transition-duration: 0ms !important;
   }
 
-  [data-app-sidebar-mode] [data-fluid-glass-backend='sdf'] [data-fluid-glass-target],
-  [data-app-sidebar-mode] [data-fluid-glass-backend='transmission'] [data-fluid-glass-target] {
+  [data-sidebar-hover] {
+    isolation: isolate;
+  }
+
+  [data-sidebar-hover]::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: color-mix(in srgb, var(--sidebar-foreground) 6%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 100ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    [data-sidebar-hover]:not([aria-disabled='true']):hover::before {
+      opacity: 1;
+    }
+  }
+
+  :root[data-input-modality='keyboard'] [data-sidebar-hover]::before,
+  :root[data-glass-motion='off'] [data-sidebar-hover]::before {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-sidebar-hover]::before {
+      transition: none;
+    }
+  }
+
+  [data-app-sidebar-mode] [data-fluid-glass-group='shared-lens'] [data-fluid-glass-target],
+  [data-app-sidebar-mode] [data-fluid-glass-group='shared-lens'] [data-slot='sidebar-item'],
+  :is(.fluid-glass-settings-nav, .fluid-glass-selection-track) [data-fluid-glass-target] {
     background-color: transparent !important;
+  }
+
+  [data-app-sidebar-mode]
+    [data-fluid-glass-group='shared-lens']
+    [data-fluid-glass-target]:not(:focus-visible),
+  [data-app-sidebar-mode]
+    [data-fluid-glass-group='shared-lens']
+    [data-slot='sidebar-item']:not(:focus-visible),
+  :is(.fluid-glass-settings-nav, .fluid-glass-selection-track)
+    [data-fluid-glass-target]:not(:focus-visible) {
     box-shadow: none !important;
   }
 
-  [data-app-sidebar-mode] [data-fluid-glass-backend='sdf'] [data-sidebar-active-indicator],
-  [data-app-sidebar-mode]
-    [data-fluid-glass-backend='transmission']
-    [data-sidebar-active-indicator] {
+  [data-app-sidebar-mode] [data-fluid-glass-group='shared-lens'] [data-sidebar-active-indicator] {
     display: none;
   }
 
-  .fluid-glass-settings-nav[data-fluid-glass-backend='sdf'] [data-fluid-glass-target],
-  .fluid-glass-settings-nav[data-fluid-glass-backend='transmission'] [data-fluid-glass-target] {
-    background-color: transparent !important;
-    box-shadow: none !important;
+  :is(.fluid-glass-settings-nav, .fluid-glass-selection-track) {
+    background: color-mix(in srgb, var(--foreground) 1.5%, transparent);
   }
 
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -313,79 +354,76 @@ code {
     }
   }
 
-  /* Glass material for floating layers (dialogs, sheets, menus).
-
-     Layered like a physical material rather than one flat blur:
-       1. scattering  — ::before backdrop blur+saturate; amount = thickness × intensity
-       2. tint        — --glass-background fill + faint top sheen from --glass-highlight
-       3. highlight   — directional inset rim (lit from top-left, near-invisible
-                        bottom-right); never a full uniform outline
-       4. shadow      — owned here, deeper for thicker glass
-     Stable glass intentionally does not claim refraction. Spatial displacement
-     belongs only to the experimental liquid-glass backend.
-     Content stays sharp: children are never processed by the material.
-
-     Semantic API lives in shared/ui/glass-surface.tsx (glassSurfaceVariants):
-       thickness  thin | regular | thick   — pane size → scattering amount
-       elevation  embedded | raised | floating — float height → shadow depth
-       tone       neutral | media          — chrome vs. over-video surfaces
-       interaction static | control        — pressable panes get press feedback
-     The appearance "glass intensity" setting scales both the token alphas
-     (resolver) and the scattering below (root data attribute). */
   :root {
-    --glass-blur-base: 16px;
-    /* Semantic control fills for small interactive elements on chrome
-       (nav pills, segmented options, close buttons). Solid style maps to the
-       conventional tokens; glass style maps to translucent washes. Callers
-       use .glass-control instead of local alpha fills. */
+    --glass-blur-base: 3px;
+
     --glass-control-track: var(--muted);
     --glass-control-hover: var(--accent);
     --glass-control-active: var(--background);
-    --material-scrim: color-mix(in srgb, var(--foreground) 46%, transparent);
+    --material-shadow-color: #000;
+    --material-scrim: rgb(0 0 0 / 0.2);
+    --material-shadow-embedded: 7%;
+    --material-shadow-raised: 12%;
+    --material-shadow-floating: 18%;
+    --glass-selection-duration: 225ms;
+    --glass-control-duration: 120ms;
+  }
+
+  :root.dark {
+    --material-scrim: rgb(0 0 0 / 0.36);
+    --material-shadow-embedded: 18%;
+    --material-shadow-raised: 28%;
+    --material-shadow-floating: 40%;
   }
 
   :root[data-surface-style='glass'] {
     --glass-control-track: color-mix(in srgb, var(--foreground) 5%, transparent);
     --glass-control-hover: color-mix(in srgb, var(--background) 24%, transparent);
     --glass-control-active: color-mix(in srgb, var(--background) 44%, transparent);
-    --material-scrim: color-mix(in srgb, var(--foreground) 32%, transparent);
   }
 
   :root[data-glass-intensity='subtle'] {
-    --glass-blur-base: 12px;
+    --glass-blur-base: 2px;
   }
 
   :root[data-glass-intensity='strong'] {
-    --glass-blur-base: 22px;
+    --glass-blur-base: 4px;
   }
 
   .glass-surface {
     --glass-thickness: 1;
-    --glass-saturate: 150%;
-    --glass-drop-shadow: 0 12px 32px color-mix(in srgb, var(--foreground) 12%, transparent);
-    --glass-material-fill: var(--glass-background);
+    --glass-saturate: 110%;
+
+    --glass-refraction-filter: initial;
+    --glass-drop-shadow: 0 12px 32px
+      color-mix(in srgb, var(--material-shadow-color) var(--material-shadow-raised), transparent);
+    --glass-material-fill: color-mix(
+      in srgb,
+      var(--glass-resolved-tint, var(--popover)) var(--glass-resolved-opacity, 8%),
+      transparent
+    );
     --glass-material-image: linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--glass-highlight) 12%, transparent),
-      transparent 34%
+      125deg,
+      color-mix(in srgb, var(--glass-highlight) 16%, transparent),
+      transparent 18%,
+      transparent 88%,
+      color-mix(in srgb, var(--glass-highlight) 7%, transparent)
     );
     --glass-backdrop-filter: var(
-      --glass-experimental-filter,
-      blur(calc(var(--glass-blur-base) * var(--glass-thickness))) saturate(var(--glass-saturate))
+      --glass-refraction-filter,
+      blur(min(6px, calc(var(--glass-blur-base) * var(--glass-thickness))))
+        saturate(var(--glass-saturate))
     );
     position: relative;
     isolation: isolate;
-    border-color: var(--glass-border);
+    border-color: color-mix(in srgb, var(--glass-border) 45%, transparent);
     background: transparent;
     box-shadow:
-      inset 1px 1px 0 color-mix(in srgb, var(--glass-highlight) 60%, transparent),
-      inset -1px -1px 0 color-mix(in srgb, var(--glass-highlight) 14%, transparent),
+      inset 0.5px 1px 0 color-mix(in srgb, var(--glass-highlight) 60%, transparent),
+      inset -0.5px -1px 0 color-mix(in srgb, var(--glass-highlight) 8%, transparent),
       var(--glass-drop-shadow);
   }
 
-  /* The material is processed behind foreground content. This is the stable
-     DOM backend: backdrop scattering/tint live here; text and icons remain in
-     the parent stacking context and never enter the filter pipeline. */
   .glass-surface::before {
     content: '';
     position: absolute;
@@ -400,75 +438,145 @@ code {
   }
 
   .glass-surface-thick {
-    --glass-thickness: 1.4;
+    --glass-thickness: 1.5;
   }
 
   .glass-surface-thin {
     --glass-thickness: 0.7;
-    --glass-saturate: 135%;
-    --glass-drop-shadow: 0 8px 24px color-mix(in srgb, var(--foreground) 10%, transparent);
+    --glass-saturate: 110%;
+    --glass-drop-shadow: 0 8px 24px
+      color-mix(in srgb, var(--material-shadow-color) var(--material-shadow-raised), transparent);
   }
 
-  /* Elevation: shadow depth is how far the pane floats, independent of thickness. */
   .glass-surface-embedded {
-    --glass-drop-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 7%, transparent);
+    --glass-drop-shadow: 0 2px 8px
+      color-mix(in srgb, var(--material-shadow-color) var(--material-shadow-embedded), transparent);
   }
 
   .glass-surface-floating {
-    --glass-drop-shadow: 0 28px 64px color-mix(in srgb, var(--foreground) 18%, transparent);
+    --glass-drop-shadow: 0 18px 48px -12px
+      color-mix(in srgb, var(--material-shadow-color) var(--material-shadow-floating), transparent);
   }
 
-  /* Backdrop tone: explicit context for what sits behind the pane. Auto (the
-     default) follows the theme tokens; light/dark fix tint and foreground for
-     a known backdrop; media is chrome over video. No automatic DOM luminance
-     analysis is claimed — callers declare the context. */
   .glass-surface-tone-light {
-    --glass-material-fill: rgba(255, 255, 255, 0.52);
+    --glass-material-fill: rgba(255, 255, 255, 0.28);
     border-color: rgba(255, 255, 255, 0.55);
     color: #1c1b20;
   }
 
   .glass-surface-tone-dark {
-    --glass-material-fill: rgba(12, 14, 20, 0.52);
+    --glass-material-fill: rgba(12, 14, 20, 0.28);
     border-color: rgba(255, 255, 255, 0.14);
     color: #f2f4f8;
   }
 
   .glass-surface-media {
-    --glass-material-fill: color-mix(in srgb, var(--media-background) 58%, transparent);
+    --glass-material-fill: color-mix(
+      in srgb,
+      var(--media-background) var(--glass-media-opacity, 58%),
+      transparent
+    );
+    --glass-backdrop-filter: var(
+      --glass-media-filter,
+      var(
+        --glass-refraction-filter,
+        blur(min(6px, calc(var(--glass-blur-base, 3px) * var(--glass-thickness, 1))))
+          saturate(var(--glass-saturate, 110%))
+      )
+    );
     --glass-material-image: none;
     border-color: rgba(255, 255, 255, 0.14);
     color: var(--media-foreground);
   }
 
-  /* Role: the semantic recipe of a pane — which conventional token it falls
-     back to when it resolves solid, and role-specific material adjustments. */
   .glass-role-shell {
     --glass-solid-fill: var(--card);
-    /* The shell sits over the static environment layer only; blurring a
-       near-monochrome gradient is pure GPU cost and nests a filter under the
-       header's. The shell keeps tint, rim, and shadow — no scattering. */
+    --glass-material-fill: color-mix(
+      in srgb,
+      var(--card) var(--glass-resolved-opacity, 8%),
+      transparent
+    );
+
     --glass-backdrop-filter: none;
   }
 
+  :root[data-preset='noir'][data-resolved-mode='dark'] .glass-role-shell {
+    --glass-solid-fill: var(--background);
+  }
+
   .glass-role-dialog,
+  .glass-role-form,
   .glass-role-sheet {
     --glass-solid-fill: var(--popover);
+    --glass-material-fill: color-mix(
+      in srgb,
+      var(--popover) var(--glass-reading-opacity, 80%),
+      transparent
+    );
   }
 
   .glass-role-menu {
     --glass-solid-fill: var(--popover);
+    --glass-material-fill: color-mix(
+      in srgb,
+      var(--popover) var(--glass-reading-opacity, 80%),
+      transparent
+    );
   }
 
   .glass-role-control {
     --glass-solid-fill: var(--secondary);
   }
 
-  /* Surface resolution: `surface="auto"` follows the global appearance
-     surfaceStyle — material under the glass style, conventional opaque layer
-     under solid. `surface="solid"` is always opaque. The solid fill comes
-     from the pane's role; elevation still drives the shadow; rims, sheen,
-     and the edge ring belong to the material only. */
+  .glass-surface:where([data-glass-modal]) {
+    --muted-foreground: var(--modal-muted-foreground);
+    --glass-material-fill: color-mix(in srgb, var(--popover) var(--modal-glass-tint), transparent);
+    --glass-material-image: none;
+    --glass-backdrop-filter: blur(var(--modal-glass-blur)) saturate(100%);
+    border-color: transparent;
+    box-shadow: var(--glass-drop-shadow);
+  }
+
+  .glass-surface:where([data-glass-modal][data-glass-optics='native']) {
+    --glass-material-fill: transparent;
+    --glass-backdrop-filter: var(--glass-refraction-filter);
+  }
+
+  .glass-role-header {
+    --glass-solid-fill: var(--header);
+    --glass-material-fill: color-mix(
+      in srgb,
+      var(--header) var(--glass-reading-opacity, 80%),
+      transparent
+    );
+  }
+
+  .glass-role-navigation {
+    --glass-solid-fill: var(--sidebar);
+    --glass-material-fill: color-mix(
+      in srgb,
+      var(--sidebar) var(--glass-reading-opacity, 80%),
+      transparent
+    );
+  }
+
+  .glass-surface[data-glass-optics='scene'] {
+    --glass-material-fill: transparent;
+    --glass-material-image: none;
+    --glass-backdrop-filter: none;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: var(--glass-drop-shadow);
+  }
+
+  .glass-surface[data-glass-optics='scene'] > [data-sidebar-glass] {
+    display: none;
+  }
+
+  .glass-surface[data-glass-optics='scene']::after {
+    display: none;
+  }
+
   .glass-surface-opaque,
   :root[data-surface-style='solid'] .glass-surface-auto {
     --glass-material-fill: var(--glass-solid-fill, var(--popover));
@@ -485,7 +593,6 @@ code {
     color: var(--media-foreground);
   }
 
-  /* Interaction: pressable glass responds with light, not movement. */
   .glass-surface-control {
     transition:
       transform 150ms cubic-bezier(0.23, 1, 0.32, 1),
@@ -493,15 +600,20 @@ code {
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .glass-surface-control:hover {
+    .glass-surface-control:not([data-glass-interaction='scoped']):hover {
       box-shadow:
         inset 1px 1px 0 color-mix(in srgb, var(--glass-highlight) 72%, transparent),
         var(--glass-drop-shadow);
     }
   }
 
-  .glass-surface-control:active:not(:focus-visible) {
-    transform: scale(0.98);
+  :root[data-surface-style='glass'][data-glass-motion='fluid']
+    .glass-surface-control:active:not(:focus-visible)::before {
+    transform: scale(0.985);
+  }
+
+  .glass-surface-control::before {
+    transition: transform var(--glass-control-duration) cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -511,11 +623,11 @@ code {
   }
 
   :root[data-glass-intensity='subtle'] .glass-surface {
-    --glass-saturate: 125%;
+    --glass-saturate: 105%;
   }
 
   :root[data-glass-intensity='strong'] .glass-surface {
-    --glass-saturate: 175%;
+    --glass-saturate: 115%;
   }
 
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -552,9 +664,6 @@ code {
     }
   }
 
-  /* Deterministic capability fallback used by diagnostics and by hosts that
-     know backdrop processing is unreliable despite positive CSS parsing.
-     Role-specific solid fills remain authoritative. */
   :root[data-glass-capability='fallback'] .glass-surface {
     --glass-material-fill: var(--glass-solid-fill, var(--popover));
     --glass-material-image: none;
@@ -570,52 +679,54 @@ code {
     --glass-material-fill: #101218;
   }
 
-  /* Environment layer behind the glass shell: nearly monochrome, derived from
-     theme tokens with minimal luminance variation so the material has
-     something to scatter. Exists only while the surface style is glass. */
-  [data-glass-environment] {
-    display: none;
+  .app-backdrop {
+    position: fixed;
+    inset: 0;
     pointer-events: none;
   }
 
-  :root[data-surface-style='glass'] [data-glass-environment] {
-    position: fixed;
-    inset: 0;
-    display: block;
-    /* Near-monochrome luminance ramp only. The glass must stay convincing
-       over real app content; it may not depend on decorative color fields. */
-    background: linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--foreground) 4%, var(--background)),
-      var(--background) 42%,
-      color-mix(in srgb, var(--foreground) 2%, var(--background))
+  [data-app-backdrop] {
+    background-color: var(--backdrop-base, var(--background));
+  }
+
+  [data-app-backdrop='ribbons'] {
+    background-image:
+      radial-gradient(
+        ellipse at 65% 120%,
+        transparent 24%,
+        var(--backdrop-first) 45%,
+        transparent 76%
+      ),
+      radial-gradient(
+        ellipse at 10% -25%,
+        transparent 18%,
+        var(--backdrop-second) 48%,
+        transparent 82%
+      );
+  }
+
+  [data-app-backdrop='silk'] {
+    background-image: repeating-linear-gradient(
+      125deg,
+      var(--backdrop-base) 0%,
+      var(--backdrop-first) 23%,
+      var(--backdrop-base) 45%,
+      var(--backdrop-second) 67%,
+      var(--backdrop-base) 90%
     );
   }
 
-  :root[data-glass-capability='fallback'] [data-glass-environment] {
-    display: none;
+  [data-app-backdrop='contours'] {
+    background-image: repeating-radial-gradient(
+      ellipse at 30% 70%,
+      var(--backdrop-base) 0% 8%,
+      var(--backdrop-first) 14% 21%,
+      var(--backdrop-second) 27% 34%,
+      var(--backdrop-base) 42% 50%
+    );
   }
 
-  @media (prefers-reduced-transparency: reduce) {
-    :root[data-surface-style='glass'] [data-glass-environment] {
-      display: none;
-    }
-  }
-
-  /* Glass shell header: in glass style the header lifts into a thin glass bar
-     and content scrolls underneath it — that is where the scattering becomes
-     visible. Solid style keeps the header in normal flow, untouched. */
   :root[data-surface-style='glass'] [data-glass-shell-header] {
-    --glass-shell-material-fill: color-mix(in srgb, var(--header) 45%, transparent);
-    --glass-shell-material-image: linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--glass-highlight) 12%, transparent),
-      transparent
-    );
-    --glass-backdrop-filter: var(
-      --glass-experimental-filter,
-      blur(calc(var(--glass-blur-base, 16px) * 0.7)) saturate(140%)
-    );
     position: absolute;
     inset-inline: 0;
     top: 0;
@@ -625,29 +736,30 @@ code {
     background: transparent;
   }
 
-  :root[data-surface-style='glass'] [data-glass-shell-header]::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background-color: var(--glass-shell-material-fill);
-    background-image: var(--glass-shell-material-image);
-    -webkit-backdrop-filter: var(--glass-backdrop-filter);
-    backdrop-filter: var(--glass-backdrop-filter);
-    pointer-events: none;
-  }
-
   :root[data-surface-style='glass'] [data-glass-shell-main] {
     padding-top: 4rem;
   }
 
-  /* Interactive control fill for small elements living on chrome. Resolves
-     through the semantic --glass-control-* tokens per surface style. */
   .glass-control {
+    position: relative;
+    isolation: isolate;
     transition:
       background-color 150ms ease,
-      color 150ms ease,
-      transform 150ms cubic-bezier(0.23, 1, 0.32, 1);
+      color 150ms ease;
+  }
+
+  .glass-control::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: inherit;
+    background: var(--glass-control-hover);
+    opacity: 0;
+    transition:
+      opacity var(--glass-control-duration) ease,
+      transform var(--glass-control-duration) cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .glass-control-track {
@@ -655,8 +767,8 @@ code {
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .glass-control:hover {
-      background-color: var(--glass-control-hover);
+    .glass-control:hover::after {
+      opacity: 0.55;
     }
   }
 
@@ -665,11 +777,16 @@ code {
     background-color: var(--glass-control-active);
     box-shadow:
       inset 0 1px 0 color-mix(in srgb, var(--glass-highlight) 45%, transparent),
-      0 1px 2px color-mix(in srgb, var(--foreground) 8%, transparent);
+      0 1px 2px color-mix(in srgb, var(--material-shadow-color) 8%, transparent);
   }
 
-  .glass-control:active:not(:focus-visible) {
-    transform: scale(0.97);
+  .glass-control:active::after {
+    opacity: 1;
+  }
+
+  :root[data-surface-style='glass'][data-glass-motion='fluid']
+    .glass-control:active:not(:focus-visible)::after {
+    transform: scale(0.985);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -678,17 +795,14 @@ code {
     }
   }
 
-  /* liquidGlass material backend: pointer-aware, shape-following rim
-     highlight and a material press response. Applied per surface (opt-in),
-     paired with the displacement filter from useLiquidGlassRefraction.
-     Never a full uniform stroke, never whole-surface brightness. */
   .glass-material-liquid {
     transition:
       transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
       box-shadow 160ms ease;
   }
 
-  .glass-material-liquid::after {
+  .glass-material-liquid::after,
+  .glass-surface[data-glass-interaction='scoped']::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -718,12 +832,8 @@ code {
     }
   }
 
-  /* Press: displacement strength rises in the filter (hook side); the pane
-     settles slightly with a tighter shadow and more highlight energy.
-     Foreground content rides along unprocessed. */
   .glass-material-liquid[data-glass-pressed='true'] {
-    transform: scale(0.998);
-    box-shadow: 0 4px 14px color-mix(in srgb, var(--foreground) 10%, transparent);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--material-shadow-color) 10%, transparent);
   }
 
   .glass-material-liquid[data-glass-pressed='true']::after {
@@ -733,6 +843,22 @@ code {
       var(--glass-highlight),
       transparent 78%
     );
+  }
+
+  .glass-surface:where([data-glass-modal])::after {
+    display: none;
+  }
+
+  .glass-surface:where([data-glass-modal][data-glass-optics='css'])::after {
+    display: block;
+    background: linear-gradient(
+      135deg,
+      rgb(255 255 255 / 0.3),
+      transparent 28% 72%,
+      rgb(255 255 255 / 0.06)
+    );
+    opacity: 1;
+    transition: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -746,29 +872,316 @@ code {
     }
   }
 
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    :root[data-surface-style='glass'] [data-glass-shell-header] {
-      --glass-shell-material-fill: var(--header);
-      --glass-shell-material-image: none;
-      --glass-backdrop-filter: none;
-    }
-  }
-
   @media (prefers-reduced-transparency: reduce) {
     .glass-material-liquid::after {
       display: none;
     }
+  }
 
-    :root[data-surface-style='glass'] [data-glass-shell-header] {
-      --glass-shell-material-fill: var(--header);
-      --glass-shell-material-image: none;
-      --glass-backdrop-filter: none;
+  :root[data-glass-capability='fallback'] .glass-surface[data-glass-modal]::after {
+    display: none;
+  }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass-surface[data-glass-modal]::after {
+      display: none;
     }
   }
 
-  :root[data-glass-capability='fallback'] [data-glass-shell-header] {
-    --glass-shell-material-fill: var(--header);
-    --glass-shell-material-image: none;
-    --glass-backdrop-filter: none;
+  .dialog-presence {
+    --dialog-enter-duration: 180ms;
+    --dialog-exit-duration: 140ms;
+  }
+
+  .dialog-presence[data-glass-motion='fluid'] {
+    --dialog-enter-duration: 240ms;
+  }
+
+  .dialog-presence[data-state='open'] {
+    animation: modal-glass-enter var(--dialog-enter-duration) cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .dialog-presence[data-state='closed'] {
+    animation: modal-glass-exit var(--dialog-exit-duration) cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+
+  .dialog-presence[data-state='open']::before,
+  .dialog-presence[data-state='open'] > * {
+    animation: modal-glass-reveal var(--dialog-enter-duration) ease-out both;
+  }
+
+  .dialog-presence[data-state='closed']::before,
+  .dialog-presence[data-state='closed'] > * {
+    animation: modal-glass-dismiss var(--dialog-exit-duration) cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+
+  .dialog-presence[data-glass-motion='off'],
+  :root:is([data-input-modality='keyboard'], [data-surface-style='glass'][data-glass-motion='off'])
+    .dialog-presence {
+    --dialog-enter-duration: 0ms;
+    --dialog-exit-duration: 0ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dialog-presence {
+      --dialog-enter-duration: 0ms;
+      --dialog-exit-duration: 0ms;
+    }
+  }
+
+  @keyframes modal-glass-enter {
+    from {
+      transform: translateY(4px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes modal-glass-exit {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(4px);
+    }
+  }
+
+  @keyframes modal-glass-reveal {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes modal-glass-dismiss {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+}
+
+@layer components {
+  :is(.fluid-glass-navigation, .fluid-glass-segmented)[data-fluid-glass-group='shared-lens']
+    :is([data-slot='sidebar-item'], [data-fluid-glass-target]) {
+    background: transparent !important;
+  }
+  :is(.fluid-glass-navigation, .fluid-glass-segmented)[data-fluid-glass-group='shared-lens']
+    :is([data-slot='sidebar-item'], [data-fluid-glass-target]):not(:focus-visible) {
+    box-shadow: none !important;
+  }
+  .fluid-glass-navigation[data-fluid-glass-group='shared-lens'] [data-sidebar-active-indicator] {
+    display: none;
+  }
+
+  :root[data-input-modality='keyboard'],
+  :root[data-surface-style='glass'][data-glass-motion='off'] {
+    --glass-control-duration: 0ms;
+    --glass-selection-duration: 0ms;
+  }
+
+  :root:is([data-input-modality='keyboard'], [data-surface-style='glass'][data-glass-motion='off'])
+    :is(
+      .glass-surface,
+      .glass-control,
+      [data-glass-shell-header],
+      [data-slot='dialog-overlay'],
+      [data-slot='sheet-overlay']
+    ) {
+    animation: none !important;
+    transition: none !important;
+  }
+  :root:is([data-input-modality='keyboard'], [data-surface-style='glass'][data-glass-motion='off'])
+    :is(.glass-surface-control, .glass-control)::before,
+  :root:is([data-input-modality='keyboard'], [data-surface-style='glass'][data-glass-motion='off'])
+    :is(.glass-material-liquid, .glass-control)::after {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --glass-control-duration: 0ms;
+      --glass-selection-duration: 0ms;
+    }
+    :is(
+      .glass-surface,
+      .glass-control,
+      [data-glass-shell-header],
+      [data-slot='dialog-overlay'],
+      [data-slot='sheet-overlay']
+    ) {
+      animation: none !important;
+      transition: none !important;
+    }
+    .glass-surface-control::before,
+    .glass-control::after {
+      transform: none !important;
+    }
+  }
+}
+
+@layer components {
+  .glass-surface[data-glass-interaction='scoped'] {
+    --glass-pointer-x: 50%;
+    --glass-pointer-y: 0%;
+    --glass-pointer-energy: 0;
+    --glass-press-energy: 0;
+  }
+
+  .glass-surface[data-glass-interaction='scoped']:not([data-glass-optics='scene'])::after {
+    display: block;
+    inset: 2px;
+    padding: 2px;
+    background: radial-gradient(
+      96px circle at var(--glass-pointer-x, 50%) var(--glass-pointer-y, 0%),
+      color-mix(
+        in srgb,
+        var(--glass-reflection-color, white) var(--glass-pointer-reflection-opacity, 20%),
+        transparent
+      ),
+      transparent 76%
+    );
+    opacity: calc(var(--glass-pointer-energy, 0) * 0.6 + var(--glass-press-energy, 0) * 0.15);
+    transition: none;
+  }
+
+  .glass-surface[data-glass-interaction='scoped'][data-glass-optics='native'][data-glass-modal]::after,
+  .glass-surface[data-glass-interaction='scoped'][data-glass-optics='solid']::after {
+    display: none;
+  }
+
+  :root .glass-surface-control[data-glass-interaction='scoped']:active::before {
+    transform: none;
+  }
+
+  [data-glass-presence] {
+    --glass-enter-duration: 180ms;
+    --glass-exit-duration: 140ms;
+    --glass-enter-x: 0px;
+    --glass-enter-y: 4px;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  [data-glass-presence='dialog'][data-glass-motion='fluid'] {
+    --glass-enter-duration: 240ms;
+  }
+
+  [data-glass-presence='popover'] {
+    --glass-enter-duration: 160ms;
+    --glass-exit-duration: 120ms;
+    --glass-enter-y: 2px;
+  }
+
+  [data-glass-presence='sheet'] {
+    --glass-enter-duration: 220ms;
+    --glass-exit-duration: 180ms;
+    --glass-enter-y: 0px;
+    translate: none !important;
+  }
+  [data-glass-presence='sheet'][data-glass-side='right'] {
+    --glass-enter-x: 100%;
+  }
+  [data-glass-presence='sheet'][data-glass-side='left'] {
+    --glass-enter-x: -100%;
+  }
+  [data-glass-presence='sheet'][data-glass-side='top'] {
+    --glass-enter-y: -100%;
+  }
+  [data-glass-presence='sheet'][data-glass-side='bottom'] {
+    --glass-enter-y: 100%;
+  }
+
+  [data-glass-presence][data-state='open'] {
+    animation: glass-presence-enter var(--glass-enter-duration) cubic-bezier(0.22, 1, 0.36, 1) both !important;
+  }
+  [data-glass-presence][data-state='closed'] {
+    animation: glass-presence-exit var(--glass-exit-duration) cubic-bezier(0.23, 1, 0.32, 1) both !important;
+  }
+  [data-glass-presence][data-state='open']::before,
+  [data-glass-presence][data-state='open'] > * {
+    animation: glass-layer-reveal var(--glass-enter-duration) ease-out both;
+  }
+  [data-glass-presence][data-state='closed']::before,
+  [data-glass-presence][data-state='closed'] > * {
+    animation: glass-layer-dismiss var(--glass-exit-duration) ease-out both;
+  }
+
+  [data-glass-overlay] {
+    --glass-enter-duration: 180ms;
+    --glass-exit-duration: 140ms;
+  }
+  [data-glass-overlay='dialog'][data-glass-motion='fluid'] {
+    --glass-enter-duration: 240ms;
+  }
+  [data-glass-overlay='sheet'] {
+    --glass-enter-duration: 220ms;
+    --glass-exit-duration: 180ms;
+  }
+  [data-glass-overlay][data-state='open'] {
+    animation: glass-layer-reveal var(--glass-enter-duration) ease-out both;
+  }
+  [data-glass-overlay][data-state='closed'] {
+    animation: glass-layer-dismiss var(--glass-exit-duration) ease-out both;
+  }
+
+  :is([data-glass-presence], [data-glass-overlay])[data-glass-motion='off'],
+  :root[data-input-modality='keyboard'] :is([data-glass-presence], [data-glass-overlay]) {
+    --glass-enter-duration: 0ms;
+    --glass-exit-duration: 0ms;
+    animation: none !important;
+  }
+  [data-glass-presence][data-glass-motion='off']::before,
+  [data-glass-presence][data-glass-motion='off'] > *,
+  :root[data-input-modality='keyboard'] [data-glass-presence]::before,
+  :root[data-input-modality='keyboard'] [data-glass-presence] > * {
+    animation: none !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root [data-glass-presence],
+    :root [data-glass-overlay],
+    :root [data-glass-presence]::before,
+    :root [data-glass-presence] > * {
+      animation: none !important;
+    }
+  }
+
+  @keyframes glass-presence-enter {
+    from {
+      transform: translate(var(--glass-enter-x), var(--glass-enter-y));
+    }
+    to {
+      transform: translate(0, 0);
+    }
+  }
+  @keyframes glass-presence-exit {
+    from {
+      transform: translate(0, 0);
+    }
+    to {
+      transform: translate(var(--glass-enter-x), var(--glass-enter-y));
+    }
+  }
+  @keyframes glass-layer-reveal {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes glass-layer-dismiss {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
   }
 }

@@ -2,8 +2,10 @@ import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { XIcon } from 'lucide-react'
 
-import { glassSurfaceVariants } from './glass-surface'
+import { GlassSurface } from './glass-surface'
 import { cn } from '@/shared/lib/utils'
+import { useGlassInteractionScope } from '@/shared/lib/glass-interaction-scope'
+import { useGlassMotion } from '@/shared/hooks/use-glass-appearance'
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
@@ -25,11 +27,15 @@ function DialogOverlay({
   className,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+  const scope = useGlassInteractionScope()
+  const motion = useGlassMotion()
   return (
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
+      data-glass-overlay={scope ? 'dialog' : undefined}
+      data-glass-motion={scope ? motion : undefined}
       className={cn(
-        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-(--material-scrim)',
+        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=open]:duration-[180ms] data-[state=closed]:duration-[140ms] motion-reduce:animate-none fixed inset-0 z-50 bg-(--material-scrim)',
         className,
       )}
       {...props}
@@ -48,26 +54,27 @@ function DialogContent({
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
-      <DialogPrimitive.Content
-        data-slot="dialog-content"
-        className={cn(
-          glassSurfaceVariants({ role: 'dialog', thickness: 'thick', elevation: 'floating' }),
-          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 overscroll-contain rounded-lg border p-6 duration-200 sm:max-w-lg',
-          className,
-        )}
-        {...props}
-      >
-        {children}
-        {showCloseButton && (
-          <DialogPrimitive.Close
-            data-slot="dialog-close"
-            className="glass-control ring-offset-background focus:ring-ring data-[state=open]:text-muted-foreground absolute top-4 right-4 z-10 inline-flex size-8 items-center justify-center rounded-md opacity-70 transition-[background-color,color,opacity] duration-150 ease-out hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none motion-reduce:transition-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
-          >
-            <XIcon />
-            <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
-        )}
-      </DialogPrimitive.Content>
+      <GlassSurface asChild role="dialog" presence="dialog" thickness="thick" elevation="floating">
+        <DialogPrimitive.Content
+          data-slot="dialog-content"
+          className={cn(
+            'dialog-presence fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 overscroll-contain rounded-[20px] border p-6 sm:max-w-lg',
+            className,
+          )}
+          {...props}
+        >
+          {children}
+          {showCloseButton && (
+            <DialogPrimitive.Close
+              data-slot="dialog-close"
+              className="glass-control text-muted-foreground hover:text-foreground ring-offset-background focus:ring-ring absolute top-4 right-4 z-10 inline-flex size-8 items-center justify-center rounded-md transition-[background-color,color] duration-150 ease-out focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none motion-reduce:transition-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+            >
+              <XIcon />
+              <span className="sr-only">Close</span>
+            </DialogPrimitive.Close>
+          )}
+        </DialogPrimitive.Content>
+      </GlassSurface>
     </DialogPortal>
   )
 }

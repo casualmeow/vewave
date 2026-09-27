@@ -6,15 +6,17 @@ export const appearancePresetIds = [
   'heatwave',
   'coldwave',
   'darkwave',
+  'noir',
+  'pearl',
 ] as const
 export const logoStrategies = ['auto', 'light', 'dark', 'mono'] as const
 export const glassIntensities = ['subtle', 'balanced', 'strong'] as const
+export const glassMotions = ['off', 'subtle', 'fluid'] as const
 export const surfaceStyles = ['solid', 'glass'] as const
+export const backgroundPresets = ['none', 'ribbons', 'silk', 'contours'] as const
+export const backgroundPalettes = ['theme', 'custom'] as const
 export const appearanceConfigVersion = 1
 
-// Glass material contract — every glass surface must declare what it is
-// instead of tuning raw blur values. Consumed by glassSurfaceVariants and
-// the .glass-surface layers in styles.css.
 export const glassThicknesses = ['thin', 'regular', 'thick'] as const
 export const glassElevations = ['embedded', 'raised', 'floating'] as const
 export const glassBackdropTones = ['auto', 'light', 'dark', 'media'] as const
@@ -30,7 +32,18 @@ export type ResolvedAppearanceMode = (typeof resolvedAppearanceModes)[number]
 export type AppearancePresetId = (typeof appearancePresetIds)[number]
 export type LogoStrategy = (typeof logoStrategies)[number]
 export type GlassIntensity = (typeof glassIntensities)[number]
+export type GlassMotion = (typeof glassMotions)[number]
 export type SurfaceStyle = (typeof surfaceStyles)[number]
+export type BackgroundPreset = (typeof backgroundPresets)[number]
+export type BackgroundSettings = {
+  preset: BackgroundPreset
+  palette: (typeof backgroundPalettes)[number]
+  colors: [string, string]
+
+  brightness: number
+  speed: number
+  animated: boolean
+}
 
 export type ThemeTokenName =
   | 'radius'
@@ -167,7 +180,10 @@ export type AppearanceSettings = {
   preset: AppearancePresetId
   logoStrategy: LogoStrategy
   glassIntensity: GlassIntensity
+  glassMotion: GlassMotion
   surfaceStyle: SurfaceStyle
+  background: BackgroundSettings
+
   experimentalRefraction: boolean
   customTheme: CustomThemeSettings
 }

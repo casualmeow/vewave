@@ -8,7 +8,9 @@ import {
   type ThemeTokens,
 } from './contract'
 import { getThemePreset } from './presets'
-import { getReadableForeground, normalizeHexColor } from './validators'
+import { getReadableForeground, hexToRgb, normalizeHexColor } from './validators'
+import { getModalGlassMutedForeground } from '@/shared/lib/modal-glass'
+import { resolveGlassMaterial } from '@/shared/lib/glass-material'
 
 export function resolveThemeTokens(
   settings: AppearanceSettings,
@@ -50,35 +52,25 @@ export function resolveThemeTokens(
     }
   }
 
-  applyGlassIntensity(tokens, settings.glassIntensity)
+  applyGlassIntensity(tokens, settings.glassIntensity, mode)
 
   return tokens
 }
 
-// Glass surfaces (sidebar, docks) read --glass-* variables; presets ship the
-// "balanced" alphas, so subtle/strong scale translucency from those values.
-const glassIntensityAlphaFactors: Record<
-  GlassIntensity,
-  { background: number; border: number; highlight: number } | null
-> = {
-  subtle: { background: 1.35, border: 0.85, highlight: 0.55 },
-  balanced: null,
-  strong: { background: 0.55, border: 1.25, highlight: 1.6 },
+function applyGlassIntensity(
+  tokens: ThemeTokens,
+  intensity: GlassIntensity,
+  mode: 'light' | 'dark',
+) {
+  const material = resolveGlassMaterial({ tokens, intensity, mode })
+  tokens.glassBackground = withColorAlpha(tokens.glassBackground, material.tintOpacity)
+  tokens.glassBorder = withColorAlpha(tokens.glassBorder, mode === 'light' ? 0.22 : 0.16)
+  tokens.glassHighlight = withColorAlpha(tokens.glassHighlight, mode === 'light' ? 0.48 : 0.14)
 }
 
-function applyGlassIntensity(tokens: ThemeTokens, intensity: GlassIntensity) {
-  const factors = glassIntensityAlphaFactors[intensity]
-
-  if (!factors) {
-    return
-  }
-
-  tokens.glassBackground = scaleColorAlpha(tokens.glassBackground, factors.background)
-  tokens.glassBorder = scaleColorAlpha(tokens.glassBorder, factors.border)
-  tokens.glassHighlight = scaleColorAlpha(tokens.glassHighlight, factors.highlight)
-}
-
-function scaleColorAlpha(color: string, factor: number) {
+function withColorAlpha(color: string, alpha: number) {
+  const hex = hexToRgb(color)
+  if (hex) return `rgba(${hex.r}, ${hex.g}, ${hex.b}, ${alpha})`
   const match = color.match(
     /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)$/,
   )
@@ -87,10 +79,7 @@ function scaleColorAlpha(color: string, factor: number) {
     return color
   }
 
-  const alpha = match[4] === undefined ? 1 : Number.parseFloat(match[4])
-  const nextAlpha = Math.min(0.98, Math.max(0.04, alpha * factor))
-
-  return `rgba(${match[1]}, ${match[2]}, ${match[3]}, ${Number(nextAlpha.toFixed(3))})`
+  return `rgba(${match[1]}, ${match[2]}, ${match[3]}, ${alpha})`
 }
 
 function linkDerivedToken(
@@ -105,22 +94,29 @@ function linkDerivedToken(
 }
 
 export function applyThemeTokens(tokens: ThemeTokens, element = document.documentElement) {
-  Object.entries(cssVariableByToken).forEach(([token, variable]) => {
-    element.style.setProperty(variable, tokens[token as keyof ThemeTokens])
+  Object.entries(getThemeTokenStyle(tokens)).forEach(([variable, value]) => {
+    element.style.setProperty(variable, value)
   })
 }
 
 export function getThemeTokenStyle(tokens: ThemeTokens) {
-  return Object.fromEntries(
-    Object.entries(cssVariableByToken).map(([token, variable]) => [
-      variable,
-      tokens[token as keyof ThemeTokens],
-    ]),
-  ) as Record<`--${string}`, string>
+  return {
+    ...Object.fromEntries(
+      Object.entries(cssVariableByToken).map(([token, variable]) => [
+        variable,
+        tokens[token as keyof ThemeTokens],
+      ]),
+    ),
+    '--modal-muted-foreground': getModalGlassMutedForeground(
+      tokens.mutedForeground,
+      tokens.foreground,
+    ),
+  } as Record<`--${string}`, string>
 }
 
 export function clearThemeTokens(element = document.documentElement) {
   Object.values(cssVariableByToken).forEach((variable) => {
     element.style.removeProperty(variable)
   })
+  element.style.removeProperty('--modal-muted-foreground')
 }

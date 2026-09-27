@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   CanvasTexture,
   ClampToEdgeWrapping,
+  Color,
   DataTexture,
   EquirectangularReflectionMapping,
   LinearFilter,
@@ -14,9 +15,11 @@ import {
   type WebGLRenderTarget,
 } from 'three'
 
+import { fluidGlassDisplayColor } from './fluid-glass-theme'
 import type { FluidGlassDebugView, FluidGlassEnvironmentSource } from '../types'
+import type { FluidGlassTheme } from './fluid-glass-theme'
 
-const environmentVertexShader = /* glsl */ `
+const environmentVertexShader = `
   varying vec2 vUv;
 
   void main() {
@@ -25,8 +28,12 @@ const environmentVertexShader = /* glsl */ `
   }
 `
 
-const environmentFragmentShader = /* glsl */ `
+const environmentFragmentShader = `
   uniform float uDark;
+  uniform vec3 uThemeBackground;
+  uniform vec3 uThemeSurface;
+  uniform vec3 uThemePrimary;
+  uniform vec3 uThemeMuted;
   uniform float uPattern;
   uniform float uUseImage;
   uniform sampler2D uEnvironment;
@@ -43,26 +50,24 @@ const environmentFragmentShader = /* glsl */ `
       return;
     }
 
-    vec3 lightBase = mix(vec3(0.89, 0.93, 0.94), vec3(0.77, 0.84, 0.86), vUv.y);
-    vec3 darkBase = mix(vec3(0.006, 0.01, 0.016), vec3(0.018, 0.027, 0.038), vUv.y);
-    vec3 color = mix(lightBase, darkBase, uDark);
+    vec3 color = mix(uThemeBackground, uThemeSurface, vUv.y * 0.36);
     float glow = max(0.0, 1.0 - length(vUv - vec2(0.18, 0.78)) * 1.6);
-    color += mix(vec3(0.025, 0.07, 0.08), vec3(0.01, 0.035, 0.045), uDark) * glow;
+    color = mix(color, uThemePrimary, glow * 0.06);
 
     if (uPattern > 0.5) {
       float fine = max(gridLine(vUv.x * 30.0, 0.465), gridLine(vUv.y * 18.0, 0.465));
       float diagonal = gridLine((vUv.x * 1.45 + vUv.y) * 13.0, 0.48);
       float accent = gridLine(vUv.x * 7.0, 0.47);
-      vec3 lineColor = mix(vec3(0.18, 0.24, 0.26), vec3(0.075, 0.14, 0.17), uDark);
+      vec3 lineColor = mix(uThemeBackground, uThemeMuted, 0.34);
       color = mix(color, lineColor, fine * 0.28 + diagonal * 0.16);
-      color += vec3(0.015, 0.22, 0.28) * accent * mix(0.2, 0.28, uDark);
+      color = mix(color, uThemePrimary, accent * mix(0.16, 0.22, uDark));
     }
 
     gl_FragColor = vec4(color, 1.0);
   }
 `
 
-const framebufferDiagnosticFragmentShader = /* glsl */ `
+const framebufferDiagnosticFragmentShader = `
   uniform sampler2D uFramebuffer;
   uniform sampler2D uSource;
   uniform float uDifference;
@@ -92,7 +97,7 @@ function createFallbackTexture() {
   return texture
 }
 
-export function createReflectionTexture() {
+export function createReflectionTexture(theme: FluidGlassTheme) {
   const canvas = document.createElement('canvas')
   canvas.width = 256
   canvas.height = 128
@@ -100,16 +105,23 @@ export function createReflectionTexture() {
   if (!context) return createFallbackTexture()
 
   const base = context.createLinearGradient(0, 0, canvas.width, canvas.height)
-  base.addColorStop(0, '#89969c')
-  base.addColorStop(0.5, '#d6dfe2')
-  base.addColorStop(1, '#718087')
+  const reflection = new Color(theme.reflection)
+  const color = (amount: number) => new Color(theme.tint).lerp(reflection, amount).getStyle()
+  base.addColorStop(0, color(theme.dark ? 0.12 : 0.36))
+  base.addColorStop(0.5, color(theme.dark ? 0.32 : 0.72))
+  base.addColorStop(1, color(theme.dark ? 0.06 : 0.18))
   context.fillStyle = base
   context.fillRect(0, 0, canvas.width, canvas.height)
 
   const softLight = context.createRadialGradient(190, 28, 4, 190, 28, 86)
-  softLight.addColorStop(0, 'rgba(255, 255, 255, 0.82)')
-  softLight.addColorStop(0.36, 'rgba(229, 240, 242, 0.38)')
-  softLight.addColorStop(1, 'rgba(229, 240, 242, 0)')
+  const displayReflection = fluidGlassDisplayColor(theme.reflection)
+  const channels = displayReflection
+    .toArray()
+    .map((channel) => Math.round(channel * 255))
+    .join(', ')
+  softLight.addColorStop(0, `rgba(${channels}, 0.82)`)
+  softLight.addColorStop(0.36, `rgba(${channels}, 0.38)`)
+  softLight.addColorStop(1, `rgba(${channels}, 0)`)
   context.fillStyle = softLight
   context.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -125,7 +137,10 @@ export function createReflectionTexture() {
   return texture
 }
 
-export function useEnvironmentTexture(environment: FluidGlassEnvironmentSource) {
+export function useEnvironmentTexture(
+  environment: FluidGlassEnvironmentSource,
+  onFailure: () => void,
+) {
   const fallback = useMemo(createFallbackTexture, [])
   const [texture, setTexture] = useState<Texture>(fallback)
   const imageSource = environment.type === 'image' ? environment.src : null
@@ -138,60 +153,54 @@ export function useEnvironmentTexture(environment: FluidGlassEnvironmentSource) 
 
     let disposed = false
     let loadedTexture: Texture | undefined
-    new TextureLoader().load(imageSource, (loaded) => {
-      if (disposed) {
-        loaded.dispose()
-        return
-      }
-      loadedTexture = loaded
-      loaded.colorSpace = NoColorSpace
-      loaded.minFilter = LinearFilter
-      loaded.magFilter = LinearFilter
-      loaded.wrapS = ClampToEdgeWrapping
-      loaded.wrapT = ClampToEdgeWrapping
-      loaded.generateMipmaps = false
-      loaded.needsUpdate = true
-      setTexture(loaded)
-    })
+    new TextureLoader().load(
+      imageSource,
+      (loaded) => {
+        if (disposed) {
+          loaded.dispose()
+          return
+        }
+        loadedTexture = loaded
+        loaded.colorSpace = NoColorSpace
+        loaded.minFilter = LinearFilter
+        loaded.magFilter = LinearFilter
+        loaded.wrapS = ClampToEdgeWrapping
+        loaded.wrapT = ClampToEdgeWrapping
+        loaded.generateMipmaps = false
+        loaded.needsUpdate = true
+        setTexture(loaded)
+      },
+      undefined,
+      () => {
+        if (!disposed) onFailure()
+      },
+    )
 
     return () => {
       disposed = true
       loadedTexture?.dispose()
     }
-  }, [fallback, imageSource])
+  }, [fallback, imageSource, onFailure])
 
   useEffect(() => () => fallback.dispose(), [fallback])
   return texture
 }
 
-export function readDarkMode(environment: FluidGlassEnvironmentSource) {
-  if (environment.type === 'theme' && environment.tone && environment.tone !== 'auto') {
-    return environment.tone === 'dark'
-  }
-  return (
-    document.documentElement.dataset.resolvedMode === 'dark' ||
-    document.documentElement.classList.contains('dark')
-  )
-}
-
 export function TransmissionEnvironment({
   environment,
   height,
+  theme,
   texture,
   width,
 }: {
   environment: FluidGlassEnvironmentSource
   height: number
+  theme: FluidGlassTheme
   texture: Texture
   width: number
 }) {
-  const [themeDark, setThemeDark] = useState(() => readDarkMode(environment))
-  const environmentTone = environment.type === 'theme' ? environment.tone : undefined
   const pattern = environment.type === 'theme' && environment.pattern === 'grid'
   const usesImage = environment.type === 'image'
-  const followsTheme = !environmentTone || environmentTone === 'auto'
-  const dark =
-    environmentTone && environmentTone !== 'auto' ? environmentTone === 'dark' : themeDark
   const material = useMemo(
     () =>
       new ShaderMaterial({
@@ -200,7 +209,11 @@ export function TransmissionEnvironment({
         fragmentShader: environmentFragmentShader,
         toneMapped: false,
         uniforms: {
-          uDark: { value: dark ? 1 : 0 },
+          uDark: { value: theme.dark ? 1 : 0 },
+          uThemeBackground: { value: fluidGlassDisplayColor(theme.background) },
+          uThemeSurface: { value: fluidGlassDisplayColor(theme.surface) },
+          uThemePrimary: { value: fluidGlassDisplayColor(theme.primary) },
+          uThemeMuted: { value: fluidGlassDisplayColor(theme.muted) },
           uEnvironment: { value: texture },
           uPattern: {
             value: pattern ? 1 : 0,
@@ -209,23 +222,8 @@ export function TransmissionEnvironment({
         },
         vertexShader: environmentVertexShader,
       }),
-    [dark, pattern, texture, usesImage],
+    [theme, pattern, texture, usesImage],
   )
-
-  useEffect(() => {
-    if (!followsTheme) return
-    const updateDarkMode = () =>
-      setThemeDark(
-        document.documentElement.dataset.resolvedMode === 'dark' ||
-          document.documentElement.classList.contains('dark'),
-      )
-    const observer = new MutationObserver(updateDarkMode)
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class', 'data-resolved-mode'],
-    })
-    return () => observer.disconnect()
-  }, [followsTheme])
 
   useEffect(() => () => material.dispose(), [material])
 
@@ -277,10 +275,6 @@ export function FramebufferDiagnostic({
   )
 }
 
-// The whole transmission pipeline is raw-sRGB passthrough (matching the SDF
-// renderer and the DOM backdrop): textures carry sRGB values undecoded, the
-// renderer output stays linear (no encode), so environment pixels reach the
-// canvas byte-identical outside the lens and single-sampled inside it.
 export function updateRenderTargetColorSpace(target: WebGLRenderTarget) {
   target.texture.colorSpace = NoColorSpace
   target.texture.minFilter = LinearFilter

@@ -1,4 +1,4 @@
-import { resolveTargetRadius, toGroupRelativeRect } from '../geometry'
+import { paddingBoxOrigin, resolveTargetRadius, toGroupRelativeRect } from '../geometry'
 import type {
   FluidGlassBehavior,
   FluidGlassRadius,
@@ -468,7 +468,8 @@ export class TargetRegistry {
     sourceTargetId: string | null,
   ) {
     if (!this.group || tokens.length === 0) return
-    const groupRect = this.group.getBoundingClientRect()
+
+    const groupRect = paddingBoxOrigin(this.group)
     let applied = false
 
     for (const token of tokens) {

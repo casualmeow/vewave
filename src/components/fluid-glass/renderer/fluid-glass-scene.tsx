@@ -3,8 +3,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { TextureLoader, Vector2, Vector4, type ShaderMaterial, type Texture } from 'three'
 
 import { FLUID_GLASS_MATERIAL_PRESETS, resolveFluidGlassQuality } from '../constants'
-import { fluidGlassFragmentShader } from '../shaders/fluid-glass.frag'
+
+import { fluidGlassFragmentShader } from '../shaders/fluid-glass.frag.ts'
 import { fluidGlassVertexShader } from '../shaders/fluid-glass.vert'
+import { fluidGlassDisplayColor, useFluidGlassTheme } from './fluid-glass-theme'
 import type {
   FluidGlassDebugView,
   FluidGlassEnvironmentSource,
@@ -12,6 +14,7 @@ import type {
   FluidGlassQuality,
   FluidGlassTelemetry,
 } from '../types'
+import type { LensStateAdapter } from '../lens/lens-state'
 import type { FluidGlassStore } from './store'
 
 const debugViewValues: Record<FluidGlassDebugView, number> = {
@@ -54,6 +57,7 @@ function smoothstep(edge0: number, edge1: number, value: number) {
 export function FluidGlassScene({
   environment,
   debugView,
+  lens: lensState,
   lightDirection,
   material,
   onFailure,
@@ -63,6 +67,8 @@ export function FluidGlassScene({
 }: {
   environment: FluidGlassEnvironmentSource
   debugView: FluidGlassDebugView
+
+  lens: LensStateAdapter
   lightDirection: readonly [number, number]
   material: FluidGlassMaterial
   onFailure: () => void
@@ -78,11 +84,7 @@ export function FluidGlassScene({
   const lastTelemetryAt = useRef(0)
   const [texture, setTexture] = useState<Texture | null>(null)
   const resolvedQuality = resolveFluidGlassQuality(quality)
-  const initialDark =
-    environment.type === 'theme' && environment.tone !== 'auto'
-      ? environment.tone === 'dark'
-      : document.documentElement.dataset.resolvedMode === 'dark' ||
-        document.documentElement.classList.contains('dark')
+  const theme = useFluidGlassTheme(environment, gl.domElement)
 
   const uniforms = useMemo(
     () => ({
@@ -99,7 +101,13 @@ export function FluidGlassScene({
       uVelocity: { value: new Vector2(0, 0) },
       uShape: { value: 0 },
       uSamples: { value: resolvedQuality.scatterSamples },
-      uDark: { value: initialDark ? 1 : 0 },
+      uDark: { value: theme.dark ? 1 : 0 },
+      uThemeBackground: { value: fluidGlassDisplayColor(theme.background) },
+      uThemeSurface: { value: fluidGlassDisplayColor(theme.surface) },
+      uThemePrimary: { value: fluidGlassDisplayColor(theme.primary) },
+      uThemeMuted: { value: fluidGlassDisplayColor(theme.muted) },
+      uTintColor: { value: fluidGlassDisplayColor(theme.tint) },
+      uReflectionColor: { value: fluidGlassDisplayColor(theme.reflection) },
       uPattern: { value: environment.type === 'theme' && environment.pattern === 'grid' ? 1 : 0 },
       uUseImage: { value: 0 },
       uEnvironment: { value: null as Texture | null },
@@ -125,10 +133,10 @@ export function FluidGlassScene({
       uLightDirection: { value: new Vector2(lightDirection[0], lightDirection[1]) },
       uDebugView: { value: debugViewValues[debugView] },
     }),
-    [debugView, environment, initialDark, lightDirection, material, resolvedQuality.scatterSamples],
+    [debugView, environment, theme, lightDirection, material, resolvedQuality.scatterSamples],
   )
 
-  useEffect(() => store.subscribe(invalidate), [invalidate, store])
+  useEffect(() => lensState.subscribe(invalidate), [invalidate, lensState])
 
   useEffect(() => {
     const canvas = gl.domElement
@@ -183,35 +191,28 @@ export function FluidGlassScene({
 
   useEffect(() => () => texture?.dispose(), [texture])
 
-  useEffect(() => {
-    const root = document.documentElement
-    const updateTheme = () => {
-      const explicitTone = environment.type === 'theme' ? environment.tone : 'auto'
-      const dark =
-        explicitTone === 'dark' ||
-        (explicitTone !== 'light' &&
-          (root.dataset.resolvedMode === 'dark' || root.classList.contains('dark')))
-          ? 1
-          : 0
-      const pattern = environment.type === 'theme' && environment.pattern === 'grid' ? 1 : 0
-      uniforms.uDark.value = dark
-      uniforms.uPattern.value = pattern
-      if (materialRef.current) {
-        materialRef.current.uniforms.uDark.value = dark
-        materialRef.current.uniforms.uPattern.value = pattern
-      }
-      invalidate()
-    }
-    const observer = new MutationObserver(updateTheme)
-    observer.observe(root, { attributes: true, attributeFilter: ['class', 'data-resolved-mode'] })
-    updateTheme()
-    return () => observer.disconnect()
-  }, [environment, invalidate, uniforms])
+  useEffect(() => invalidate(), [invalidate, uniforms])
 
   useFrame(({ clock }) => {
     if (!materialRef.current) return
     const materialUniforms = materialRef.current.uniforms
-    const lens = store.current
+    const snapshot = lensState.read()
+
+    const lens = {
+      ...store.current,
+      x: snapshot.current.x,
+      y: snapshot.current.y,
+      width: snapshot.current.width,
+      height: snapshot.current.height,
+      radius: snapshot.current.radius,
+      shape: snapshot.current.shape,
+      opacity: snapshot.opacity,
+      scaleX: snapshot.motion.scaleX,
+      scaleY: snapshot.motion.scaleY,
+      velocityX: snapshot.motion.velocityX,
+      velocityY: snapshot.motion.velocityY,
+      interactionEnergy: snapshot.motion.energy,
+    }
     const width = lens.width * lens.scaleX
     const height = lens.height * lens.scaleY
     const drawingBufferSize = gl.getDrawingBufferSize(framebufferSize.current)

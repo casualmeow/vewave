@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import type { GlassMotion } from '@/shared/theme/contract'
 
 export type FluidGlassShape = 'rounded-rect' | 'capsule' | 'circle'
 
@@ -238,6 +239,7 @@ export type FluidGlassTransitionDebugSnapshot = {
 export type FluidGlassEnvironmentSource =
   | { type: 'theme'; pattern?: 'calm' | 'grid'; tone?: 'auto' | 'light' | 'dark' }
   | { type: 'image'; src: string }
+  | { type: 'auto-dom' }
 
 export type FluidGlassBackend = 'css' | 'sdf' | 'transmission'
 
@@ -263,6 +265,8 @@ export type FluidGlassGroupProps = {
   activation?: 'always' | 'appearance'
   forceFallback?: boolean
   simulateReducedMotion?: boolean
+
+  motion?: 'auto' | GlassMotion
   material?: Partial<FluidGlassMaterial>
   materialPreset?: FluidGlassMaterialPreset
   transmissionMaterial?: Partial<FluidTransmissionMaterial>

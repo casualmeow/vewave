@@ -105,6 +105,37 @@ describe('fluid glass multi-scope ownership topology', () => {
     vi.unstubAllGlobals()
   })
 
+  it('keeps a committed sidebar selection while the pointer crosses other rows and footer items', () => {
+    render(
+      <FluidGlassGroup activation="always" forceFallback simulateReducedMotion>
+        <FluidGlassTarget
+          id="room-current"
+          scopeId="sidebar"
+          behaviors={['selection']}
+          active
+          asChild
+        >
+          <button>Current room</button>
+        </FluidGlassTarget>
+        <FluidGlassTarget id="room-other" scopeId="sidebar" behaviors={['selection']} asChild>
+          <button>Other room</button>
+        </FluidGlassTarget>
+        <FluidGlassTarget id="settings" scopeId="sidebar" behaviors={['selection']} asChild>
+          <button>Settings</button>
+        </FluidGlassTarget>
+        <StoreProbe />
+      </FluidGlassGroup>,
+    )
+    for (const label of ['Other room', 'Settings', 'Current room', 'Other room']) {
+      const row = screen.getByRole('button', { name: label })
+      fireEvent.pointerEnter(row)
+      fireEvent.pointerMove(row)
+      expect(capturedStore?.resolvedTarget?.id).toBe('room-current')
+      fireEvent.pointerLeave(row)
+      expect(capturedStore?.activeTargetsByScope.sidebar).toBe('room-current')
+    }
+  })
+
   it('keeps sidebar membership without allowing its rerender or measurement to reclaim tabs', async () => {
     const { rerender } = render(<MultiScopeTopology broadcastRevision={0} />)
     const broadcast = screen.getByRole('button', { name: 'Broadcasts' })

@@ -14,6 +14,18 @@ export function resolveTargetRadius(
   return Number.isFinite(computedRadius) ? Math.min(computedRadius, width / 2, height / 2) : 0
 }
 
+export function paddingBoxOrigin(element: Element): { left: number; top: number } {
+  const rect = element.getBoundingClientRect()
+  if (typeof window === 'undefined' || typeof window.getComputedStyle !== 'function') {
+    return { left: rect.left, top: rect.top }
+  }
+  const style = window.getComputedStyle(element)
+  return {
+    left: rect.left + (Number.parseFloat(style.borderLeftWidth) || 0),
+    top: rect.top + (Number.parseFloat(style.borderTopWidth) || 0),
+  }
+}
+
 export function toGroupRelativeRect(
   targetRect: Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>,
   groupRect: Pick<DOMRect, 'left' | 'top'>,

@@ -2,7 +2,7 @@ import type { Color, ShaderMaterial } from 'three'
 
 import type { FluidGlassDebugView, FluidTransmissionMaterial } from '../types'
 
-export const depthHeatmapVertexShader = /* glsl */ `
+export const depthHeatmapVertexShader = `
   varying float vDepth;
 
   void main() {
@@ -11,7 +11,7 @@ export const depthHeatmapVertexShader = /* glsl */ `
   }
 `
 
-export const depthHeatmapFragmentShader = /* glsl */ `
+export const depthHeatmapFragmentShader = `
   varying float vDepth;
 
   void main() {
@@ -85,9 +85,6 @@ export function isNeutralTransmissionMaterial(material: FluidTransmissionMateria
   )
 }
 
-// Reflection and shadow are support layers on top of clear transmission; every
-// isolation debug view and the strict neutral material must render pure
-// transmission with all of them off.
 export function resolveTransmissionSupportLayers(
   debugView: FluidGlassDebugView,
   material: FluidTransmissionMaterial,
@@ -119,13 +116,7 @@ export function patchTransmissionMaterial(instance: TransmissionMaterialInstance
         `uniform sampler2D buffer;
         uniform float uFluidGlassDebugMode;`,
       )
-      .replace(
-        // The renderer uses an orthographic camera; drei's perspective-style
-        // view vector (cameraPosition - pos) tilts incident rays up to ~80°
-        // near the canvas edges, which smears the transmitted sample sideways.
-        'vec3 v = normalize( cameraPosition - pos );',
-        'vec3 v = vec3(0.0, 0.0, 1.0);',
-      )
+      .replace('vec3 v = normalize( cameraPosition - pos );', 'vec3 v = vec3(0.0, 0.0, 1.0);')
       .replace(
         'vec3 n = inverseTransformDirection( normal, viewMatrix );',
         `vec3 n = inverseTransformDirection( normal, viewMatrix );
@@ -143,12 +134,8 @@ export function patchTransmissionMaterial(instance: TransmissionMaterialInstance
       )
       .replace(
         'totalDiffuse = mix( totalDiffuse, transmission.rgb, material.transmission );',
-        `// Composition contract: inside the lens the refracted environment sample
-        // (transmission.rgb) IS the base image — material.transmission is 1, so the
-        // diffuse term is replaced entirely and the fragment writes alpha 1 over
-        // the transparent canvas. The calm center comes from near-zero UV
-        // displacement at the flat lens center, never from blending the
-        // un-refracted backdrop back in at a low contribution.
+        `
+
         float transmissionLuminance = dot(transmission.rgb, vec3(0.2126, 0.7152, 0.0722));
         vec3 dispersionContribution = clamp(
           abs(transmission.rgb - vec3(transmissionLuminance)) * 5.0,
