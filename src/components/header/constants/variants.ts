@@ -21,37 +21,37 @@ export const headerVariants = cva(
       variant: {
         glass: [
           'border-[color:var(--glass-border)] bg-[var(--glass-background)] text-header-foreground',
-          'shadow-[0_18px_54px_color-mix(in_srgb,var(--foreground)_16%,transparent),inset_0_1px_0_var(--glass-highlight)]',
+          'shadow-[0_18px_54px_color-mix(in_srgb,var(--material-shadow-color)_16%,transparent),inset_0_1px_0_var(--glass-highlight)]',
         ],
         glassDark: [
           'border-[color:var(--glass-border)] bg-[color-mix(in_srgb,var(--background)_72%,transparent)] text-header-foreground',
-          'shadow-[0_16px_48px_color-mix(in_srgb,var(--foreground)_24%,transparent),inset_0_1px_0_var(--glass-highlight)]',
+          'shadow-[0_16px_48px_color-mix(in_srgb,var(--material-shadow-color)_24%,transparent),inset_0_1px_0_var(--glass-highlight)]',
         ],
         glassLight: [
           'border-header-border bg-header text-header-foreground',
-          'shadow-[0_16px_48px_color-mix(in_srgb,var(--foreground)_10%,transparent),inset_0_1px_0_var(--glass-highlight)]',
+          'shadow-[0_16px_48px_color-mix(in_srgb,var(--material-shadow-color)_10%,transparent),inset_0_1px_0_var(--glass-highlight)]',
         ],
         liquidGlass: [
           'border-[color:var(--glass-border)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--glass-highlight)_76%,transparent),var(--glass-background)_44%,color-mix(in_srgb,var(--accent)_24%,transparent)_100%)] text-header-foreground',
-          'shadow-[0_26px_84px_color-mix(in_srgb,var(--foreground)_20%,transparent),0_10px_28px_color-mix(in_srgb,var(--accent)_14%,transparent),inset_0_1px_0_var(--glass-highlight)]',
+          'shadow-[0_26px_84px_color-mix(in_srgb,var(--material-shadow-color)_20%,transparent),0_10px_28px_color-mix(in_srgb,var(--accent)_14%,transparent),inset_0_1px_0_var(--glass-highlight)]',
           'supports-[backdrop-filter]:bg-[var(--glass-background)]',
         ],
         telegramGlass: [
           'border-[color:var(--glass-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--glass-highlight)_58%,transparent),var(--glass-background))] text-header-foreground',
-          'shadow-[0_18px_64px_color-mix(in_srgb,var(--foreground)_16%,transparent),inset_0_1px_0_var(--glass-highlight)]',
+          'shadow-[0_18px_64px_color-mix(in_srgb,var(--material-shadow-color)_16%,transparent),inset_0_1px_0_var(--glass-highlight)]',
           'supports-[backdrop-filter]:bg-[var(--glass-background)]',
         ],
         solid: [
           'border-border bg-background text-foreground',
-          'shadow-[0_16px_48px_color-mix(in_srgb,var(--foreground)_18%,transparent)]',
+          'shadow-[0_16px_48px_color-mix(in_srgb,var(--material-shadow-color)_18%,transparent)]',
         ],
         gradient: [
           'border-header-border bg-[linear-gradient(135deg,var(--surface-elevated)_0%,var(--background)_100%)] text-header-foreground',
-          'shadow-[0_16px_48px_color-mix(in_srgb,var(--foreground)_24%,transparent)]',
+          'shadow-[0_16px_48px_color-mix(in_srgb,var(--material-shadow-color)_24%,transparent)]',
         ],
         glow: [
           'border-header-border bg-header text-header-foreground',
-          'shadow-[0_16px_48px_color-mix(in_srgb,var(--foreground)_28%,transparent),0_0_56px_color-mix(in_srgb,var(--header-glow)_40%,transparent)]',
+          'shadow-[0_16px_48px_color-mix(in_srgb,var(--material-shadow-color)_28%,transparent),0_0_56px_color-mix(in_srgb,var(--header-glow)_40%,transparent)]',
         ],
       },
     },
@@ -78,7 +78,7 @@ export const headerNavItemVariants = cva(
       },
       active: {
         true: [
-          'bg-[var(--tabs-active)] text-foreground opacity-100 shadow-[0_10px_28px_color-mix(in_srgb,var(--foreground)_12%,transparent),inset_0_1px_0_var(--glass-highlight)]',
+          'bg-[var(--tabs-active)] text-foreground opacity-100 shadow-[0_10px_28px_color-mix(in_srgb,var(--material-shadow-color)_12%,transparent),inset_0_1px_0_var(--glass-highlight)]',
           'backdrop-blur-xl',
         ],
         false:

@@ -12,7 +12,6 @@ import { useAuthStore } from '@/modules/auth'
 import { rememberCreatedRoom } from '@/modules/watch-together/room'
 import {
   Button,
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
@@ -24,6 +23,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  GlassSurface,
   Input,
 } from '@/shared/ui'
 
@@ -209,20 +209,24 @@ export function CreateRoomForm({ onCreated, variant = 'card' }: CreateRoomFormPr
 
   if (variant === 'firstRun') {
     return (
-      <Card className="w-full">
+      <GlassSurface role="form" elevation="embedded" className="w-full rounded-xl border py-6">
         <CardContent className="pt-6">{formContent}</CardContent>
-      </Card>
+      </GlassSurface>
     )
   }
 
   return (
-    <Card className="w-full max-w-3xl">
+    <GlassSurface
+      role="form"
+      elevation="embedded"
+      className="flex w-full max-w-3xl flex-col gap-6 rounded-xl border py-6"
+    >
       <CardHeader>
         <CardTitle>Room details</CardTitle>
         <CardDescription>Add a room name and video link.</CardDescription>
       </CardHeader>
       <CardContent>{formContent}</CardContent>
-    </Card>
+    </GlassSurface>
   )
 }
 

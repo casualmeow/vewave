@@ -7,7 +7,7 @@ import {
   useRoomSnapshot,
 } from '../hooks'
 import { useRoomPreferences, useRoomStore } from '../model'
-import { getRoomOverlayStyle } from './room-chrome'
+import { getRoomOverlayStyle, roomOverlayClassName } from './room-chrome'
 import { RoomDrawer, useIsDesktop } from './room-drawer'
 import { RoomHeader, RoomMenu, RoomParticipantsButton } from './room-header'
 import { RoomInvite } from './room-invite'
@@ -18,6 +18,7 @@ import { RoomStage } from './room-stage'
 import { RoomWorkspace } from './room-workspace'
 import type { EmbeddedPlayerController, EmbeddedPlayerInfo } from '../player'
 import { getApiErrorMessage } from '@/core/api/http/errors'
+import { cn } from '@/shared/lib/utils'
 
 type RoomPageProps = {
   code: string
@@ -139,7 +140,10 @@ export function RoomPage({ code }: RoomPageProps) {
           drawerOpen={drawerOpen}
           topLeft={<RoomSidebarToggle variant="media" style={overlayStyle} />}
           topRight={({ setInteracting }) => (
-            <div className="flex h-9 items-center gap-1 px-1" style={overlayStyle}>
+            <div
+              className={cn(roomOverlayClassName, 'flex h-9 items-center gap-1 px-1')}
+              style={overlayStyle}
+            >
               <RoomParticipantsButton
                 count={participantCount}
                 variant="media"

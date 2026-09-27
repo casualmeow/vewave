@@ -18,17 +18,10 @@ import {
   SidebarSection,
   useStudioSidebar,
 } from '@/components/sidebar'
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from '@/shared/ui'
+import { Dialog, DialogTrigger, Sheet, SheetContent, SheetTrigger } from '@/shared/ui'
 import { VewaveLogoMark } from '@/shared/theme'
 import { cn } from '@/shared/lib/utils'
+import { FluidGlassGroup } from '@/components/fluid-glass'
 
 export function StudioSidebar({ className }: { className?: string }) {
   const location = useLocation()
@@ -38,6 +31,7 @@ export function StudioSidebar({ className }: { className?: string }) {
 
   return (
     <Sidebar
+      motion="none"
       mobileDockItems={mobileDockItems}
       mobileDockPathname={dockPathname}
       mobileDockPlacement="app"
@@ -64,38 +58,46 @@ export function StudioSidebar({ className }: { className?: string }) {
           }
         />
 
-        <SidebarSection title="Studio">
-          {studioNavigationItems.map((item) => {
-            const Icon = item.icon
-            const active = isStudioSidebarItemActive(location.pathname, item.to)
+        <FluidGlassGroup environment={{ type: 'auto-dom' }} className="fluid-glass-navigation">
+          <SidebarSection title="Studio">
+            {studioNavigationItems.map((item) => {
+              const Icon = item.icon
+              const active = isStudioSidebarItemActive(location.pathname, item.to)
 
-            return (
-              <SidebarItem key={item.to} asChild active={active} value={item.to} badge={item.badge}>
-                <Link to={item.to}>
-                  <SidebarItemIcon>
-                    <Icon />
-                  </SidebarItemIcon>
-                  <SidebarItemLabel>{item.label}</SidebarItemLabel>
-                  {active ? (
-                    <span className="ml-auto inline-flex items-center rounded-full border border-border bg-background px-2 py-0.5 text-[0.64rem] font-semibold uppercase tracking-[0.12em] text-sidebar-foreground shadow-sm">
-                      Current
-                    </span>
-                  ) : null}
-                  {item.badge ? (
-                    <span
-                      className={cn(
-                        'rounded-full bg-primary px-2 py-0.5 text-[0.68rem] font-semibold leading-none text-primary-foreground shadow-sm',
-                        active ? 'ml-1' : 'ml-auto',
-                      )}
-                    >
-                      {item.badge}
-                    </span>
-                  ) : null}
-                </Link>
-              </SidebarItem>
-            )
-          })}
-        </SidebarSection>
+              return (
+                <SidebarItem
+                  key={item.to}
+                  asChild
+                  active={active}
+                  value={item.to}
+                  badge={item.badge}
+                >
+                  <Link to={item.to}>
+                    <SidebarItemIcon>
+                      <Icon />
+                    </SidebarItemIcon>
+                    <SidebarItemLabel>{item.label}</SidebarItemLabel>
+                    {active ? (
+                      <span className="ml-auto inline-flex items-center rounded-full border border-border bg-background px-2 py-0.5 text-[0.64rem] font-semibold uppercase tracking-[0.12em] text-sidebar-foreground shadow-sm">
+                        Current
+                      </span>
+                    ) : null}
+                    {item.badge ? (
+                      <span
+                        className={cn(
+                          'rounded-full bg-primary px-2 py-0.5 text-[0.68rem] font-semibold leading-none text-primary-foreground shadow-sm',
+                          active ? 'ml-1' : 'ml-auto',
+                        )}
+                      >
+                        {item.badge}
+                      </span>
+                    ) : null}
+                  </Link>
+                </SidebarItem>
+              )
+            })}
+          </SidebarSection>
+        </FluidGlassGroup>
       </div>
 
       <SidebarFooter>
@@ -105,10 +107,7 @@ export function StudioSidebar({ className }: { className?: string }) {
               Settings
             </SidebarItem>
           </DialogTrigger>
-          <DialogContent className="flex min-h-[80vh] min-w-[60vw] flex-col">
-            <DialogTitle>Settings</DialogTitle>
-            <StudioSettingsDialog />
-          </DialogContent>
+          <StudioSettingsDialog />
         </Dialog>
 
         <Sheet>

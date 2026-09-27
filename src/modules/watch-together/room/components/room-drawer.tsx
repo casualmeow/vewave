@@ -2,7 +2,7 @@ import { Pin, PinOff, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/utils'
-import { Button, Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/ui'
+import { Button, GlassSurface, Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/ui'
 
 const desktopQuery = '(min-width: 768px)'
 
@@ -32,12 +32,6 @@ type RoomDrawerProps = {
   children: ReactNode
 }
 
-/**
- * Contextual host for the room panel in immersive view. On desktop it slides
- * in from the right and can overlay the stage or pin beside it; on small
- * screens it becomes a non-modal bottom sheet so playback controls stay
- * reachable. Escape closes the unpinned drawer.
- */
 export function RoomDrawer({
   open,
   pinned,
@@ -85,38 +79,45 @@ export function RoomDrawer({
   }
 
   return (
-    <aside
-      ref={panelRef}
-      aria-label="Room panel"
-      className={cn(
-        'z-20 flex h-full w-[min(380px,85vw)] shrink-0 flex-col border-l border-border bg-background',
-        pinned ? 'relative' : 'absolute inset-y-0 right-0 shadow-lg',
-      )}
+    <GlassSurface
+      asChild
+      role="sheet"
+      thickness="thick"
+      elevation={pinned ? 'embedded' : 'floating'}
     >
-      <div className="flex shrink-0 items-center justify-end gap-1 px-3 pt-2">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="size-7 text-muted-foreground"
-          aria-label={pinned ? 'Unpin panel' : 'Pin panel beside the video'}
-          aria-pressed={pinned}
-          onClick={onTogglePinned}
-        >
-          {pinned ? <PinOff className="size-4" /> : <Pin className="size-4" />}
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="size-7 text-muted-foreground"
-          aria-label="Close room panel"
-          onClick={onClose}
-        >
-          <X className="size-4" />
-        </Button>
-      </div>
-      <div className="min-h-0 flex-1 px-3 pb-3">{children}</div>
-    </aside>
+      <aside
+        ref={panelRef}
+        aria-label="Room panel"
+        className={cn(
+          'z-20 flex h-full w-[min(380px,85vw)] shrink-0 flex-col border-l',
+          pinned ? 'relative' : 'absolute inset-y-0 right-0',
+        )}
+      >
+        <div className="flex shrink-0 items-center justify-end gap-1 px-3 pt-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-7 text-muted-foreground"
+            aria-label={pinned ? 'Unpin panel' : 'Pin panel beside the video'}
+            aria-pressed={pinned}
+            onClick={onTogglePinned}
+          >
+            {pinned ? <PinOff className="size-4" /> : <Pin className="size-4" />}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-7 text-muted-foreground"
+            aria-label="Close room panel"
+            onClick={onClose}
+          >
+            <X className="size-4" />
+          </Button>
+        </div>
+        <div className="min-h-0 flex-1 px-3 pb-3">{children}</div>
+      </aside>
+    </GlassSurface>
   )
 }

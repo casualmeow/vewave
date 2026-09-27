@@ -9,6 +9,7 @@ import type { MotionStyle } from 'motion/react'
 import type { SidebarResolvedFluidConfig } from '../types'
 import type { MobileSidebarDockItem } from './mobile-sidebar-dock'
 import { cn } from '@/shared/lib/utils'
+import { FluidGlassTarget } from '@/components/fluid-glass'
 
 type MobileDockStyle = MotionStyle & Record<`--${string}`, string | number>
 
@@ -21,6 +22,7 @@ interface MobileSidebarDockItemProps {
   refractionId: string
   config: SidebarResolvedFluidConfig
   canAnimate: boolean
+  sharedLens: boolean
   showLiquidEffects: boolean
   canTrackPointer: boolean
   effectiveFocusedItemKey: string | null
@@ -36,6 +38,7 @@ export function MobileSidebarDockButton({
   refractionId,
   config,
   canAnimate,
+  sharedLens,
   showLiquidEffects,
   canTrackPointer,
   effectiveFocusedItemKey,
@@ -116,12 +119,12 @@ export function MobileSidebarDockButton({
     resetFluidTransform()
   }
 
-  return (
+  const shell = (
     <motion.div
       data-slot="mobile-sidebar-dock-item-shell"
       data-focused={effectiveFocusedItemKey === itemKey ? 'true' : 'false'}
       data-deemphasized={hasFocusedSibling ? 'true' : 'false'}
-      className="group/mobile-dock-item relative isolate min-w-0 [--dock-item-glow-opacity:0] [--dock-item-pointer-x:50%] [--dock-item-pointer-y:50%]"
+      className="group/mobile-dock-item relative isolate min-w-0 rounded-[1.55rem] [--dock-item-glow-opacity:0] [--dock-item-pointer-x:50%] [--dock-item-pointer-y:50%]"
       style={itemStyle}
       animate={
         canAnimate
@@ -196,7 +199,7 @@ export function MobileSidebarDockButton({
         />
       ) : null}
 
-      {active && !showLiquidEffects ? (
+      {active && !showLiquidEffects && !sharedLens ? (
         <span
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 rounded-[1.55rem] border border-[color:var(--glass-border)] bg-sidebar-accent shadow-sm"
@@ -209,7 +212,7 @@ export function MobileSidebarDockButton({
         <motion.span
           layoutId={active && canAnimate ? `${scopeId}-mobile-active-dock-item` : undefined}
           aria-hidden="true"
-          className="pointer-events-none absolute overflow-hidden rounded-[1.55rem] border border-[color:var(--glass-border)] bg-[radial-gradient(circle_at_var(--dock-item-pointer-x)_var(--dock-item-pointer-y),var(--glass-highlight),transparent_36%),linear-gradient(135deg,var(--sidebar-accent),var(--glass-background)_52%,color-mix(in_srgb,var(--accent)_28%,transparent))] shadow-[0_18px_44px_color-mix(in_srgb,var(--accent)_22%,transparent),0_8px_22px_color-mix(in_srgb,var(--foreground)_15%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-xl backdrop-saturate-200"
+          className="pointer-events-none absolute overflow-hidden rounded-[1.55rem] border border-[color:var(--glass-border)] bg-[radial-gradient(circle_at_var(--dock-item-pointer-x)_var(--dock-item-pointer-y),var(--glass-highlight),transparent_36%),linear-gradient(135deg,var(--sidebar-accent),var(--glass-background)_52%,color-mix(in_srgb,var(--accent)_28%,transparent))] shadow-[0_18px_44px_color-mix(in_srgb,var(--accent)_22%,transparent),0_8px_22px_color-mix(in_srgb,var(--material-shadow-color)_15%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-xl backdrop-saturate-200"
           style={{ filter: `url(#${refractionId})` }}
           initial={
             canAnimate ? { opacity: 0, scale: 0.76, top: 0, right: 0, bottom: 0, left: 0 } : false
@@ -263,6 +266,7 @@ export function MobileSidebarDockButton({
         aria-disabled={item.disabled || undefined}
         tabIndex={item.disabled ? -1 : undefined}
         className={cn(
+          sharedLens && 'glass-control',
           'relative z-10 flex min-h-[4.25rem] min-w-0 flex-col items-center justify-center gap-1 rounded-[1.55rem] px-1.5 py-2 text-[0.67rem] font-semibold leading-none outline-none transition-colors',
           'focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
           active
@@ -288,5 +292,19 @@ export function MobileSidebarDockButton({
         <span className="max-w-full truncate">{item.shortLabel ?? item.label}</span>
       </Link>
     </motion.div>
+  )
+
+  return sharedLens ? (
+    <FluidGlassTarget
+      id={itemKey}
+      active={active && !item.disabled}
+      behaviors={['selection']}
+      radius="inherit"
+      asChild
+    >
+      {shell}
+    </FluidGlassTarget>
+  ) : (
+    shell
   )
 }

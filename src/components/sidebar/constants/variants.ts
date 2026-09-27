@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority'
+import { glassSurfaceVariants } from '@/shared/ui/glass-surface'
 
 export const SIDEBAR_SOFT_TRANSITION = {
   type: 'spring',
@@ -102,15 +103,14 @@ export const sidebarRootVariants = cva(
     variants: {
       design: {
         solid: 'border-sidebar-border bg-sidebar shadow-sm',
-        glass:
-          'border-[color:var(--glass-border)] bg-[var(--glass-background)] shadow-[0_18px_48px_color-mix(in_srgb,var(--foreground)_10%,transparent)] backdrop-blur-[var(--glass-blur-base,16px)]',
+        glass: glassSurfaceVariants({ role: 'navigation', elevation: 'embedded' }),
         liquidGlass: [
           'border-[color:var(--glass-border)] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--glass-highlight)_72%,transparent),var(--glass-background)_46%,color-mix(in_srgb,var(--accent)_24%,transparent)_100%)]',
-          'shadow-[0_34px_96px_color-mix(in_srgb,var(--foreground)_22%,transparent),0_12px_36px_color-mix(in_srgb,var(--accent)_14%,transparent),inset_0_1px_0_var(--glass-highlight)]',
+          'shadow-[0_34px_96px_color-mix(in_srgb,var(--material-shadow-color)_22%,transparent),0_12px_36px_color-mix(in_srgb,var(--accent)_14%,transparent),inset_0_1px_0_var(--glass-highlight)]',
           'backdrop-blur-2xl backdrop-saturate-200 supports-[backdrop-filter]:bg-[var(--glass-background)]',
         ],
         fluent:
-          'border-sidebar-border bg-[linear-gradient(135deg,var(--sidebar),var(--surface-elevated))] shadow-[0_18px_55px_color-mix(in_srgb,var(--foreground)_11%,transparent)] backdrop-blur-xl',
+          'border-sidebar-border bg-[linear-gradient(135deg,var(--sidebar),var(--surface-elevated))] shadow-[0_18px_55px_color-mix(in_srgb,var(--material-shadow-color)_11%,transparent)] backdrop-blur-xl',
       },
       size: {
         sm: 'w-56',
@@ -222,10 +222,10 @@ export const sidebarActiveIndicatorVariants = cva(
       design: {
         solid: 'border-sidebar-border bg-sidebar-accent shadow-sm',
         glass:
-          'border-[color:var(--glass-border)] bg-sidebar-accent shadow-[0_10px_24px_color-mix(in_srgb,var(--foreground)_8%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-md',
+          'border-[color:var(--glass-border)] bg-sidebar-accent shadow-[0_10px_24px_color-mix(in_srgb,var(--material-shadow-color)_8%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-md',
         liquidGlass: [
           'border-[color:var(--glass-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--glass-highlight)_72%,transparent),var(--sidebar-accent))]',
-          'shadow-[0_10px_24px_color-mix(in_srgb,var(--foreground)_10%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-lg',
+          'shadow-[0_10px_24px_color-mix(in_srgb,var(--material-shadow-color)_10%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-lg',
         ],
         fluent:
           'border-sidebar-border bg-sidebar-accent shadow-[inset_3px_0_0_var(--sidebar-primary),0_8px_22px_color-mix(in_srgb,var(--sidebar-primary)_14%,transparent)]',

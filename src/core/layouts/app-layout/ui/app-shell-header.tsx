@@ -3,9 +3,8 @@ import { getNextAppSidebarMode, type AppSidebarMode } from '../app-sidebar-mode'
 import type { ReactNode } from 'react'
 
 import type { AppShellSurfaceRenderer } from './app-shell-surfaces'
-import { useLiquidGlassRefraction } from '@/shared/hooks'
 import { cn } from '@/shared/lib/utils'
-import { useAppearance } from '@/shared/theme'
+import { GlassSurface } from '@/shared/ui/glass-surface'
 
 type AppShellHeaderProps = {
   actions?: ReactNode
@@ -38,69 +37,54 @@ export function AppShellHeader({
 }: AppShellHeaderProps) {
   const wrapSurface = (surface: Parameters<AppShellSurfaceRenderer>[0], children: ReactNode) =>
     renderSurface ? renderSurface(surface, children) : children
-  const { settings } = useAppearance()
-  const glassShell = settings.surfaceStyle === 'glass'
-  const refraction = useLiquidGlassRefraction({
-    enabled: glassShell && settings.experimentalRefraction,
-    radius: 0,
-    edgeWidth: 16,
-    refraction: 18,
-    scattering: 6,
-  })
 
   return (
-    <header
-      ref={refraction.ref}
-      data-glass-shell-header
-      data-liquid-glass-active={refraction.active || undefined}
-      style={refraction.style}
-      {...(refraction.active ? refraction.handlers : {})}
-      className={cn(
-        'flex min-h-16 shrink-0 items-center justify-between gap-4 border-b border-border/70 px-5',
-        refraction.active && 'glass-material-liquid',
-      )}
-    >
-      {refraction.filterNode}
-      <div className="flex min-w-0 items-center gap-3">
-        {sidebarMode && onSidebarModeChange
-          ? wrapSurface(
-              'headerSidebarToggle',
-              <button
-                type="button"
-                className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground outline-none transition-[background-color,color,box-shadow] hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
-                aria-label={sidebarModeLabels[sidebarMode]}
-                title={sidebarModeLabels[sidebarMode]}
-                onClick={() => onSidebarModeChange(getNextAppSidebarMode(sidebarMode))}
-              >
-                <span className="relative grid size-4 place-items-center" aria-hidden>
-                  {sidebarModeIcons.map(({ mode, icon: Icon }) => (
-                    <Icon
-                      key={mode}
-                      className={cn(
-                        'col-start-1 row-start-1 size-4 transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none',
-                        mode === sidebarMode ? 'scale-100 opacity-100' : 'scale-[0.55] opacity-0',
-                      )}
-                    />
-                  ))}
-                </span>
-              </button>,
-            )
+    <GlassSurface asChild role="header" thickness="thin" elevation="embedded">
+      <header
+        data-glass-shell-header
+        className="flex min-h-16 shrink-0 items-center justify-between gap-4 border-b px-5"
+      >
+        <div className="flex min-w-0 items-center gap-3">
+          {sidebarMode && onSidebarModeChange
+            ? wrapSurface(
+                'headerSidebarToggle',
+                <button
+                  type="button"
+                  className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground outline-none transition-[background-color,color,box-shadow] hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+                  aria-label={sidebarModeLabels[sidebarMode]}
+                  title={sidebarModeLabels[sidebarMode]}
+                  onClick={() => onSidebarModeChange(getNextAppSidebarMode(sidebarMode))}
+                >
+                  <span className="relative grid size-4 place-items-center" aria-hidden>
+                    {sidebarModeIcons.map(({ mode, icon: Icon }) => (
+                      <Icon
+                        key={mode}
+                        className={cn(
+                          'col-start-1 row-start-1 size-4 transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none',
+                          mode === sidebarMode ? 'scale-100 opacity-100' : 'scale-[0.55] opacity-0',
+                        )}
+                      />
+                    ))}
+                  </span>
+                </button>,
+              )
+            : null}
+          {wrapSurface(
+            'headerTitle',
+            <div className="min-w-0">
+              <p className="text-xs font-medium uppercase tracking-[0.22em] text-primary">
+                {eyebrow}
+              </p>
+              <h1 className="truncate text-lg font-semibold tracking-tight text-foreground">
+                {title}
+              </h1>
+            </div>,
+          )}
+        </div>
+        {actions
+          ? wrapSurface('headerActions', <div className="flex items-center gap-2">{actions}</div>)
           : null}
-        {wrapSurface(
-          'headerTitle',
-          <div className="min-w-0">
-            <p className="text-xs font-medium uppercase tracking-[0.22em] text-primary">
-              {eyebrow}
-            </p>
-            <h1 className="truncate text-lg font-semibold tracking-tight text-foreground">
-              {title}
-            </h1>
-          </div>,
-        )}
-      </div>
-      {actions
-        ? wrapSurface('headerActions', <div className="flex items-center gap-2">{actions}</div>)
-        : null}
-    </header>
+      </header>
+    </GlassSurface>
   )
 }

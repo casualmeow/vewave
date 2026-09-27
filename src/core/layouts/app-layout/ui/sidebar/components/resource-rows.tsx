@@ -218,6 +218,7 @@ export function SidebarRoomListItem({
         id={glassId}
         scopeId={`sidebar:${scopeId}`}
         active={active}
+        behaviors={['selection']}
         shape="rounded-rect"
         radius="inherit"
         asChild
@@ -226,6 +227,7 @@ export function SidebarRoomListItem({
           to="/room/$code"
           params={{ code: room.code }}
           aria-current={active ? 'page' : undefined}
+          data-sidebar-hover=""
           className={sidebarInlineRowClassName(active)}
         >
           <Icon className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden />
@@ -265,6 +267,7 @@ export function SidebarServerListItem({
         id={glassId}
         scopeId={`sidebar:${scopeId}`}
         active={active}
+        behaviors={['selection']}
         shape="rounded-rect"
         radius="inherit"
         asChild
@@ -273,6 +276,7 @@ export function SidebarServerListItem({
           to="/servers/$serverId"
           params={{ serverId: server.id }}
           aria-current={active ? 'page' : undefined}
+          data-sidebar-hover=""
           className={sidebarInlineRowClassName(active)}
         >
           <Server className="size-4 shrink-0 text-sidebar-foreground/55" aria-hidden />

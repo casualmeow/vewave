@@ -1,7 +1,7 @@
 import { Maximize, Minimize, Pause, Play, Settings, Volume2, VolumeX } from 'lucide-react'
 import { useState } from 'react'
 import { usePlaybackPosition } from '../hooks/use-playback-position'
-import { formatPlaybackTime } from './room-chrome'
+import { formatPlaybackTime, roomOverlayClassName } from './room-chrome'
 import type { CSSProperties, ReactNode, RefObject } from 'react'
 import type { RoomConnectionStatus, RoomOverlayDensity } from '../model'
 import type { EmbeddedPlayerController, EmbeddedPlayerInfo } from '../player'
@@ -32,19 +32,14 @@ type RoomControlBarProps = {
   onOpenSettings: () => void
   overlayStyle: CSSProperties
   density: RoomOverlayDensity
-  /** Reports open menus so overlay auto-hide pauses while one is open. */
+
   onInteractionChange: (open: boolean) => void
-  /** Local audio commands only work for embedded providers. */
+
   supportsLocalAudio: boolean
 }
 
 const hostOnlyHint = 'Only the room owner or a host can control shared playback.'
 
-/**
- * The single playback-control system for a room. Renders over the stage,
- * distinguishes host commands from local-only controls, and keeps read-only
- * participants informed instead of surprising them with dead buttons.
- */
 export function RoomControlBar({
   playback,
   canControl,
@@ -108,7 +103,11 @@ export function RoomControlBar({
   return (
     <div
       data-room-control-bar
-      className={cn('pointer-events-auto w-full', density === 'comfortable' ? 'p-3' : 'p-2')}
+      className={cn(
+        roomOverlayClassName,
+        'pointer-events-auto w-full',
+        density === 'comfortable' ? 'p-3' : 'p-2',
+      )}
       style={overlayStyle}
     >
       <HostGate allowed={canControl} className="block w-full">
@@ -243,7 +242,6 @@ function DiagnosticRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-/** Wraps host-only controls so read-only participants learn why they are off. */
 function HostGate({
   allowed,
   children,

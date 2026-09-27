@@ -2,7 +2,7 @@ import { ExternalLink, Loader2, PanelRight } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useOverlayVisibility } from '../hooks/use-overlay-visibility'
 import { YouTubePlayer } from '../player'
-import { getRoomOverlayStyle } from './room-chrome'
+import { getRoomOverlayStyle, roomOverlayClassName } from './room-chrome'
 import { RoomControlBar } from './room-control-bar'
 import type { KeyboardEvent, ReactNode, RefObject } from 'react'
 import type { RoomConnectionStatus, RoomPreferences } from '../model'
@@ -26,26 +26,16 @@ type RoomStageProps = {
   playerController: RefObject<EmbeddedPlayerController | null>
   preferences: RoomPreferences
   onOpenSettings: () => void
-  /** Immersive top-left overlay zone (room identity + sync state). */
+
   topLeft?: ReactNode
-  /**
-   * Immersive top-right overlay zone (participants, invite, room menu).
-   * Render prop so open menus can hold the overlay visible via
-   * `setInteracting`.
-   */
+
   topRight?: (ctx: { setInteracting: (open: boolean) => void }) => ReactNode
-  /** Right-edge affordance that opens the room drawer (immersive only). */
+
   onToggleDrawer?: () => void
   drawerOpen?: boolean
   className?: string
 }
 
-/**
- * The video stage shared by both room views. The media fills the available
- * stage viewport (contain by default, optional fill-and-crop), and every
- * piece of chrome is an auto-hiding overlay inside safe zones — the stage
- * itself stays visually open instead of being boxed into cards.
- */
 export function RoomStage({
   media,
   playback,
@@ -205,7 +195,10 @@ export function RoomStage({
       {showLoadingVideo || buffering ? (
         <div className="pointer-events-none absolute inset-0 grid place-items-center">
           <span
-            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-media-foreground"
+            className={cn(
+              roomOverlayClassName,
+              'inline-flex items-center gap-2 px-3 py-1.5 text-sm',
+            )}
             style={overlayStyle}
           >
             <Loader2 className="size-4 animate-spin motion-reduce:animate-none" />
@@ -230,7 +223,10 @@ export function RoomStage({
             type="button"
             variant="ghost"
             size="icon"
-            className="size-9 text-media-foreground hover:bg-media-control hover:text-media-foreground"
+            className={cn(
+              roomOverlayClassName,
+              'size-9 text-media-foreground hover:bg-media-control hover:text-media-foreground',
+            )}
             style={overlayStyle}
             aria-label={drawerOpen ? 'Close room panel' : 'Open room panel'}
             aria-expanded={drawerOpen}

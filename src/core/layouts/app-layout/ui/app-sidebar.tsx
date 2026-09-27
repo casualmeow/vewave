@@ -133,6 +133,7 @@ export function AppSidebar({
 
   const sidebarShell = (
     <Sidebar
+      motion="none"
       collapsed={collapsed}
       hidden={mode === 'hidden'}
       data-app-sidebar-mode={mode}
@@ -149,7 +150,7 @@ export function AppSidebar({
       )}
     >
       <FluidGlassGroup
-        environment={{ type: 'theme', pattern: 'calm' }}
+        environment={{ type: 'auto-dom' }}
         quality="auto"
         activation="appearance"
         className="flex min-h-0 flex-1 flex-col rounded-[inherit]"

@@ -37,6 +37,9 @@ export function SidebarSurfaceEffects({
   }
 
   return (
-    <span className="pointer-events-none absolute inset-x-4 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--glass-highlight),transparent)] opacity-70" />
+    <span
+      data-sidebar-glass="specular"
+      className="pointer-events-none absolute inset-x-4 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--glass-highlight),transparent)] opacity-70"
+    />
   )
 }

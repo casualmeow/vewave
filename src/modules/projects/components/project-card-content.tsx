@@ -1,6 +1,7 @@
 import { Clock3, PlayCircle, UsersRound, Video } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { RoomWorkspaceItem, RoomsDashboardSurfaceRenderer } from '../types'
+import { GlassSurface } from '@/shared/ui'
 
 function wrapSurface(
   renderSurface: RoomsDashboardSurfaceRenderer | undefined,
@@ -124,31 +125,40 @@ export function RoomMedia({
 
       <div className="relative z-10 flex h-full flex-col justify-between p-4">
         <div className="flex items-start justify-between gap-2">
-          <span className="min-w-0 truncate rounded-full bg-card/72 px-3 py-1 text-xs font-semibold text-foreground shadow-sm backdrop-blur">
-            {getRoomStatusLabel(item)}
-          </span>
-          <span className="shrink-0 rounded-full bg-background/72 px-2.5 py-1 text-[0.68rem] font-semibold text-foreground shadow-sm backdrop-blur">
-            {item.videos > 0
-              ? `${item.videos} video link${item.videos === 1 ? '' : 's'}`
-              : 'No video link'}
-          </span>
+          <GlassSurface asChild role="media" thickness="thin" elevation="embedded">
+            <span className="min-w-0 truncate rounded-full px-3 py-1 text-xs font-semibold">
+              {getRoomStatusLabel(item)}
+            </span>
+          </GlassSurface>
+          <GlassSurface asChild role="media" thickness="thin" elevation="embedded">
+            <span className="shrink-0 rounded-full px-2.5 py-1 text-[0.68rem] font-semibold">
+              {item.videos > 0
+                ? `${item.videos} video link${item.videos === 1 ? '' : 's'}`
+                : 'No video link'}
+            </span>
+          </GlassSurface>
         </div>
 
         <div className="grid place-items-center">
-          <div className="grid size-14 place-items-center rounded-full border border-background/40 bg-background/62 text-foreground shadow-[0_18px_42px_color-mix(in_srgb,var(--foreground)_18%,transparent),inset_0_1px_0_color-mix(in_srgb,var(--background)_80%,transparent)] backdrop-blur-xl">
+          <GlassSurface
+            role="media"
+            thickness="thin"
+            elevation="embedded"
+            className="grid size-14 place-items-center rounded-full"
+            aria-hidden="true"
+          >
             <PlayCircle className="size-7" />
-          </div>
+          </GlassSurface>
         </div>
 
-        <div className="rounded-lg border border-background/35 bg-background/58 p-3 text-foreground shadow-sm backdrop-blur">
-          <div className="flex items-center justify-between gap-3 text-[0.68rem] font-semibold uppercase tracking-[0.14em]">
-            <span className="truncate">Room {item.roomCode}</span>
-            <span className="shrink-0">Room</span>
-          </div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-foreground/12">
-            <span className="block h-full w-2/3 rounded-full bg-primary" />
-          </div>
-        </div>
+        <GlassSurface
+          role="media"
+          thickness="thin"
+          elevation="embedded"
+          className="rounded-lg px-3 py-2"
+        >
+          <span className="block truncate text-xs font-medium">Room {item.roomCode}</span>
+        </GlassSurface>
       </div>
     </div>,
   )
@@ -175,7 +185,7 @@ export function RoomExpandedContent({
           const Icon = stat.icon
 
           return (
-            <div key={stat.label} className="rounded-lg border border-border bg-card p-4">
+            <div key={stat.label} className="border-t border-border/60 pt-4">
               <Icon className="size-4 text-muted-foreground" />
               <div className="mt-3 text-lg font-semibold text-foreground">{stat.value}</div>
               <div className="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">

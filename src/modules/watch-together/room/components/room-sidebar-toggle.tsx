@@ -1,4 +1,5 @@
 import { PanelLeft, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { roomOverlayClassName } from './room-chrome'
 import type { CSSProperties } from 'react'
 import { useAppShellStore } from '@/core/layouts/app-layout/app-shell-store'
 import {
@@ -20,10 +21,6 @@ const sidebarModeLabels: Record<AppSidebarMode, string> = {
   hidden: 'Show sidebar',
 }
 
-/**
- * The app sidebar toggle re-homed into the room UI — the shell header is
- * hidden on room routes, so this is the only sidebar control there.
- */
 export function RoomSidebarToggle({
   variant = 'default',
   style,
@@ -42,6 +39,7 @@ export function RoomSidebarToggle({
       size="icon"
       className={cn(
         'size-9 shrink-0',
+        variant === 'media' && roomOverlayClassName,
         variant === 'media'
           ? 'text-media-foreground hover:bg-media-control hover:text-media-foreground'
           : 'text-muted-foreground',

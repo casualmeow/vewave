@@ -27,6 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  GlassSurface,
 } from '@/shared/ui'
 
 export type RoomsDashboardViewProps = {
@@ -138,34 +139,36 @@ function EmptyRoomsState({
 
       {wrapSurface(
         'roomList',
-        <section className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-          <div className="flex flex-col gap-4 border-b border-border/70 p-6 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                Recent rooms
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Rooms you start or open will appear here.
-              </p>
-            </div>
-            <StartRoomDialog />
-          </div>
-
-          <div className="grid min-h-[22rem] place-items-center px-6 py-12 text-center">
-            <div className="max-w-sm">
-              <div className="mx-auto grid size-12 place-items-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
-                <Radio className="size-5" />
+        <GlassSurface asChild role="form" elevation="embedded">
+          <section className="overflow-hidden rounded-xl border">
+            <div className="flex flex-col gap-4 border-b border-border/70 p-6 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                  Recent rooms
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Rooms you start or open will appear here.
+                </p>
               </div>
-              <h3 className="mt-5 text-xl font-semibold tracking-tight text-foreground">
-                You do not have any rooms yet.
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Start a room from a video link. After it opens, it will appear here as a recent
-                room.
-              </p>
+              <StartRoomDialog />
             </div>
-          </div>
-        </section>,
+
+            <div className="grid min-h-[22rem] place-items-center px-6 py-12 text-center">
+              <div className="max-w-sm">
+                <div className="mx-auto grid size-12 place-items-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
+                  <Radio className="size-5" />
+                </div>
+                <h3 className="mt-5 text-xl font-semibold tracking-tight text-foreground">
+                  You do not have any rooms yet.
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Start a room from a video link. After it opens, it will appear here as a recent
+                  room.
+                </p>
+              </div>
+            </div>
+          </section>
+        </GlassSurface>,
       )}
     </>
   )
@@ -218,7 +221,6 @@ function RoomsListState({
             variant="ghost"
             size="default"
             actionVariant="default"
-            className="rounded-lg border border-border bg-card p-4"
             listClassName="mx-0 max-w-none gap-4 md:grid-cols-2 xl:grid-cols-3"
             compactSize={{
               width: '100%',
@@ -275,38 +277,40 @@ function ContinueWatchingCard({
   room: RoomWorkspaceItem
 }) {
   return (
-    <section className="rounded-lg border border-border bg-card p-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-4">
-          <div className="grid size-11 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
-            <PlayCircle className="size-5" />
+    <GlassSurface asChild role="form" elevation="embedded">
+      <section className="rounded-xl border p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-4">
+            <div className="grid size-11 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
+              <PlayCircle className="size-5" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Continue watching</p>
+              <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
+                {room.title}
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Room {room.roomCode} · {room.members} viewer{room.members === 1 ? '' : 's'} ·{' '}
+                {room.videos > 0
+                  ? `${room.videos} video link${room.videos === 1 ? '' : 's'}`
+                  : 'video link pending'}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-semibold text-foreground">Continue watching</p>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
-              {room.title}
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Room {room.roomCode} · {room.members} viewer{room.members === 1 ? '' : 's'} ·{' '}
-              {room.videos > 0
-                ? `${room.videos} video link${room.videos === 1 ? '' : 's'}`
-                : 'video link pending'}
-            </p>
-          </div>
-        </div>
-        {navigation === 'live' ? (
-          <Button asChild className="w-fit rounded-md">
-            <Link to="/room/$code" params={{ code: room.roomCode }}>
+          {navigation === 'live' ? (
+            <Button asChild className="w-fit rounded-md">
+              <Link to="/room/$code" params={{ code: room.roomCode }}>
+                Open room
+              </Link>
+            </Button>
+          ) : (
+            <Button type="button" className="w-fit rounded-md">
               Open room
-            </Link>
-          </Button>
-        ) : (
-          <Button type="button" className="w-fit rounded-md">
-            Open room
-          </Button>
-        )}
-      </div>
-    </section>
+            </Button>
+          )}
+        </div>
+      </section>
+    </GlassSurface>
   )
 }
 

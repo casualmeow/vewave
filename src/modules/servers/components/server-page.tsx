@@ -3,7 +3,7 @@ import { ArrowLeft, Radio, Server, UsersRound } from 'lucide-react'
 import { type ReactNode } from 'react'
 
 import { useGetApiServersByServerId } from '@/core/api/generated/servers/servers'
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui'
+import { Button, CardDescription, CardHeader, CardTitle, GlassSurface } from '@/shared/ui'
 
 type ServerPageProps = {
   serverId: string
@@ -17,12 +17,12 @@ export function ServerPage({ serverId }: ServerPageProps) {
     return (
       <div className="px-6 py-8 md:px-10">
         <div className="grid w-full max-w-3xl gap-5">
-          <Card className="rounded-lg border-border bg-card">
+          <ServerPanel>
             <CardHeader>
               <CardTitle>Loading server</CardTitle>
-              <CardDescription>Fetching the server from the backend.</CardDescription>
+              <CardDescription>Getting your server ready.</CardDescription>
             </CardHeader>
-          </Card>
+          </ServerPanel>
         </div>
       </div>
     )
@@ -38,7 +38,7 @@ export function ServerPage({ serverId }: ServerPageProps) {
               Back to rooms
             </Link>
           </Button>
-          <Card className="rounded-lg border-border bg-card">
+          <ServerPanel>
             <CardHeader>
               <div className="grid size-11 place-items-center rounded-lg bg-muted text-foreground">
                 <Server className="size-5" />
@@ -48,7 +48,7 @@ export function ServerPage({ serverId }: ServerPageProps) {
                 Create a server from the sidebar or join one from Community to open it here.
               </CardDescription>
             </CardHeader>
-          </Card>
+          </ServerPanel>
         </div>
       </div>
     )
@@ -93,25 +93,14 @@ export function ServerPage({ serverId }: ServerPageProps) {
           />
         </section>
 
-        <Card className="overflow-hidden rounded-lg border-border bg-card">
-          <div
-            className={`h-2 bg-gradient-to-r ${getServerAccent(server.visibility)}`}
-            aria-hidden
-          />
+        <ServerPanel>
           <CardHeader>
-            <CardTitle>Server workspace</CardTitle>
+            <CardTitle>Watch with your server</CardTitle>
             <CardDescription>
-              This server is stored on the backend. Rooms can be attached here once server-room
-              membership is added to the room creation contract.
+              Start a room from Rooms, then share its invite link with the people in your server.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="rounded-lg border border-border bg-muted/35 p-4 text-sm leading-6 text-muted-foreground">
-              Use Rooms to create synchronized watch sessions. Server-linked room creation is the
-              next contract layer to add.
-            </div>
-          </CardContent>
-        </Card>
+        </ServerPanel>
       </div>
     </div>
   )
@@ -127,7 +116,7 @@ function ServerMetricCard({
   value: ReactNode
 }) {
   return (
-    <Card className="rounded-lg border-border bg-card">
+    <ServerPanel>
       <CardHeader>
         <div className="grid size-10 place-items-center rounded-lg bg-primary/10 text-primary">
           {icon}
@@ -135,7 +124,7 @@ function ServerMetricCard({
         <CardDescription>{label}</CardDescription>
         <CardTitle className="text-2xl">{value}</CardTitle>
       </CardHeader>
-    </Card>
+    </ServerPanel>
   )
 }
 
@@ -146,9 +135,10 @@ function formatVisibility(value: string) {
   return 'Private'
 }
 
-function getServerAccent(visibility: string) {
-  if (visibility === 'community') return 'from-primary/45 via-accent/25 to-secondary'
-  if (visibility === 'invite') return 'from-accent/35 via-secondary to-muted'
-
-  return 'from-muted via-secondary to-primary/20'
+function ServerPanel({ children }: { children: ReactNode }) {
+  return (
+    <GlassSurface role="form" elevation="embedded" className="rounded-xl border py-6">
+      {children}
+    </GlassSurface>
+  )
 }

@@ -183,6 +183,7 @@ export function SidebarItem({
   const sharedProps = {
     'data-slot': 'sidebar-item',
     'data-active': active ? 'true' : 'false',
+    'data-sidebar-hover': showLiquidEffects ? undefined : '',
     'aria-current': active ? ('page' as const) : undefined,
     'aria-disabled': disabled || undefined,
     className: cn(sidebarItemVariants({ design, size, collapsed }), className),
@@ -208,6 +209,8 @@ export function SidebarItem({
       id={`${scopeId}-${itemKey}`}
       scopeId={`sidebar:${scopeId}`}
       active={active}
+      disabled={disabled}
+      behaviors={showLiquidEffects ? undefined : ['selection']}
       shape="rounded-rect"
       radius="inherit"
       asChild
@@ -216,7 +219,7 @@ export function SidebarItem({
         data-slot="sidebar-item-shell"
         data-focused={effectiveFocusedItemKey === interactionKey ? 'true' : 'false'}
         data-deemphasized={hasFocusedSibling ? 'true' : 'false'}
-        className="group/sidebar-item-shell relative isolate [--item-pointer-glow:0] [--item-pointer-x:50%] [--item-pointer-y:50%]"
+        className="group/sidebar-item-shell relative isolate rounded-[1.18rem] [--item-pointer-glow:0] [--item-pointer-x:50%] [--item-pointer-y:50%]"
         style={itemStyle}
         animate={
           canAnimate
@@ -285,7 +288,7 @@ export function SidebarItem({
             <motion.span
               key="fluid-field"
               aria-hidden="true"
-              className="pointer-events-none absolute overflow-hidden rounded-[1.7rem] border border-[color:var(--glass-border)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--glass-highlight)_48%,transparent),var(--glass-background)_45%,color-mix(in_srgb,var(--accent)_24%,transparent))] shadow-[0_20px_52px_color-mix(in_srgb,var(--foreground)_16%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-2xl"
+              className="pointer-events-none absolute overflow-hidden rounded-[1.7rem] border border-[color:var(--glass-border)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--glass-highlight)_48%,transparent),var(--glass-background)_45%,color-mix(in_srgb,var(--accent)_24%,transparent))] shadow-[0_20px_52px_color-mix(in_srgb,var(--material-shadow-color)_16%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-2xl"
               style={{ filter: `url(#${filterIds.refraction})` }}
               initial={{ opacity: 0, scale: 0.82, top: 0, right: 0, bottom: 0, left: 0 }}
               animate={{
@@ -410,7 +413,7 @@ export function SidebarItemLabel({ ref, className, ...props }: SidebarItemPartPr
       ref={ref}
       className={cn(
         'relative z-10 min-w-0 flex-1 truncate text-left',
-        collapsed && 'sr-only',
+        collapsed && 'hidden',
         className,
       )}
       {...props}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { useAuthBootstrap } from '../hooks'
 import { useAuthStore } from '../model'
 import { getAppearanceSettingsFromAppConfig, useAppearance } from '@/shared/theme'
@@ -20,26 +20,13 @@ export function AuthBootstrap({ children }: AuthBootstrapProps) {
 
 function AuthAppearanceSync() {
   const user = useAuthStore((state) => state.user)
-  const { setAppearanceSettings } = useAppearance()
-  const syncedUserIdRef = useRef<string | null>(null)
+  const status = useAuthStore((state) => state.status)
+  const { bindAppearanceAccount } = useAppearance()
 
   useEffect(() => {
-    if (!user) {
-      syncedUserIdRef.current = null
-      return
-    }
-
-    if (syncedUserIdRef.current === user.id) {
-      return
-    }
-
-    const appearance = getAppearanceSettingsFromAppConfig(user.appConfig)
-    syncedUserIdRef.current = user.id
-
-    if (appearance) {
-      setAppearanceSettings(appearance)
-    }
-  }, [setAppearanceSettings, user])
+    if (status !== 'authenticated' && status !== 'anonymous') return
+    bindAppearanceAccount(user?.id ?? null, getAppearanceSettingsFromAppConfig(user?.appConfig))
+  }, [bindAppearanceAccount, status, user])
 
   return null
 }

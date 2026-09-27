@@ -5,11 +5,11 @@ import { toast } from 'sonner'
 import type { GetApiRoomsByCode200 } from '@/core/api/generated/model'
 import { apiUrl } from '@/shared/config/env'
 import { cn } from '@/shared/lib/utils'
-import { Button, glassSurfaceVariants } from '@/shared/ui'
+import { Button, GlassSurface } from '@/shared/ui'
 
 type RoomInviteProps = {
   snapshot: GetApiRoomsByCode200
-  /** 'media' renders the trigger as stage overlay chrome. */
+
   variant?: 'default' | 'media'
   onOpenChange?: (open: boolean) => void
 }
@@ -27,10 +27,6 @@ function XIcon({ className }: { className?: string }) {
   )
 }
 
-/**
- * The single invite/share action for a room. One popover gathers the copy
- * link, contact shortcuts, the join QR, and the current access rules.
- */
 export function RoomInvite({ snapshot, variant = 'default', onOpenChange }: RoomInviteProps) {
   const [copied, setCopied] = useState(false)
   const code = snapshot.room.code
@@ -100,67 +96,66 @@ export function RoomInvite({ snapshot, variant = 'default', onOpenChange }: Room
         </Button>
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
-        <PopoverPrimitive.Content
-          align="end"
-          sideOffset={8}
-          className={cn(
-            glassSurfaceVariants({ role: 'menu', thickness: 'thin' }),
-            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 z-50 w-80 origin-(--radix-popover-content-transform-origin) rounded-md border p-4 text-popover-foreground',
-          )}
-        >
-          <div className="flex flex-col gap-3">
-            <div>
-              <p className="text-sm font-medium">Invite to {title}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                Anyone with the link joins as a viewer
-                {snapshot.room.visibility === 'private' ? ' of this private room' : ''}.
-              </p>
-            </div>
+        <GlassSurface asChild role="menu" thickness="thin" elevation="floating" presence="popover">
+          <PopoverPrimitive.Content
+            align="end"
+            sideOffset={8}
+            className="z-50 w-80 rounded-xl border p-4 text-popover-foreground"
+          >
+            <div className="flex flex-col gap-3">
+              <div>
+                <p className="text-sm font-medium">Invite to {title}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Anyone with the link joins as a viewer
+                  {snapshot.room.visibility === 'private' ? ' of this private room' : ''}.
+                </p>
+              </div>
 
-            <div className="flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-              <span className="min-w-0 flex-1 truncate">{roomUrl}</span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="size-7 shrink-0"
-                onClick={() => void copyLink()}
-              >
-                {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-                <span className="sr-only">Copy link</span>
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-5 gap-1">
-              {networks.map((network) => (
-                <a
-                  key={network.name}
-                  href={network.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex flex-col items-center gap-1.5 rounded-md p-2 text-xs text-muted-foreground transition-colors hover:bg-accent motion-reduce:transition-none"
+              <div className="flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+                <span className="min-w-0 flex-1 truncate">{roomUrl}</span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-7 shrink-0"
+                  onClick={() => void copyLink()}
                 >
-                  <network.icon className={cn('size-5', network.className)} />
-                  {network.name}
-                </a>
-              ))}
-            </div>
+                  {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+                  <span className="sr-only">Copy link</span>
+                </Button>
+              </div>
 
-            <div className="flex items-center gap-3 rounded-md bg-muted/30 p-3">
-              <img
-                src={qrCodeUrl}
-                alt={`QR code for room ${code}`}
-                className="size-20 shrink-0 rounded-md bg-white p-1"
-                width={80}
-                height={80}
-              />
-              <p className="text-xs text-muted-foreground">
-                Scan to join on another device. Room code{' '}
-                <span className="font-mono text-foreground">{code}</span>.
-              </p>
+              <div className="grid grid-cols-5 gap-1">
+                {networks.map((network) => (
+                  <a
+                    key={network.name}
+                    href={network.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex flex-col items-center gap-1.5 rounded-md p-2 text-xs text-muted-foreground transition-colors hover:bg-accent motion-reduce:transition-none"
+                  >
+                    <network.icon className={cn('size-5', network.className)} />
+                    {network.name}
+                  </a>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-3 rounded-md bg-muted/30 p-3">
+                <img
+                  src={qrCodeUrl}
+                  alt={`QR code for room ${code}`}
+                  className="size-20 shrink-0 rounded-md bg-white p-1"
+                  width={80}
+                  height={80}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Scan to join on another device. Room code{' '}
+                  <span className="font-mono text-foreground">{code}</span>.
+                </p>
+              </div>
             </div>
-          </div>
-        </PopoverPrimitive.Content>
+          </PopoverPrimitive.Content>
+        </GlassSurface>
       </PopoverPrimitive.Portal>
     </PopoverPrimitive.Root>
   )

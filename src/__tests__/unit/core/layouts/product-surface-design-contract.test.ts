@@ -1,10 +1,3 @@
-/**
- * Spelling-based design-contract tests — see navigation-design-contract.test.ts
- * for the full maintenance contract. These assert on raw source strings, so
- * refactors near imported files will break assertions: update the spelling to
- * match, do not auto-rewrite the test. Convert to render tests only if a
- * single assertion has broken 3+ times for non-substantive reasons.
- */
 import { describe, expect, it } from 'vitest'
 
 import landingIndexPageSource from '@/modules/landing/landing-index-page.tsx?raw'
@@ -57,7 +50,8 @@ describe('product surface design contract', () => {
     expect(appLayoutSource).not.toContain("inRoom ? 'gap-0 p-0'")
     expect(appLayoutSource).toContain('{inRoom ? null : (')
     expect(appLayoutSource).toContain("inRoom ? 'p-0'")
-    expect(appLayoutSource).toContain("'rounded-[2rem] border border-[color:var(--glass-border)]'")
+    expect(appLayoutSource).toContain("'rounded-[2rem] border'")
+    expect(appLayoutSource).toContain('<GlassSurface')
     expect(roomPageSource).not.toContain('h-full min-h-0 overflow-hidden rounded-[2rem]')
     expect(roomPageSource).toContain('rounded-[2rem] focus-visible:ring-inset')
   })

@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react'
+import { motion } from 'motion/react'
 import { useId, useState } from 'react'
 import { SIDEBAR_FLUID_TRANSITION } from '../constants'
 import { useFinePointer, useMobileDockPhysics, useResolvedFluidConfig } from '../hooks'
@@ -15,6 +15,9 @@ import type {
   SidebarMobileDockPlacement,
 } from '../types'
 import { cn } from '@/shared/lib/utils'
+import { FluidGlassGroup } from '@/components/fluid-glass'
+import { useGlassMotion } from '@/shared/hooks'
+import { GlassSurface } from '@/shared/ui/glass-surface'
 
 export type MobileSidebarDockItem = {
   id?: string
@@ -81,10 +84,10 @@ export function MobileSidebarDock({
   maxItems = 5,
   placement = 'container',
 }: MobileSidebarDockProps) {
-  const prefersReducedMotion = useReducedMotion()
+  const glassMotion = useGlassMotion()
   const finePointer = useFinePointer()
-  const canAnimate = !prefersReducedMotion
   const expressiveDock = fluidPreset === 'expressive' || fluidPreset === 'extreme'
+  const canAnimate = expressiveDock && glassMotion !== 'off'
   const showLiquidEffects = expressiveDock && canAnimate
   const canTrackPointer = showLiquidEffects && finePointer
   const scopeId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
@@ -118,6 +121,67 @@ export function MobileSidebarDock({
     onPointerLeave: () => setFocusedItemKey(null),
   })
 
+  const dockItems = (
+    <div
+      className="relative z-10 grid grid-cols-[repeat(var(--mobile-dock-count),minmax(0,1fr))] gap-1.5"
+      style={{ '--mobile-dock-count': visibleItems.length } as CSSProperties}
+    >
+      {visibleItems.map((item) => {
+        const itemKey = getMobileDockItemKey(item)
+
+        return (
+          <MobileSidebarDockButton
+            key={itemKey}
+            item={item}
+            itemKey={itemKey}
+            active={isActivePath(pathname, item)}
+            scopeId={scopeId}
+            filterId={gooFilterId}
+            refractionId={refractionId}
+            config={config}
+            canAnimate={canAnimate}
+            sharedLens={!expressiveDock}
+            showLiquidEffects={showLiquidEffects}
+            canTrackPointer={Boolean(canTrackPointer)}
+            effectiveFocusedItemKey={effectiveFocusedItemKey}
+            setFocusedItemKey={setFocusedItemKey}
+          />
+        )
+      })}
+    </div>
+  )
+
+  const pane = (
+    <motion.div
+      className={cn(
+        'pointer-events-auto relative mx-auto max-w-[27rem] overflow-visible rounded-[1.85rem] border p-2 [--mobile-dock-glow-opacity:0.24] [--mobile-dock-pointer-x:50%] [--mobile-dock-pointer-y:50%] [--mobile-dock-sheen-x:22%] [--mobile-dock-sheen-y:12%]',
+        expressiveDock
+          ? 'border-[color:var(--glass-border)] bg-[var(--glass-background)] shadow-[0_16px_42px_color-mix(in_srgb,var(--material-shadow-color)_18%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-xl'
+          : '',
+      )}
+      style={{ ...fluidTransformStyle }}
+      drag={showLiquidEffects ? toMotionDragMode(dockDragMode) : false}
+      dragConstraints={{ left: -18, right: 18, top: -10, bottom: 10 }}
+      dragElastic={0.32}
+      dragMomentum={false}
+      dragSnapToOrigin
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
+    >
+      {showLiquidEffects ? (
+        <MobileDockLiquidEffects gooFilterId={gooFilterId} refractionId={refractionId} />
+      ) : null}
+
+      {expressiveDock ? (
+        dockItems
+      ) : (
+        <FluidGlassGroup environment={{ type: 'auto-dom' }} className="fluid-glass-navigation">
+          {dockItems}
+        </FluidGlassGroup>
+      )}
+    </motion.div>
+  )
+
   return (
     <motion.div
       aria-label={ariaLabel}
@@ -134,48 +198,13 @@ export function MobileSidebarDock({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={SIDEBAR_FLUID_TRANSITION}
     >
-      <motion.div
-        className="pointer-events-auto relative mx-auto max-w-[27rem] overflow-visible rounded-[1.85rem] border border-[color:var(--glass-border)] bg-[var(--glass-background)] p-2 shadow-[0_16px_42px_color-mix(in_srgb,var(--foreground)_18%,transparent),inset_0_1px_0_var(--glass-highlight)] backdrop-blur-xl [--mobile-dock-glow-opacity:0.24] [--mobile-dock-pointer-x:50%] [--mobile-dock-pointer-y:50%] [--mobile-dock-sheen-x:22%] [--mobile-dock-sheen-y:12%]"
-        style={{ ...fluidTransformStyle }}
-        drag={showLiquidEffects ? toMotionDragMode(dockDragMode) : false}
-        dragConstraints={{ left: -18, right: 18, top: -10, bottom: 10 }}
-        dragElastic={0.32}
-        dragMomentum={false}
-        dragSnapToOrigin
-        onPointerMove={handlePointerMove}
-        onPointerLeave={handlePointerLeave}
-      >
-        {showLiquidEffects ? (
-          <MobileDockLiquidEffects gooFilterId={gooFilterId} refractionId={refractionId} />
-        ) : null}
-
-        <div
-          className="relative z-10 grid grid-cols-[repeat(var(--mobile-dock-count),minmax(0,1fr))] gap-1.5"
-          style={{ '--mobile-dock-count': visibleItems.length } as CSSProperties}
-        >
-          {visibleItems.map((item) => {
-            const itemKey = getMobileDockItemKey(item)
-
-            return (
-              <MobileSidebarDockButton
-                key={itemKey}
-                item={item}
-                itemKey={itemKey}
-                active={isActivePath(pathname, item)}
-                scopeId={scopeId}
-                filterId={gooFilterId}
-                refractionId={refractionId}
-                config={config}
-                canAnimate={canAnimate}
-                showLiquidEffects={showLiquidEffects}
-                canTrackPointer={Boolean(canTrackPointer)}
-                effectiveFocusedItemKey={effectiveFocusedItemKey}
-                setFocusedItemKey={setFocusedItemKey}
-              />
-            )
-          })}
-        </div>
-      </motion.div>
+      {expressiveDock ? (
+        pane
+      ) : (
+        <GlassSurface asChild role="navigation" elevation="floating">
+          {pane}
+        </GlassSurface>
+      )}
     </motion.div>
   )
 }

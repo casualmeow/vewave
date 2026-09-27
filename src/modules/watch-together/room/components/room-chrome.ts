@@ -1,24 +1,27 @@
 import type { CSSProperties } from 'react'
 import type { RoomConnectionStatus, RoomOverlayPreferences } from '../model'
 import type { GetApiRoomsByCode200Playback } from '@/core/api/generated/model'
+import { glassSurfaceVariants } from '@/shared/ui'
 
-/**
- * Inline style for chrome placed over media, driven by the bounded
- * per-user overlay preferences. Glass is reserved for surfaces above the
- * video stage; regular page surfaces stay on the normal token system.
- */
+export const roomOverlayClassName = glassSurfaceVariants({
+  role: 'media',
+  thickness: 'thin',
+  elevation: 'embedded',
+})
+
 export function getRoomOverlayStyle(overlay: RoomOverlayPreferences): CSSProperties {
   const blurPx = Math.round((overlay.blur / 100) * 20)
   const outlineAlpha = (overlay.outline / 100) * 0.35
 
   return {
-    backgroundColor: `color-mix(in srgb, var(--media-background) ${overlay.opacity}%, transparent)`,
-    backdropFilter: blurPx > 0 ? `blur(${blurPx}px)` : undefined,
-    WebkitBackdropFilter: blurPx > 0 ? `blur(${blurPx}px)` : undefined,
+    '--glass-media-opacity': `${overlay.opacity}%`,
+    '--glass-media-filter': blurPx > 0 ? `blur(${blurPx}px)` : 'none',
     boxShadow:
-      outlineAlpha > 0 ? `inset 0 0 0 1px rgba(255, 255, 255, ${outlineAlpha})` : undefined,
+      outlineAlpha > 0
+        ? `inset 0 0 0 1px color-mix(in srgb, var(--media-foreground) ${Math.round(overlay.outline * 35) / 100}%, transparent)`
+        : 'none',
     borderRadius: overlay.cornerRadius,
-  }
+  } as CSSProperties
 }
 
 export type RoomSyncTone = 'positive' | 'caution' | 'critical' | 'neutral'
@@ -34,7 +37,7 @@ const syncDriftToleranceMs = 2500
 type SyncStatusInput = {
   connectionStatus: RoomConnectionStatus
   playback: GetApiRoomsByCode200Playback | null
-  /** Difference between the local player position and the expected synced position. */
+
   driftMs?: number | null
 }
 
