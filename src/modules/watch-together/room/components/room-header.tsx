@@ -1,6 +1,7 @@
 import {
   Copy,
   ExternalLink,
+  HelpCircle,
   LayoutPanelLeft,
   MonitorPlay,
   MoreVertical,
@@ -55,6 +56,7 @@ export function RoomMenu({
   viewMode,
   onViewModeChange,
   onOpenSettings,
+  onOpenGuide,
   variant = 'default',
   onOpenChange,
 }: {
@@ -62,6 +64,7 @@ export function RoomMenu({
   viewMode: RoomViewMode
   onViewModeChange: (mode: RoomViewMode) => void
   onOpenSettings: () => void
+  onOpenGuide?: () => void
   variant?: RoomChromeVariant
   onOpenChange?: (open: boolean) => void
 }) {
@@ -107,6 +110,12 @@ export function RoomMenu({
           Room settings…
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        {onOpenGuide && (
+          <DropdownMenuItem onClick={onOpenGuide}>
+            <HelpCircle className="size-4" />
+            Room guide
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={() => void copyCode()}>
           <Copy className="size-4" />
           Copy room code
@@ -129,6 +138,7 @@ type RoomHeaderProps = {
   onViewModeChange: (mode: RoomViewMode) => void
   onOpenSettings: () => void
   onOpenPeople: () => void
+  onOpenGuide?: () => void
 }
 
 export function RoomHeader({
@@ -138,11 +148,24 @@ export function RoomHeader({
   onViewModeChange,
   onOpenSettings,
   onOpenPeople,
+  onOpenGuide,
 }: RoomHeaderProps) {
   return (
     <header className="flex h-12 shrink-0 items-center justify-between gap-3 px-1">
       <RoomSidebarToggle />
       <div className="flex shrink-0 items-center gap-1.5">
+        {onOpenGuide && (
+          <Button
+            data-room-guide-help
+            variant="ghost"
+            size="sm"
+            className="hidden sm:inline-flex"
+            onClick={onOpenGuide}
+          >
+            <HelpCircle className="size-4" />
+            Help
+          </Button>
+        )}
         <RoomParticipantsButton count={participantCount} onClick={onOpenPeople} />
         <RoomInvite snapshot={snapshot} />
         <RoomMenu
@@ -150,6 +173,7 @@ export function RoomHeader({
           viewMode={viewMode}
           onViewModeChange={onViewModeChange}
           onOpenSettings={onOpenSettings}
+          onOpenGuide={onOpenGuide}
         />
       </div>
     </header>

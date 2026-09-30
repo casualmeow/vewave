@@ -1,15 +1,8 @@
-import { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { createRoomSchema, getCreateRoomVideoLinks, type CreateRoomFields } from '../schema'
-import type { PostApiMediaParseUrl200, PostApiRooms200 } from '@/core/api/generated/model'
-import { usePostApiMediaParseUrl } from '@/core/api/generated/media/media'
-import { usePostApiRooms } from '@/core/api/generated/rooms/rooms'
-import { getApiErrorMessage } from '@/core/api/http/errors'
-import { useAuthStore } from '@/modules/auth'
-import { rememberCreatedRoom } from '@/modules/watch-together/room'
+import { useCreateRoom } from '../hooks/use-create-room'
+import { createRoomSchema, type CreateRoomFields } from '../schema'
+import type { PostApiRooms200 } from '@/core/api/generated/model'
 import {
   Button,
   CardContent,
@@ -33,100 +26,37 @@ type CreateRoomFormProps = {
 }
 
 export function CreateRoomForm({ onCreated, variant = 'card' }: CreateRoomFormProps) {
-  const navigate = useNavigate()
+  const creation = useCreateRoom({ onCreated })
   const compact = variant === 'compact'
-  const userId = useAuthStore((state) => state.user?.id ?? null)
-  const [parsedMedia, setParsedMedia] = useState<Array<PostApiMediaParseUrl200>>([])
-  const [validatedUrl, setValidatedUrl] = useState<string | null>(null)
-  const parseMutation = usePostApiMediaParseUrl()
-  const createMutation = usePostApiRooms()
   const form = useForm<CreateRoomFields>({
     resolver: zodResolver(createRoomSchema),
-    defaultValues: {
-      url: '',
-      title: '',
-    },
+    defaultValues: { url: '', title: '' },
   })
-
-  function resetParsedMedia() {
-    setParsedMedia([])
-    setValidatedUrl(null)
-  }
+  const checking = creation.draft.videos.some((video) => video.status === 'loading')
 
   async function validateVideoLink() {
-    const valid = await form.trigger('url')
-
+    if (!(await form.trigger('url'))) return false
+    const value = form.getValues('url')
+    const valid = await creation.queue.replaceAll(value)
+    if (form.getValues('url') !== value) return false
     if (!valid) {
-      resetParsedMedia()
-      return false
-    }
-
-    const videoLinks = getCreateRoomVideoLinks(form.getValues('url'))
-    const validationKey = videoLinks.join('\n')
-
-    if (parsedMedia.length === videoLinks.length && validatedUrl === validationKey) {
-      return true
-    }
-
-    try {
-      const mediaItems: Array<PostApiMediaParseUrl200> = []
-
-      for (const url of videoLinks) {
-        mediaItems.push(await parseMutation.mutateAsync({ data: { url } }))
-      }
-
-      if (getCreateRoomVideoLinks(form.getValues('url')).join('\n') !== validationKey) {
-        return false
-      }
-
-      setParsedMedia(mediaItems)
-      setValidatedUrl(validationKey)
-      form.clearErrors('url')
-
-      return true
-    } catch (error) {
-      resetParsedMedia()
       form.setError('url', {
-        message: getApiErrorMessage(error, 'Unsupported link.'),
+        message:
+          creation.queue.getSnapshot().videos.find((video) => video.error)?.error ??
+          'Check the video links.',
       })
-
-      return false
+    } else {
+      form.clearErrors('url')
     }
+    return valid
   }
 
   async function onSubmit(values: CreateRoomFields) {
-    const linkIsSupported = await validateVideoLink()
-
-    if (!linkIsSupported) {
-      return
-    }
-
-    try {
-      const videoLinks = getCreateRoomVideoLinks(values.url)
-      const response = await createMutation.mutateAsync({
-        data: {
-          url: videoLinks[0],
-          urls: videoLinks,
-          title: values.title?.trim() || 'Untitled room',
-        },
-      })
-      rememberCreatedRoom(response, userId)
-      toast.success('Room created')
-      onCreated?.(response)
-      await navigate({
-        to: '/room/$code',
-        params: {
-          code: response.room.code,
-        },
-      })
-    } catch (error) {
-      form.setError('root', {
-        message: getApiErrorMessage(error, 'Unable to create and open the room.'),
-      })
-    }
+    if (creation.phase === 'created' || (await validateVideoLink()))
+      await creation.submit(values.title ?? '')
   }
 
-  const formContent = (
+  const content = (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className={compact ? 'space-y-4' : 'space-y-6'}>
         <FormField
@@ -134,13 +64,12 @@ export function CreateRoomForm({ onCreated, variant = 'card' }: CreateRoomFormPr
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Room name</FormLabel>
+              <FormLabel>
+                Room name <span className="font-normal text-muted-foreground">(optional)</span>
+              </FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Friday movie night" />
+                <Input {...field} readOnly={creation.locked} placeholder="Friday movie night" />
               </FormControl>
-              {compact ? null : (
-                <FormDescription>This name will be shown to invited viewers.</FormDescription>
-              )}
               <FormMessage />
             </FormItem>
           )}
@@ -150,115 +79,69 @@ export function CreateRoomForm({ onCreated, variant = 'card' }: CreateRoomFormPr
           name="url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Video link</FormLabel>
+              <FormLabel>Video links</FormLabel>
               <FormControl>
                 <textarea
                   {...field}
-                  className="border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive min-h-24 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs outline-none transition-[color,box-shadow] focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-                  placeholder="https://youtube.com/watch?v=...\nhttps://youtu.be/..."
+                  readOnly={creation.locked}
+                  className="border-input placeholder:text-muted-foreground focus-visible:ring-ring/50 min-h-24 w-full rounded-md border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2"
+                  placeholder={'https://youtube.com/watch?v=...\nhttps://youtu.be/...'}
                   rows={compact ? 2 : 3}
-                  onBlur={(event) => {
+                  onBlur={() => {
                     field.onBlur()
-
-                    if (event.currentTarget.value.trim()) {
-                      void validateVideoLink()
-                    }
+                    if (field.value.trim() && !creation.locked) void validateVideoLink()
                   }}
                   onChange={(event) => {
                     field.onChange(event)
-                    resetParsedMedia()
+                    creation.queue.reset()
                   }}
                 />
               </FormControl>
-              <VideoLinkDescription isValidating={parseMutation.isPending} media={parsedMedia} />
+              <FormDescription>
+                {checking
+                  ? 'Checking links…'
+                  : 'Add up to 20 videos, one link per line. YouTube plays in the room. Vimeo and TikTok open on their own sites.'}
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        {form.formState.errors.root ? (
-          <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>
-        ) : null}
-        <div className="grid gap-2">
-          <Button
-            type="submit"
-            className={compact ? 'w-full' : 'w-full sm:w-fit'}
-            disabled={
-              form.formState.isSubmitting || parseMutation.isPending || createMutation.isPending
-            }
-          >
-            {parseMutation.isPending
-              ? 'Validating link…'
-              : createMutation.isPending
-                ? 'Creating room…'
+        {creation.error && (
+          <p role="alert" className="text-sm text-destructive">
+            {creation.error}
+          </p>
+        )}
+        <Button
+          type="submit"
+          className={compact ? 'w-full' : 'w-full sm:w-fit'}
+          disabled={form.formState.isSubmitting || creation.isPending || checking}
+        >
+          {creation.phase === 'creating'
+            ? 'Creating room…'
+            : creation.phase === 'opening'
+              ? 'Opening room…'
+              : creation.phase === 'created'
+                ? 'Open your room'
                 : 'Create and open room'}
-          </Button>
-          {compact ? null : (
-            <p className="text-xs leading-5 text-muted-foreground">
-              After creation, the room opens with the video source, invite link, and synced playback
-              controls.
-            </p>
-          )}
-        </div>
+        </Button>
       </form>
     </Form>
   )
 
-  if (variant === 'plain' || variant === 'compact') {
-    return formContent
-  }
-
-  if (variant === 'firstRun') {
-    return (
-      <GlassSurface role="form" elevation="embedded" className="w-full rounded-xl border py-6">
-        <CardContent className="pt-6">{formContent}</CardContent>
-      </GlassSurface>
-    )
-  }
-
+  if (variant === 'plain' || compact) return content
   return (
     <GlassSurface
       role="form"
       elevation="embedded"
-      className="flex w-full max-w-3xl flex-col gap-6 rounded-xl border py-6"
+      className="flex w-full max-w-3xl flex-col gap-6 rounded-xl py-6"
     >
-      <CardHeader>
-        <CardTitle>Room details</CardTitle>
-        <CardDescription>Add a room name and video link.</CardDescription>
-      </CardHeader>
-      <CardContent>{formContent}</CardContent>
+      {variant !== 'firstRun' && (
+        <CardHeader>
+          <CardTitle>Start a room</CardTitle>
+          <CardDescription>Add something to watch, then invite your friends.</CardDescription>
+        </CardHeader>
+      )}
+      <CardContent>{content}</CardContent>
     </GlassSurface>
   )
-}
-
-type VideoLinkDescriptionProps = {
-  isValidating: boolean
-  media: Array<PostApiMediaParseUrl200>
-}
-
-function VideoLinkDescription({ isValidating, media }: VideoLinkDescriptionProps) {
-  if (isValidating) {
-    return <FormDescription>Validating link…</FormDescription>
-  }
-
-  if (media.length > 1) {
-    return (
-      <FormDescription>
-        {media.length} videos found. They will be saved as a room playlist.
-      </FormDescription>
-    )
-  }
-
-  if (media[0]) {
-    return <FormDescription>Video found: {getProviderLabel(media[0].provider)}</FormDescription>
-  }
-
-  return (
-    <FormDescription>
-      YouTube, Vimeo, and TikTok links are supported. Paste one link per line for a playlist.
-    </FormDescription>
-  )
-}
-
-function getProviderLabel(provider: string) {
-  return `${provider.slice(0, 1).toUpperCase()}${provider.slice(1)}`
 }

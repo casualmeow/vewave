@@ -45,6 +45,15 @@ import type {
   PatchApiProfileMePasswordBodyOne,
   PatchApiProfileMePasswordBodyThree,
   PatchApiProfileMePasswordBodyTwo,
+  PatchApiProfileMeRoomGuide200,
+  PatchApiProfileMeRoomGuide400,
+  PatchApiProfileMeRoomGuide401,
+  PatchApiProfileMeRoomGuide404,
+  PatchApiProfileMeRoomGuide409,
+  PatchApiProfileMeRoomGuide500,
+  PatchApiProfileMeRoomGuideBodyOne,
+  PatchApiProfileMeRoomGuideBodyThree,
+  PatchApiProfileMeRoomGuideBodyTwo,
   PostApiProfileMeAvatar200,
   PostApiProfileMeAvatar400,
   PostApiProfileMeAvatar401,
@@ -215,10 +224,9 @@ export function useGetApiProfileMe<
 }
 
 export const patchApiProfileMe = (
-  patchApiProfileMeBody:
-    | BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>
-    | PatchApiProfileMeBodyTwo
-    | PatchApiProfileMeBodyThree,
+  patchApiProfileMeBody: BodyType<
+    PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree
+  >,
   options?: SecondParameter<typeof orvalMutator>,
   signal?: AbortSignal,
 ) => {
@@ -227,6 +235,8 @@ export const patchApiProfileMe = (
     options,
   )
 }
+
+export const getPatchApiProfileMeMutationKey = () => ['patchApiProfileMe'] as const
 
 export const getPatchApiProfileMeMutationOptions = <
   TError = ErrorType<
@@ -241,23 +251,17 @@ export const getPatchApiProfileMeMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof patchApiProfileMe>>,
     TError,
-    {
-      data: BodyType<
-        PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree
-      >
-    },
+    PatchApiProfileMeMutationVariables,
     TContext
   >
   request?: SecondParameter<typeof orvalMutator>
 }): UseMutationOptions<
   Awaited<ReturnType<typeof patchApiProfileMe>>,
   TError,
-  {
-    data: BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>
-  },
+  PatchApiProfileMeMutationVariables,
   TContext
 > => {
-  const mutationKey = ['patchApiProfileMe']
+  const mutationKey = getPatchApiProfileMeMutationKey()
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
       ? options
@@ -266,11 +270,7 @@ export const getPatchApiProfileMeMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof patchApiProfileMe>>,
-    {
-      data: BodyType<
-        PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree
-      >
-    }
+    PatchApiProfileMeMutationVariables
   > = (props) => {
     const { data } = props ?? {}
 
@@ -293,6 +293,9 @@ export type PatchApiProfileMeMutationError = ErrorType<
   | PatchApiProfileMe409
   | PatchApiProfileMe500
 >
+export type PatchApiProfileMeMutationVariables = {
+  data: BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>
+}
 
 export const usePatchApiProfileMe = <
   TError = ErrorType<
@@ -308,11 +311,7 @@ export const usePatchApiProfileMe = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof patchApiProfileMe>>,
       TError,
-      {
-        data: BodyType<
-          PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree
-        >
-      },
+      PatchApiProfileMeMutationVariables,
       TContext
     >
     request?: SecondParameter<typeof orvalMutator>
@@ -321,22 +320,131 @@ export const usePatchApiProfileMe = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof patchApiProfileMe>>,
   TError,
-  {
-    data: BodyType<PatchApiProfileMeBodyOne | PatchApiProfileMeBodyTwo | PatchApiProfileMeBodyThree>
-  },
+  PatchApiProfileMeMutationVariables,
   TContext
 > => {
   return useMutation(getPatchApiProfileMeMutationOptions(options), queryClient)
 }
+export const patchApiProfileMeRoomGuide = (
+  patchApiProfileMeRoomGuideBody: BodyType<
+    | PatchApiProfileMeRoomGuideBodyOne
+    | PatchApiProfileMeRoomGuideBodyTwo
+    | PatchApiProfileMeRoomGuideBodyThree
+  >,
+  options?: SecondParameter<typeof orvalMutator>,
+  signal?: AbortSignal,
+) => {
+  return orvalMutator<PatchApiProfileMeRoomGuide200>(
+    {
+      url: `/api/profile/me/room-guide`,
+      method: 'PATCH',
+      data: patchApiProfileMeRoomGuideBody,
+      signal,
+    },
+    options,
+  )
+}
+
+export const getPatchApiProfileMeRoomGuideMutationKey = () =>
+  ['patchApiProfileMeRoomGuide'] as const
+
+export const getPatchApiProfileMeRoomGuideMutationOptions = <
+  TError = ErrorType<
+    | PatchApiProfileMeRoomGuide400
+    | PatchApiProfileMeRoomGuide401
+    | PatchApiProfileMeRoomGuide404
+    | PatchApiProfileMeRoomGuide409
+    | PatchApiProfileMeRoomGuide500
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof patchApiProfileMeRoomGuide>>,
+    TError,
+    PatchApiProfileMeRoomGuideMutationVariables,
+    TContext
+  >
+  request?: SecondParameter<typeof orvalMutator>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof patchApiProfileMeRoomGuide>>,
+  TError,
+  PatchApiProfileMeRoomGuideMutationVariables,
+  TContext
+> => {
+  const mutationKey = getPatchApiProfileMeRoomGuideMutationKey()
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof patchApiProfileMeRoomGuide>>,
+    PatchApiProfileMeRoomGuideMutationVariables
+  > = (props) => {
+    const { data } = props ?? {}
+
+    return patchApiProfileMeRoomGuide(data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type PatchApiProfileMeRoomGuideMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchApiProfileMeRoomGuide>>
+>
+export type PatchApiProfileMeRoomGuideMutationBody = BodyType<
+  | PatchApiProfileMeRoomGuideBodyOne
+  | PatchApiProfileMeRoomGuideBodyTwo
+  | PatchApiProfileMeRoomGuideBodyThree
+>
+export type PatchApiProfileMeRoomGuideMutationError = ErrorType<
+  | PatchApiProfileMeRoomGuide400
+  | PatchApiProfileMeRoomGuide401
+  | PatchApiProfileMeRoomGuide404
+  | PatchApiProfileMeRoomGuide409
+  | PatchApiProfileMeRoomGuide500
+>
+export type PatchApiProfileMeRoomGuideMutationVariables = {
+  data: BodyType<
+    | PatchApiProfileMeRoomGuideBodyOne
+    | PatchApiProfileMeRoomGuideBodyTwo
+    | PatchApiProfileMeRoomGuideBodyThree
+  >
+}
+
+export const usePatchApiProfileMeRoomGuide = <
+  TError = ErrorType<
+    | PatchApiProfileMeRoomGuide400
+    | PatchApiProfileMeRoomGuide401
+    | PatchApiProfileMeRoomGuide404
+    | PatchApiProfileMeRoomGuide409
+    | PatchApiProfileMeRoomGuide500
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof patchApiProfileMeRoomGuide>>,
+      TError,
+      PatchApiProfileMeRoomGuideMutationVariables,
+      TContext
+    >
+    request?: SecondParameter<typeof orvalMutator>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof patchApiProfileMeRoomGuide>>,
+  TError,
+  PatchApiProfileMeRoomGuideMutationVariables,
+  TContext
+> => {
+  return useMutation(getPatchApiProfileMeRoomGuideMutationOptions(options), queryClient)
+}
 export const postApiProfileMeAvatar = (
-  postApiProfileMeAvatarBody:
-    | BodyType<
-        | PostApiProfileMeAvatarBodyOne
-        | PostApiProfileMeAvatarBodyTwo
-        | PostApiProfileMeAvatarBodyThree
-      >
-    | PostApiProfileMeAvatarBodyTwo
-    | PostApiProfileMeAvatarBodyThree,
+  postApiProfileMeAvatarBody: BodyType<
+    PostApiProfileMeAvatarBodyOne | PostApiProfileMeAvatarBodyTwo | PostApiProfileMeAvatarBodyThree
+  >,
   options?: SecondParameter<typeof orvalMutator>,
   signal?: AbortSignal,
 ) => {
@@ -345,6 +453,8 @@ export const postApiProfileMeAvatar = (
     options,
   )
 }
+
+export const getPostApiProfileMeAvatarMutationKey = () => ['postApiProfileMeAvatar'] as const
 
 export const getPostApiProfileMeAvatarMutationOptions = <
   TError = ErrorType<
@@ -359,29 +469,17 @@ export const getPostApiProfileMeAvatarMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
     TError,
-    {
-      data: BodyType<
-        | PostApiProfileMeAvatarBodyOne
-        | PostApiProfileMeAvatarBodyTwo
-        | PostApiProfileMeAvatarBodyThree
-      >
-    },
+    PostApiProfileMeAvatarMutationVariables,
     TContext
   >
   request?: SecondParameter<typeof orvalMutator>
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
   TError,
-  {
-    data: BodyType<
-      | PostApiProfileMeAvatarBodyOne
-      | PostApiProfileMeAvatarBodyTwo
-      | PostApiProfileMeAvatarBodyThree
-    >
-  },
+  PostApiProfileMeAvatarMutationVariables,
   TContext
 > => {
-  const mutationKey = ['postApiProfileMeAvatar']
+  const mutationKey = getPostApiProfileMeAvatarMutationKey()
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
       ? options
@@ -390,13 +488,7 @@ export const getPostApiProfileMeAvatarMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
-    {
-      data: BodyType<
-        | PostApiProfileMeAvatarBodyOne
-        | PostApiProfileMeAvatarBodyTwo
-        | PostApiProfileMeAvatarBodyThree
-      >
-    }
+    PostApiProfileMeAvatarMutationVariables
   > = (props) => {
     const { data } = props ?? {}
 
@@ -419,6 +511,11 @@ export type PostApiProfileMeAvatarMutationError = ErrorType<
   | PostApiProfileMeAvatar409
   | PostApiProfileMeAvatar500
 >
+export type PostApiProfileMeAvatarMutationVariables = {
+  data: BodyType<
+    PostApiProfileMeAvatarBodyOne | PostApiProfileMeAvatarBodyTwo | PostApiProfileMeAvatarBodyThree
+  >
+}
 
 export const usePostApiProfileMeAvatar = <
   TError = ErrorType<
@@ -434,13 +531,7 @@ export const usePostApiProfileMeAvatar = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
       TError,
-      {
-        data: BodyType<
-          | PostApiProfileMeAvatarBodyOne
-          | PostApiProfileMeAvatarBodyTwo
-          | PostApiProfileMeAvatarBodyThree
-        >
-      },
+      PostApiProfileMeAvatarMutationVariables,
       TContext
     >
     request?: SecondParameter<typeof orvalMutator>
@@ -449,26 +540,17 @@ export const usePostApiProfileMeAvatar = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiProfileMeAvatar>>,
   TError,
-  {
-    data: BodyType<
-      | PostApiProfileMeAvatarBodyOne
-      | PostApiProfileMeAvatarBodyTwo
-      | PostApiProfileMeAvatarBodyThree
-    >
-  },
+  PostApiProfileMeAvatarMutationVariables,
   TContext
 > => {
   return useMutation(getPostApiProfileMeAvatarMutationOptions(options), queryClient)
 }
 export const patchApiProfileMePassword = (
-  patchApiProfileMePasswordBody:
-    | BodyType<
-        | PatchApiProfileMePasswordBodyOne
-        | PatchApiProfileMePasswordBodyTwo
-        | PatchApiProfileMePasswordBodyThree
-      >
+  patchApiProfileMePasswordBody: BodyType<
+    | PatchApiProfileMePasswordBodyOne
     | PatchApiProfileMePasswordBodyTwo
-    | PatchApiProfileMePasswordBodyThree,
+    | PatchApiProfileMePasswordBodyThree
+  >,
   options?: SecondParameter<typeof orvalMutator>,
   signal?: AbortSignal,
 ) => {
@@ -483,6 +565,8 @@ export const patchApiProfileMePassword = (
   )
 }
 
+export const getPatchApiProfileMePasswordMutationKey = () => ['patchApiProfileMePassword'] as const
+
 export const getPatchApiProfileMePasswordMutationOptions = <
   TError = ErrorType<
     | PatchApiProfileMePassword400
@@ -496,29 +580,17 @@ export const getPatchApiProfileMePasswordMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof patchApiProfileMePassword>>,
     TError,
-    {
-      data: BodyType<
-        | PatchApiProfileMePasswordBodyOne
-        | PatchApiProfileMePasswordBodyTwo
-        | PatchApiProfileMePasswordBodyThree
-      >
-    },
+    PatchApiProfileMePasswordMutationVariables,
     TContext
   >
   request?: SecondParameter<typeof orvalMutator>
 }): UseMutationOptions<
   Awaited<ReturnType<typeof patchApiProfileMePassword>>,
   TError,
-  {
-    data: BodyType<
-      | PatchApiProfileMePasswordBodyOne
-      | PatchApiProfileMePasswordBodyTwo
-      | PatchApiProfileMePasswordBodyThree
-    >
-  },
+  PatchApiProfileMePasswordMutationVariables,
   TContext
 > => {
-  const mutationKey = ['patchApiProfileMePassword']
+  const mutationKey = getPatchApiProfileMePasswordMutationKey()
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
       ? options
@@ -527,13 +599,7 @@ export const getPatchApiProfileMePasswordMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof patchApiProfileMePassword>>,
-    {
-      data: BodyType<
-        | PatchApiProfileMePasswordBodyOne
-        | PatchApiProfileMePasswordBodyTwo
-        | PatchApiProfileMePasswordBodyThree
-      >
-    }
+    PatchApiProfileMePasswordMutationVariables
   > = (props) => {
     const { data } = props ?? {}
 
@@ -558,6 +624,13 @@ export type PatchApiProfileMePasswordMutationError = ErrorType<
   | PatchApiProfileMePassword409
   | PatchApiProfileMePassword500
 >
+export type PatchApiProfileMePasswordMutationVariables = {
+  data: BodyType<
+    | PatchApiProfileMePasswordBodyOne
+    | PatchApiProfileMePasswordBodyTwo
+    | PatchApiProfileMePasswordBodyThree
+  >
+}
 
 export const usePatchApiProfileMePassword = <
   TError = ErrorType<
@@ -573,13 +646,7 @@ export const usePatchApiProfileMePassword = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof patchApiProfileMePassword>>,
       TError,
-      {
-        data: BodyType<
-          | PatchApiProfileMePasswordBodyOne
-          | PatchApiProfileMePasswordBodyTwo
-          | PatchApiProfileMePasswordBodyThree
-        >
-      },
+      PatchApiProfileMePasswordMutationVariables,
       TContext
     >
     request?: SecondParameter<typeof orvalMutator>
@@ -588,13 +655,7 @@ export const usePatchApiProfileMePassword = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof patchApiProfileMePassword>>,
   TError,
-  {
-    data: BodyType<
-      | PatchApiProfileMePasswordBodyOne
-      | PatchApiProfileMePasswordBodyTwo
-      | PatchApiProfileMePasswordBodyThree
-    >
-  },
+  PatchApiProfileMePasswordMutationVariables,
   TContext
 > => {
   return useMutation(getPatchApiProfileMePasswordMutationOptions(options), queryClient)

@@ -39,3 +39,5 @@ Use the server realtime integration tests and focused client room tests. Do not 
 Services use shared `AppError` codes; route schemas document response shapes. Preserve the error envelope so transport and feature error states remain predictable.
 
 Account configuration can contain unrelated keys. Appearance updates must preserve those keys rather than replacing the entire object. See [Appearance preferences](appearance.md).
+
+The `roomGuide` configuration key is server-managed: ordinary profile writes cannot overwrite it. Save its outcome through `PATCH /api/profile/me/room-guide`, which updates that key atomically. New accounts receive pending eligibility; existing accounts without the key remain manual-only. See [Room creation and first-room guidance](room-creation.md).

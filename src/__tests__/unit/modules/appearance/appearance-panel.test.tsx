@@ -158,39 +158,13 @@ describe('color studio', () => {
     await act(() => Promise.resolve())
   })
 
-  it('applies White Glass to the live draft and saves it only through Save changes', async () => {
+  it('keeps Pearl available as a palette and leaves the White Glass action in Settings', () => {
     setup()
-    const previous = sanitizeAppearanceSettings({
-      ...saved,
-      mode: 'dark',
-      glassMotion: 'subtle',
-      glassIntensity: 'strong',
-      logoStrategy: 'dark',
-      background: { ...saved.background, preset: 'silk', brightness: 0.2 },
-      customTheme: { enabled: true, overrides: { light: { background: '#DDEEFF' } } },
-    })
-    act(() => appearance.setAppearanceSettings(previous))
-    fireEvent.click(screen.getByRole('button', { name: 'Apply White Glass' }))
-    const expected = {
-      ...previous,
-      mode: 'light',
-      preset: 'pearl',
-      surfaceStyle: 'glass',
-      customTheme: { ...previous.customTheme, enabled: false },
-    }
-    expect(appearance.settings).toEqual(expected)
-    expect(screen.getByRole('button', { name: 'Pearl' }).getAttribute('aria-pressed')).toBe('true')
-    expect(screen.getByRole('status').textContent).toBe('Unsaved changes')
-    expect(screen.getByRole<HTMLInputElement>('textbox', { name: 'Canvas hex value' }).value).toBe(
-      '#F4F5F6',
-    )
-    expect(saveRequest).not.toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
-    await waitFor(() => expect(screen.getByRole('status').textContent).toBe('All changes saved'))
-    expect(saveRequest).toHaveBeenCalledTimes(1)
-    expect(saveRequest.mock.calls[0][0]).toMatchObject({
-      data: { appConfig: { appearance: expected, unrelated: { keep: true } } },
-    })
+    expect(screen.queryByRole('button', { name: 'Apply White Glass' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Pearl' }))
+    expect(appearance.settings.preset).toBe('pearl')
+    expect(appearance.settings.surfaceStyle).toBe(saved.surfaceStyle)
+    expect(appearance.settings.mode).toBe(saved.mode)
   })
 
   it('keeps invalid input visible, blocks saving it, and lets Escape restore the active color', async () => {

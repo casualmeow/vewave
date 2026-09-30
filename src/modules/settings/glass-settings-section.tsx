@@ -1,10 +1,13 @@
 import { SegmentedControl, SettingRow } from './settings-primitives'
+import { WhiteGlassLook } from '@/modules/appearance/components/white-glass-look'
 import { useAppearance } from '@/shared/theme'
 
 export function GlassSettingsSection() {
-  const { settings, setSurfaceStyle, setGlassIntensity, setGlassMotion } = useAppearance()
+  const { settings, setSurfaceStyle, setGlassIntensity, setGlassMotion, setAppearanceSettings } =
+    useAppearance()
   return (
     <div className="space-y-7">
+      <WhiteGlassLook settings={settings} onApply={setAppearanceSettings} />
       <SettingRow
         title="Surface style"
         searchId="surface"

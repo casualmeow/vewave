@@ -3,21 +3,13 @@ import { ArrowUpRight, Check } from 'lucide-react'
 import { useId } from 'react'
 
 import { SegmentedControl, SettingRow, SettingsGroup } from './settings-primitives'
-import { WhiteGlassLook } from '@/modules/appearance/components/white-glass-look'
 import { resolvedAppearanceModes, themePresets, useAppearance } from '@/shared/theme'
 import { Button, Checkbox, DialogClose, Label } from '@/shared/ui'
 import { cn } from '@/shared/lib/utils'
 
 export function AppearanceSettingsSection() {
   const id = useId()
-  const {
-    resolvedMode,
-    setAppearanceSettings,
-    setCustomThemeEnabled,
-    setMode,
-    setPreset,
-    settings,
-  } = useAppearance()
+  const { resolvedMode, setCustomThemeEnabled, setMode, setPreset, settings } = useAppearance()
   const overrideCount = resolvedAppearanceModes.reduce(
     (total, mode) => total + Object.keys(settings.customTheme.overrides[mode] ?? {}).length,
     0,
@@ -25,7 +17,6 @@ export function AppearanceSettingsSection() {
 
   return (
     <div className="space-y-8">
-      <WhiteGlassLook settings={settings} onApply={setAppearanceSettings} />
       <SettingRow
         title="Display mode"
         searchId="mode"

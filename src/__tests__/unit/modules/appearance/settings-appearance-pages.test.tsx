@@ -211,7 +211,7 @@ describe('appearance settings pages', () => {
     fireEvent.change(screen.getByRole('searchbox', { name: 'Search settings' }), {
       target: { value: 'White Glass' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'White Glass Appearance / Colors' }))
+    fireEvent.click(screen.getByRole('button', { name: 'White Glass Appearance / Glass' }))
     await act(async () => {
       await vi.advanceTimersByTimeAsync(32)
     })
@@ -228,6 +228,9 @@ describe('appearance settings pages', () => {
       customTheme: { ...previous.customTheme, enabled: false },
     })
     expect(apply.disabled).toBe(true)
+    expect(screen.getByRole('tab', { name: 'Glass' }).getAttribute('aria-selected')).toBe('true')
+    page('Colors')
+    expect(screen.queryByRole('button', { name: 'Apply White Glass' })).toBeNull()
     expect(option('Color palette', 'Pearl').getAttribute('aria-pressed')).toBe('true')
     await tickSave()
     expect(patchApiProfileMe).toHaveBeenCalledTimes(1)

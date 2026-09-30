@@ -18,11 +18,6 @@ export const appearanceSettingsSections: ReadonlyArray<SettingsDialogSection> = 
         content: <AppearanceSettingsSection />,
         searchItems: [
           {
-            label: 'White Glass',
-            target: 'white-glass',
-            keywords: 'pearl white light glass look clear fluid',
-          },
-          {
             label: 'Display mode',
             target: 'mode',
             keywords: 'light dark system device interface theme',
@@ -44,6 +39,11 @@ export const appearanceSettingsSections: ReadonlyArray<SettingsDialogSection> = 
         label: 'Glass',
         content: <GlassSettingsSection />,
         searchItems: [
+          {
+            label: 'White Glass',
+            target: 'white-glass',
+            keywords: 'pearl white light glass look clear fluid',
+          },
           {
             label: 'Surface style',
             target: 'surface',

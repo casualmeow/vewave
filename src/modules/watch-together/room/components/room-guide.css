@@ -1,0 +1,5 @@
+[data-room-guide-highlight] {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+  scroll-margin: 1rem;
+}

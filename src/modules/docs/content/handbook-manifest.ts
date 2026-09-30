@@ -11,6 +11,15 @@ export type HandbookEntry = {
 
 export const handbookManifest: ReadonlyArray<HandbookEntry> = [
   {
+    slug: 'room-creation',
+    title: 'Room creation and first-room guidance',
+    description:
+      'Creation drafts, media validation, room handoff, and account-based introductions.',
+    group: 'Architecture and systems',
+    order: 8.5,
+    sourcePath: 'docs/room-creation.md',
+  },
+  {
     slug: 'index',
     title: 'Developer handbook',
     description: 'Find your way around Vewave and make your first change.',

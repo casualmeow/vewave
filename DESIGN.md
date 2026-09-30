@@ -85,10 +85,10 @@ The preset is available in Settings and Theme Studio and uses the same account p
 the other presets. Changing it does not change the user's mode or reset custom overrides.
 
 `Pearl` supplies cool white surfaces with graphite text in Light and neutral dark equivalents.
-The **White Glass** appearance action selects Pearl, Light, and Glass together and disables custom
+The **White Glass** action in Settings → Appearance → Glass selects Pearl, Light, and Glass together and disables custom
 theme overrides without deleting them. Background, intensity, motion, and logo preferences stay
-intact. Settings saves this action through the account appearance flow; Theme Studio applies it
-to the current draft. Selecting the ordinary Pearl color preset only changes the palette.
+intact. Settings saves this action through the account appearance flow. The color studio keeps
+the ordinary Pearl color preset, which only changes the palette.
 
 ## Typography
 

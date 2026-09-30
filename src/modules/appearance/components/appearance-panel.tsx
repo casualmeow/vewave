@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { BackgroundSettingsControls } from './background-settings-controls'
-import { WhiteGlassLook } from './white-glass-look'
 import {
   appearanceModes,
   getAppearanceSettingsFromAppConfig,
@@ -400,14 +399,6 @@ function ColorStudio() {
       </header>
 
       <div className="flex-1 space-y-8 px-5 py-6 sm:px-8">
-        <WhiteGlassLook
-          settings={draft}
-          onApply={(next) => {
-            setColorRevision((revision) => revision + 1)
-            setEditorMode('light')
-            setAppearanceSettings(next)
-          }}
-        />
         <section aria-labelledby={`${id}-presets`} className="space-y-3">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 id={`${id}-presets`} className="text-sm font-medium">

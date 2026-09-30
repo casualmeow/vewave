@@ -83,6 +83,7 @@ export function RoomInvite({ snapshot, variant = 'default', onOpenChange }: Room
     <PopoverPrimitive.Root onOpenChange={onOpenChange}>
       <PopoverPrimitive.Trigger asChild>
         <Button
+          data-room-guide="invite"
           type="button"
           size="sm"
           variant={variant === 'media' ? 'ghost' : 'default'}

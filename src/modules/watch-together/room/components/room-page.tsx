@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { HelpCircle } from 'lucide-react'
 import {
   usePresenceActivity,
   useRoomChatHistory,
@@ -7,6 +8,7 @@ import {
   useRoomSnapshot,
 } from '../hooks'
 import { useRoomPreferences, useRoomStore } from '../model'
+import { useRoomGuide } from '../hooks/use-room-guide'
 import { getRoomOverlayStyle, roomOverlayClassName } from './room-chrome'
 import { RoomDrawer, useIsDesktop } from './room-drawer'
 import { RoomHeader, RoomMenu, RoomParticipantsButton } from './room-header'
@@ -16,7 +18,9 @@ import { RoomSidebarToggle } from './room-sidebar-toggle'
 import { RoomSidePanel, type RoomPanelTab } from './room-side-panel'
 import { RoomStage } from './room-stage'
 import { RoomWorkspace } from './room-workspace'
+import { RoomGuide } from './room-guide'
 import type { EmbeddedPlayerController, EmbeddedPlayerInfo } from '../player'
+import { Button } from '@/shared/ui'
 import { getApiErrorMessage } from '@/core/api/http/errors'
 import { cn } from '@/shared/lib/utils'
 
@@ -56,6 +60,9 @@ export function RoomPage({ code }: RoomPageProps) {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [panelTab, setPanelTab] = useState<RoomPanelTab>('queue')
+  const [guidePanelTab, setGuidePanelTab] = useState<RoomPanelTab>('queue')
+  const guide = useRoomGuide(code, Boolean(snapshot) && !query.isError)
+  const showingGuidePanel = guide.step === 2
 
   if (query.isPending && !snapshot) {
     return (
@@ -104,8 +111,8 @@ export function RoomPage({ code }: RoomPageProps) {
       chatMessages={chatMessages}
       roomHistory={roomHistory}
       presence={presence}
-      tab={panelTab}
-      onTabChange={setPanelTab}
+      tab={showingGuidePanel ? guidePanelTab : panelTab}
+      onTabChange={showingGuidePanel ? setGuidePanelTab : setPanelTab}
     />
   )
 
@@ -121,10 +128,26 @@ export function RoomPage({ code }: RoomPageProps) {
     />
   )
 
+  const guideOverlay = (
+    <RoomGuide
+      step={guide.step}
+      onStepChange={(step) => {
+        if (step === 2) setGuidePanelTab('queue')
+        guide.setStep(step)
+      }}
+      onClose={guide.close}
+      returnFocus={guide.returnFocus}
+      viewMode={preferences.viewMode}
+      canControl={canControl}
+      provider={snapshot.media.provider}
+    />
+  )
+
   if (preferences.viewMode === 'immersive') {
     return (
       <div className="relative flex h-full min-h-0">
         <RoomStage
+          forceControlsVisible={guide.step !== null}
           className="min-h-0 min-w-0 flex-1 rounded-[2rem] focus-visible:ring-inset fullscreen:rounded-none"
           media={snapshot.media}
           playback={activePlayback}
@@ -137,13 +160,23 @@ export function RoomPage({ code }: RoomPageProps) {
           preferences={preferences}
           onOpenSettings={() => setSettingsOpen(true)}
           onToggleDrawer={() => setDrawerOpen((open) => !open)}
-          drawerOpen={drawerOpen}
+          drawerOpen={drawerOpen || showingGuidePanel}
           topLeft={<RoomSidebarToggle variant="media" style={overlayStyle} />}
           topRight={({ setInteracting }) => (
             <div
               className={cn(roomOverlayClassName, 'flex h-9 items-center gap-1 px-1')}
               style={overlayStyle}
             >
+              <Button
+                data-room-guide-help
+                variant="ghost"
+                size="icon"
+                className="hidden size-8 text-media-foreground sm:inline-flex"
+                aria-label="Room guide"
+                onClick={guide.start}
+              >
+                <HelpCircle className="size-4" />
+              </Button>
               <RoomParticipantsButton
                 count={participantCount}
                 variant="media"
@@ -155,6 +188,7 @@ export function RoomPage({ code }: RoomPageProps) {
                 viewMode={preferences.viewMode}
                 onViewModeChange={(viewMode) => updatePreferences({ viewMode })}
                 onOpenSettings={() => setSettingsOpen(true)}
+                onOpenGuide={guide.start}
                 variant="media"
                 onOpenChange={setInteracting}
               />
@@ -162,15 +196,16 @@ export function RoomPage({ code }: RoomPageProps) {
           )}
         />
         <RoomDrawer
-          open={drawerOpen}
+          open={drawerOpen || showingGuidePanel}
           pinned={preferences.drawerPinned}
-          onClose={() => setDrawerOpen(false)}
+          onClose={() => (showingGuidePanel ? guide.close() : setDrawerOpen(false))}
           onTogglePinned={() => updatePreferences({ drawerPinned: !preferences.drawerPinned })}
           isDesktop={isDesktop}
         >
           {sidePanel}
         </RoomDrawer>
         {settingsDialog}
+        {guideOverlay}
       </div>
     )
   }
@@ -184,6 +219,7 @@ export function RoomPage({ code }: RoomPageProps) {
         onViewModeChange={(viewMode) => updatePreferences({ viewMode })}
         onOpenSettings={() => setSettingsOpen(true)}
         onOpenPeople={() => setPanelTab('people')}
+        onOpenGuide={guide.start}
       />
       <div className="min-h-0 flex-1">
         <RoomWorkspace
@@ -191,6 +227,7 @@ export function RoomPage({ code }: RoomPageProps) {
           updatePreferences={updatePreferences}
           stage={
             <RoomStage
+              forceControlsVisible={guide.step !== null}
               media={snapshot.media}
               playback={activePlayback}
               connectionStatus={connectionStatus}
@@ -207,6 +244,7 @@ export function RoomPage({ code }: RoomPageProps) {
         />
       </div>
       {settingsDialog}
+      {guideOverlay}
     </div>
   )
 }

@@ -1,0 +1,34 @@
+.create-room-container {
+  container: room-create / inline-size;
+  height: 100%;
+}
+
+@container room-create (min-width: 64rem) {
+  .create-room-page {
+    height: 100%;
+  }
+
+  .create-room-columns {
+    grid-template-columns: minmax(0, 1fr) minmax(22rem, 25rem);
+    gap: 2rem;
+  }
+
+  .create-room-workbench {
+    overflow-y: auto;
+    padding-right: 0.25rem;
+  }
+
+  .create-room-preview {
+    flex: 1;
+    min-height: min(44svh, 30rem);
+  }
+
+  .create-room-settings {
+    overflow-y: auto;
+  }
+
+  .create-room-actions {
+    position: static;
+    background: transparent;
+  }
+}

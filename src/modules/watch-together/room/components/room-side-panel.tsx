@@ -48,6 +48,7 @@ export function RoomSidePanel({
 }: RoomSidePanelProps) {
   return (
     <Tabs
+      data-room-guide="panel"
       value={tab}
       onValueChange={(value) => onTabChange(value as RoomPanelTab)}
       className={cn('flex h-full min-h-0 flex-col gap-0', className)}

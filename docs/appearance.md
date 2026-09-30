@@ -30,7 +30,7 @@ Adding a preference requires a contract value, defaults, sanitization, token or 
 
 Mono uses the saved preset ID `noir`; Pearl provides the neutral white palette. Display names and persisted identifiers have different compatibility responsibilities.
 
-White Glass selects Pearl, Light, and Glass together. It disables custom overrides without deleting them and preserves background, intensity, motion, and logo preferences.
+White Glass lives under Settings → Appearance → Glass, including its search result. It selects Pearl, Light, and Glass together. It disables custom overrides without deleting them and preserves background, intensity, motion, and logo preferences. The Colors tab and color studio retain the ordinary Pearl palette without the combined-look shortcut.
 
 Background settings contain the selected procedural pattern, palette, custom colors, brightness, animation state, and speed. Preserve them across theme changes. A background is a scene source, not a reason to animate an otherwise reduced-motion interface.
 

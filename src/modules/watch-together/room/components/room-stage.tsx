@@ -34,6 +34,7 @@ type RoomStageProps = {
   onToggleDrawer?: () => void
   drawerOpen?: boolean
   className?: string
+  forceControlsVisible?: boolean
 }
 
 export function RoomStage({
@@ -52,6 +53,7 @@ export function RoomStage({
   onToggleDrawer,
   drawerOpen,
   className,
+  forceControlsVisible,
 }: RoomStageProps) {
   const stageRef = useRef<HTMLDivElement | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -59,6 +61,7 @@ export function RoomStage({
   const { visible, poke, setInteracting } = useOverlayVisibility({
     playing,
     delayMs: preferences.overlay.autoHideDelayMs,
+    forceVisible: forceControlsVisible,
   })
 
   useEffect(() => {
@@ -271,17 +274,17 @@ function UnsupportedSourceState({ media }: { media: GetApiRoomsByCode200Media })
           {media.provider} playback is not supported yet
         </p>
         <p className="mt-2 text-sm text-media-foreground/70">
-          Sync still runs through the room protocol. A provider-specific player adapter can be added
-          without changing room state.
+          Open this video on its own site, or choose a YouTube video from the queue to watch
+          together here.
         </p>
-        {media.embedUrl ? (
+        {media.canonicalUrl ? (
           <a
             className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-media-foreground underline-offset-4 hover:underline"
-            href={media.embedUrl}
+            href={media.canonicalUrl}
             rel="noreferrer"
             target="_blank"
           >
-            Open embed
+            Open source video
             <ExternalLink className="size-4" />
           </a>
         ) : null}
